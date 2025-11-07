@@ -79,6 +79,29 @@
     box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.1), 0 8px 32px rgba(14, 165, 233, 0.25);
   }
 
+  select.liquid-input {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%23cbd5e1' d='M1 1l5 5 5-5'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    padding-right: 40px;
+    background-color: rgba(255, 255, 255, 0.05);
+  }
+
+  select.liquid-input option {
+    background: #1e293b;
+    color: #e2e8f0;
+    padding: 8px;
+  }
+
+  select.liquid-input option:checked {
+    background: linear-gradient(rgba(56, 189, 248, 0.3), rgba(56, 189, 248, 0.3)), #1e293b;
+    color: #38bdf8;
+  }
+
+  select.liquid-input option:hover {
+    background: rgba(56, 189, 248, 0.2);
+  }
+
   .specular-highlight {
     position: relative;
   }
