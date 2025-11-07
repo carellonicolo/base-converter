@@ -13,6 +13,10 @@
   body {
     background: linear-gradient(135deg, #1e293b 0%, #0f172a 50%, #1e293b 100%);
     background-attachment: fixed;
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
   }
 }
 
