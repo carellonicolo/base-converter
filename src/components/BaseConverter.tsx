@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react';
 import { ArrowRight, Copy, Check } from 'lucide-react';
+import useCopyToClipboard from '../hooks/useCopyToClipboard';
+import { isValidForBase } from '../utils/validation';
 
 interface ConversionResult {
   base: number;
@@ -14,7 +16,21 @@ function BaseConverter() {
   const [customBase, setCustomBase] = useState('');
   const [results, setResults] = useState<ConversionResult[]>([]);
   const [error, setError] = useState('');
+  const [copyStatus, copy] = useCopyToClipboard();
   const [copiedIndex, setCopiedIndex] = useState<number | null>(null);
+
+  const handleCopy = (text: string, index: number) => {
+    copy(text);
+    setCopiedIndex(index);
+    setTimeout(() => setCopiedIndex(null), 2000);
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { value } = e.target;
+    if (isValidForBase(value, inputBase)) {
+      setInputValue(value);
+    }
+  };
 
   const commonBases = [
     { base: 2, label: 'Binario', prefix: '0b' },
@@ -67,16 +83,6 @@ function BaseConverter() {
     }
   }, [inputValue, inputBase, customBase]);
 
-  const copyToClipboard = async (text: string, index: number) => {
-    try {
-      await navigator.clipboard.writeText(text);
-      setCopiedIndex(index);
-      setTimeout(() => setCopiedIndex(null), 2000);
-    } catch (err) {
-      console.error('Errore copia:', err);
-    }
-  };
-
   return (
     <div className="space-y-8">
       <div className="grid md:grid-cols-2 gap-6">
@@ -87,7 +93,7 @@ function BaseConverter() {
           <input
             type="text"
             value={inputValue}
-            onChange={(e) => setInputValue(e.target.value)}
+            onChange={handleInputChange}
             placeholder="Inserisci un numero..."
             className="liquid-input w-full text-white placeholder-slate-400"
           />
@@ -152,11 +158,11 @@ function BaseConverter() {
                 <div className="flex items-center justify-between mb-4">
                   <h4 className="text-sm font-bold text-liquid-300 uppercase tracking-wider">{result.label}</h4>
                   <button
-                    onClick={() => copyToClipboard(result.prefix + result.value, index)}
+                    onClick={() => handleCopy(result.prefix + result.value, index)}
                     className="glass-morphism p-2.5 rounded-xl transition-all duration-300 hover:scale-110 hover:bg-white/10"
                     title="Copia"
                   >
-                    {copiedIndex === index ? (
+                    {copiedIndex === index && copyStatus === 'copied' ? (
                       <Check className="w-4 h-4 text-green-400" />
                     ) : (
                       <Copy className="w-4 h-4 text-slate-300 group-hover:text-white transition-colors" />
