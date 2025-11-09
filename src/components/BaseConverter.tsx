@@ -17,6 +17,13 @@ function BaseConverter() {
   const [results, setResults] = useState<ConversionResult[]>([]);
   const [error, setError] = useState('');
   const [copyStatus, copy] = useCopyToClipboard();
+  const [copiedIndex, setCopiedIndex] = useState<number | null>(null);
+
+  const handleCopy = (text: string, index: number) => {
+    copy(text);
+    setCopiedIndex(index);
+    setTimeout(() => setCopiedIndex(null), 2000);
+  };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = e.target;
@@ -151,11 +158,11 @@ function BaseConverter() {
                 <div className="flex items-center justify-between mb-4">
                   <h4 className="text-sm font-bold text-liquid-300 uppercase tracking-wider">{result.label}</h4>
                   <button
-                    onClick={() => copy(result.prefix + result.value)}
+                    onClick={() => handleCopy(result.prefix + result.value, index)}
                     className="glass-morphism p-2.5 rounded-xl transition-all duration-300 hover:scale-110 hover:bg-white/10"
                     title="Copia"
                   >
-                    {copyStatus === 'copied' ? (
+                    {copiedIndex === index && copyStatus === 'copied' ? (
                       <Check className="w-4 h-4 text-green-400" />
                     ) : (
                       <Copy className="w-4 h-4 text-slate-300 group-hover:text-white transition-colors" />
