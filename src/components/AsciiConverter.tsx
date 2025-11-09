@@ -1,56 +1,18 @@
 import { useState } from 'react';
 import { ArrowRightLeft, Copy, Check } from 'lucide-react';
 import AsciiTable from './AsciiTable';
+import useCopyToClipboard from '../hooks/useCopyToClipboard';
+import { textToAscii, asciiToText, textToBinary, textToHex } from '../utils/conversions';
 
 function AsciiConverter() {
   const [textInput, setTextInput] = useState('');
   const [asciiInput, setAsciiInput] = useState('');
+  const [copyStatus, copy] = useCopyToClipboard();
   const [copiedField, setCopiedField] = useState<string | null>(null);
-
-  const textToAscii = (text: string): string => {
-    return text
-      .split('')
-      .map((char) => char.charCodeAt(0))
-      .join(' ');
-  };
-
-  const asciiToText = (ascii: string): string => {
-    try {
-      return ascii
-        .trim()
-        .split(/[\s,]+/)
-        .map((code) => {
-          const num = parseInt(code);
-          return isNaN(num) ? '' : String.fromCharCode(num);
-        })
-        .join('');
-    } catch {
-      return '';
-    }
-  };
-
-  const textToBinary = (text: string): string => {
-    return text
-      .split('')
-      .map((char) => char.charCodeAt(0).toString(2).padStart(8, '0'))
-      .join(' ');
-  };
-
-  const textToHex = (text: string): string => {
-    return text
-      .split('')
-      .map((char) => char.charCodeAt(0).toString(16).toUpperCase().padStart(2, '0'))
-      .join(' ');
-  };
-
-  const copyToClipboard = async (text: string, field: string) => {
-    try {
-      await navigator.clipboard.writeText(text);
-      setCopiedField(field);
-      setTimeout(() => setCopiedField(null), 2000);
-    } catch (err) {
-      console.error('Errore copia:', err);
-    }
+  const handleCopy = (text: string, field: string) => {
+    copy(text);
+    setCopiedField(field);
+    setTimeout(() => setCopiedField(null), 2000);
   };
 
   const asciiResult = textInput ? textToAscii(textInput) : '';
@@ -90,11 +52,11 @@ function AsciiConverter() {
                 <div className="flex items-center justify-between mb-3">
                   <h4 className="text-sm font-bold text-liquid-300 uppercase tracking-wider">ASCII Decimale</h4>
                   <button
-                    onClick={() => copyToClipboard(asciiResult, 'ascii')}
+                    onClick={() => handleCopy(asciiResult, 'ascii')}
                     className="glass-morphism p-2.5 rounded-xl transition-all duration-300 hover:scale-110 hover:bg-white/10"
                     title="Copia"
                   >
-                    {copiedField === 'ascii' ? (
+                    {copiedField === 'ascii' && copyStatus === 'copied' ? (
                       <Check className="w-4 h-4 text-green-400" />
                     ) : (
                       <Copy className="w-4 h-4 text-slate-300 hover:text-white" />
@@ -108,11 +70,11 @@ function AsciiConverter() {
                 <div className="flex items-center justify-between mb-3">
                   <h4 className="text-sm font-bold text-liquid-300 uppercase tracking-wider">Binario</h4>
                   <button
-                    onClick={() => copyToClipboard(binaryResult, 'binary')}
+                    onClick={() => handleCopy(binaryResult, 'binary')}
                     className="glass-morphism p-2.5 rounded-xl transition-all duration-300 hover:scale-110 hover:bg-white/10"
                     title="Copia"
                   >
-                    {copiedField === 'binary' ? (
+                    {copiedField === 'binary' && copyStatus === 'copied' ? (
                       <Check className="w-4 h-4 text-green-400" />
                     ) : (
                       <Copy className="w-4 h-4 text-slate-300 hover:text-white" />
@@ -126,11 +88,11 @@ function AsciiConverter() {
                 <div className="flex items-center justify-between mb-3">
                   <h4 className="text-sm font-bold text-liquid-300 uppercase tracking-wider">Esadecimale</h4>
                   <button
-                    onClick={() => copyToClipboard(hexResult, 'hex')}
+                    onClick={() => handleCopy(hexResult, 'hex')}
                     className="glass-morphism p-2.5 rounded-xl transition-all duration-300 hover:scale-110 hover:bg-white/10"
                     title="Copia"
                   >
-                    {copiedField === 'hex' ? (
+                    {copiedField === 'hex' && copyStatus === 'copied' ? (
                       <Check className="w-4 h-4 text-green-400" />
                     ) : (
                       <Copy className="w-4 h-4 text-slate-300 hover:text-white" />
@@ -162,11 +124,11 @@ function AsciiConverter() {
               <div className="flex items-center justify-between mb-3">
                 <h4 className="text-sm font-bold text-liquid-300 uppercase tracking-wider">Testo Risultante</h4>
                 <button
-                  onClick={() => copyToClipboard(textResult, 'text')}
+                  onClick={() => handleCopy(textResult, 'text')}
                   className="glass-morphism p-2.5 rounded-xl transition-all duration-300 hover:scale-110 hover:bg-white/10"
                   title="Copia"
                 >
-                  {copiedField === 'text' ? (
+                  {copiedField === 'text' && copyStatus === 'copied' ? (
                     <Check className="w-4 h-4 text-green-400" />
                   ) : (
                     <Copy className="w-4 h-4 text-slate-300 hover:text-white" />
