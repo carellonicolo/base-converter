@@ -3,6 +3,7 @@ import { Palette } from 'lucide-react';
 import Input from '../ui/Input';
 import Card from '../ui/Card';
 import CopyButton from '../shared/CopyButton';
+import InfoBox from '../ui/InfoBox';
 import {
   hexToRgb,
   rgbToHex,
@@ -69,19 +70,26 @@ const ColorConverter: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      {/* Info */}
-      <div className="glass-morphism rounded-2xl p-6">
-        <div className="flex items-start gap-3">
-          <Palette className="w-6 h-6 text-liquid-300 flex-shrink-0 mt-1" />
-          <div>
-            <h3 className="text-lg font-bold text-white mb-2">Convertitore di Colori</h3>
-            <p className="text-slate-300 text-sm leading-relaxed">
-              Converti colori tra diversi formati: HEX, RGB, HSL, HSV, e CMYK.
-              Perfetto per web design, grafica digitale, e stampa.
-            </p>
-          </div>
-        </div>
-      </div>
+      {/* Educational Info Box */}
+      <InfoBox
+        title="Convertitore di Colori"
+        description="I colori digitali possono essere rappresentati in diversi modi: HEX per il web, RGB per gli schermi, HSL per design intuitivo, HSV per editor grafici, e CMYK per la stampa. Ogni formato è ottimizzato per uno scopo specifico."
+        icon={<Palette className="w-5 h-5" />}
+        useCases={[
+          "Web Design: CSS usa HEX (#FF0000) e RGB (rgb(255,0,0))",
+          "Grafica digitale: HSL permette di regolare luminosità e saturazione facilmente",
+          "Stampa: CMYK è lo standard per stampanti (Cyan, Magenta, Yellow, blacK)",
+          "Photo editing: HSV/HSB usato in Photoshop e altri editor",
+          "Accessibilità: trovare colori con contrasto sufficiente"
+        ]}
+        examples={[
+          { label: 'Rosso', value: '#FF0000 = RGB(255,0,0) = HSL(0°,100%,50%)' },
+          { label: 'Azzurro', value: '#38BDF8 = RGB(56,189,248)' },
+          { label: 'Grigio', value: 'RGB(128,128,128) = HSL(0°,0%,50%)' }
+        ]}
+        realWorldUse="Quando scegli un colore in Figma o Photoshop, il color picker usa HSV/HSL perché è più intuitivo (ruota dei colori). Ma quando lo usi in CSS, diventa HEX o RGB. Se lo stampi, viene convertito in CMYK automaticamente dalla stampante."
+        type="educational"
+      />
 
       {/* Color preview */}
       <Card className="text-center">

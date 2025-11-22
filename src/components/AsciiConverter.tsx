@@ -1,8 +1,9 @@
 import { useState } from 'react';
-import { ArrowRightLeft, Copy, Check } from 'lucide-react';
+import { ArrowRightLeft, Copy, Check, Type } from 'lucide-react';
 import AsciiTable from './AsciiTable';
 import useCopyToClipboard from '../hooks/useCopyToClipboard';
 import { textToAscii, asciiToText, textToBinary, textToHex } from '../utils/conversions';
+import InfoBox from './ui/InfoBox';
 
 function AsciiConverter() {
   const [textInput, setTextInput] = useState('');
@@ -22,6 +23,27 @@ function AsciiConverter() {
 
   return (
     <div className="space-y-6">
+      {/* Educational Info Box */}
+      <InfoBox
+        title="Convertitore ASCII"
+        description="ASCII (American Standard Code for Information Interchange) è un sistema che assegna un numero univoco a ogni carattere. È alla base di come i computer rappresentano il testo: ogni lettera, numero o simbolo che digiti ha un codice ASCII."
+        icon={<Type className="w-5 h-5" />}
+        useCases={[
+          "Programmazione: capire come i computer memorizzano il testo",
+          "Debugging: identificare caratteri speciali nascosti nel codice",
+          "Comunicazione dati: trasmissione di testo tra sistemi",
+          "Crittografia base: manipolare caratteri a livello numerico",
+          "Analisi file: vedere i dati grezzi dei file di testo"
+        ]}
+        examples={[
+          { label: "'A'", value: 'ASCII 65 (binario: 01000001)' },
+          { label: "'Hello'", value: '72 101 108 108 111' },
+          { label: "'0' (zero)", value: 'ASCII 48 (diverso dal numero 0!)' }
+        ]}
+        realWorldUse="Quando premi il tasto 'A' sulla tastiera, il computer riceve il numero 65. Questo numero viene poi convertito nella lettera 'A' sullo schermo. ASCII è usato in file .txt, codice sorgente, email, e quasi ovunque ci sia testo nei computer."
+        type="educational"
+      />
+
       <AsciiTable />
 
       <div className="flex items-center justify-center py-4">
