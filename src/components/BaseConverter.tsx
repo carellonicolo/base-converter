@@ -27,9 +27,8 @@ function BaseConverter() {
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = e.target;
-    if (isValidForBase(value, inputBase)) {
-      setInputValue(value);
-    }
+    setInputValue(value);
+    setError(''); // Clear error when typing
   };
 
   const commonBases = [
@@ -47,10 +46,34 @@ function BaseConverter() {
     }
 
     try {
-      const cleanValue = inputValue.trim().replace(/^0[bBxXoO]/, '');
-      const decimalValue = parseInt(cleanValue, inputBase);
+      // Remove common prefixes and detect base
+      let cleanValue = inputValue.trim();
+      let detectedBase = inputBase;
 
-      if (isNaN(decimalValue)) {
+      if (cleanValue.startsWith('0x') || cleanValue.startsWith('0X')) {
+        cleanValue = cleanValue.substring(2);
+        detectedBase = 16;
+      } else if (cleanValue.startsWith('0b') || cleanValue.startsWith('0B')) {
+        cleanValue = cleanValue.substring(2);
+        detectedBase = 2;
+      } else if (cleanValue.startsWith('0o') || cleanValue.startsWith('0O')) {
+        cleanValue = cleanValue.substring(2);
+        detectedBase = 8;
+      }
+
+      // Validate for the detected base
+      if (!isValidForBase(cleanValue, detectedBase)) {
+        const maxChar = detectedBase > 10
+          ? (detectedBase - 1).toString(36).toUpperCase()
+          : (detectedBase - 1);
+        setError(`Caratteri non validi per base ${detectedBase}. Usa solo: 0-${maxChar}`);
+        setResults([]);
+        return;
+      }
+
+      const decimalValue = parseInt(cleanValue, detectedBase);
+
+      if (isNaN(decimalValue) || !isFinite(decimalValue)) {
         setError('Valore non valido per la base selezionata');
         setResults([]);
         return;
