@@ -18,6 +18,7 @@ const URLConverter: React.FC = () => {
   const [textInput, setTextInput] = useState('');
   const [urlInput, setURLInput] = useState('');
   const [queryInput, setQueryInput] = useState('');
+  const [error, setError] = useState('');
   const { add } = useHistory();
 
   const debouncedText = useDebounce(textInput, 300);
@@ -25,17 +26,26 @@ const URLConverter: React.FC = () => {
   const debouncedQuery = useDebounce(queryInput, 300);
 
   const encodedURL = debouncedText ? encodeURL(debouncedText) : '';
+
   const decodedURL = React.useMemo(() => {
+    if (!debouncedURL) {
+      setError('');
+      return '';
+    }
     try {
-      return debouncedURL ? decodeURL(debouncedURL) : '';
+      const result = decodeURL(debouncedURL);
+      setError('');
+      return result;
     } catch {
-      return 'URL non valido';
+      setError('');
+      return debouncedURL; // Return as-is if not encoded
     }
   }, [debouncedURL]);
 
   const queryParams = React.useMemo(() => {
+    if (!debouncedQuery) return null;
     try {
-      return debouncedQuery ? parseQueryString(debouncedQuery) : null;
+      return parseQueryString(debouncedQuery);
     } catch {
       return null;
     }
@@ -44,7 +54,7 @@ const URLConverter: React.FC = () => {
   const slugified = debouncedText ? slugify(debouncedText) : '';
 
   React.useEffect(() => {
-    if (encodedURL) {
+    if (encodedURL && debouncedText) {
       add('url', debouncedText, { encoded: encodedURL, slugified });
     }
   }, [encodedURL, debouncedText, slugified, add]);

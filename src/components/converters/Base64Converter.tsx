@@ -19,7 +19,10 @@ const Base64Converter: React.FC = () => {
 
   // Encode text to Base64
   const encodedResult = React.useMemo(() => {
-    if (!debouncedText) return '';
+    if (!debouncedText) {
+      setError('');
+      return '';
+    }
     try {
       const result = encodeBase64(debouncedText);
       setError('');
@@ -33,14 +36,22 @@ const Base64Converter: React.FC = () => {
 
   // Decode Base64 to text
   const decodedResult = React.useMemo(() => {
-    if (!debouncedBase64) return '';
+    if (!debouncedBase64) {
+      setError('');
+      return '';
+    }
+    // Skip validation for very short input (user is still typing)
+    if (debouncedBase64.length < 4) {
+      setError('');
+      return '';
+    }
     try {
       const result = decodeBase64(debouncedBase64);
       setError('');
       add('base64', debouncedBase64, result);
       return result;
     } catch (err) {
-      setError('Base64 non valido');
+      setError('Base64 non valido. Verifica che la stringa sia corretta.');
       return '';
     }
   }, [debouncedBase64, add]);
