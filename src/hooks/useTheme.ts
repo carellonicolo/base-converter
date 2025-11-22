@@ -49,7 +49,32 @@ export function useTheme() {
 
     // Apply background gradient
     document.body.style.background = theme.colors.backgroundGradient;
-  }, [theme]);
+
+    // Apply accessibility settings
+    const fontSize = {
+      small: '14px',
+      medium: '16px',
+      large: '18px',
+    }[settings.accessibility.fontSize];
+    root.style.setProperty('--base-font-size', fontSize);
+    root.style.fontSize = fontSize;
+
+    // High contrast mode
+    if (settings.accessibility.highContrast) {
+      root.classList.add('high-contrast');
+      root.style.setProperty('--glass-opacity', '0.15');
+      root.style.setProperty('--glass-border-opacity', '0.5');
+    } else {
+      root.classList.remove('high-contrast');
+    }
+
+    // Reduced motion
+    if (settings.accessibility.reducedMotion) {
+      root.classList.add('reduced-motion');
+    } else {
+      root.classList.remove('reduced-motion');
+    }
+  }, [theme, settings.accessibility]);
 
   // Listen for system theme changes when in auto mode
   useEffect(() => {

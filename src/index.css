@@ -291,4 +291,40 @@
     outline: 2px solid #38bdf8;
     outline-offset: 4px;
   }
+
+  /* High contrast mode - applied via Settings */
+  .high-contrast .glass-morphism {
+    border: 2px solid rgba(255, 255, 255, 0.5) !important;
+    background: rgba(255, 255, 255, 0.1) !important;
+  }
+
+  .high-contrast .text-slate-300,
+  .high-contrast .text-slate-400 {
+    color: #f1f5f9 !important;
+  }
+
+  .high-contrast button,
+  .high-contrast a {
+    border: 1px solid rgba(255, 255, 255, 0.3) !important;
+  }
+
+  /* Reduced motion - applied via Settings */
+  .reduced-motion * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  .reduced-motion .animate-float,
+  .reduced-motion .animate-slideDown,
+  .reduced-motion .animate-fadeIn,
+  .reduced-motion .animate-scaleIn,
+  .reduced-motion .animate-glow,
+  .reduced-motion .liquid-gradient-bg {
+    animation: none !important;
+  }
+
+  .reduced-motion .glass-card:hover {
+    transform: none !important;
+  }
 }
