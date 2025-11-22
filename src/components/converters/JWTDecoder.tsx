@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
-import { Shield, AlertTriangle, CheckCircle } from 'lucide-react';
+import { Shield, AlertTriangle, CheckCircle, Key } from 'lucide-react';
 import Textarea from '../ui/Textarea';
 import Card from '../ui/Card';
 import CopyButton from '../shared/CopyButton';
+import InfoBox from '../ui/InfoBox';
 import { decodeJWT, validateJWT, formatJWT } from '../../utils/conversions/jwt';
 import { useHistory } from '../../hooks/useHistory';
 import { useDebounce } from '../../hooks/useDebounce';
@@ -52,26 +53,26 @@ const JWTDecoder: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      {/* Info */}
-      <div className="glass-morphism rounded-2xl p-6">
-        <div className="flex items-start gap-3">
-          <Shield className="w-6 h-6 text-liquid-300 flex-shrink-0 mt-1" />
-          <div>
-            <h3 className="text-lg font-bold text-white mb-2">JWT Decoder</h3>
-            <p className="text-slate-300 text-sm leading-relaxed mb-3">
-              Decodifica e analizza JSON Web Tokens (JWT). I JWT sono usati per autenticazione
-              e scambio sicuro di informazioni tra parti.
-            </p>
-            <div className="glass-morphism rounded-xl p-4 bg-red-500/10 border-red-500/20">
-              <p className="text-red-300 text-xs font-medium flex items-center gap-2">
-                <AlertTriangle className="w-4 h-4" />
-                Attenzione: Questo strumento decodifica JWT ma NON verifica la firma crittografica.
-                Non inserire token sensibili in ambienti non sicuri.
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
+      {/* Educational Info Box */}
+      <InfoBox
+        title="JWT Decoder"
+        description="JSON Web Token (JWT) è uno standard per trasmettere informazioni in modo sicuro tra parti come JSON. Sono firmati crittograficamente e contengono claims (affermazioni) su un utente. Usati principalmente per autenticazione e autorizzazione in API moderne."
+        icon={<Key className="w-5 h-5" />}
+        useCases={[
+          "Autenticazione: dopo login, il server genera un JWT che identifica l'utente",
+          "Single Sign-On (SSO): un token per accedere a più servizi",
+          "API autorizzazione: ogni richiesta include JWT per verificare permessi",
+          "Sessioni stateless: non serve salvare sessioni sul server",
+          "OAuth 2.0: access_token e id_token sono spesso JWT"
+        ]}
+        examples={[
+          { label: 'Header', value: '{"alg":"HS256","typ":"JWT"}' },
+          { label: 'Payload', value: '{"sub":"user123","exp":1735689600}' },
+          { label: 'Token', value: 'eyJhbGc...{header}.{payload}.{signature}' }
+        ]}
+        realWorldUse="Quando fai login su un'app, ricevi un JWT. Ad ogni richiesta API, il browser invia questo token nell'header 'Authorization: Bearer eyJhbGc...'. Il server verifica la firma del JWT (questo tool NON lo fa!) e legge chi sei senza controllare un database. ⚠️ ATTENZIONE: Non inserire JWT reali qui - contengono dati sensibili!"
+        type="warning"
+      />
 
       {/* Input */}
       <Textarea

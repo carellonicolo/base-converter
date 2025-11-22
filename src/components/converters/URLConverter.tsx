@@ -3,6 +3,7 @@ import { Link2, ExternalLink } from 'lucide-react';
 import Textarea from '../ui/Textarea';
 import Card from '../ui/Card';
 import CopyButton from '../shared/CopyButton';
+import InfoBox from '../ui/InfoBox';
 import {
   encodeURL,
   decodeURL,
@@ -61,19 +62,26 @@ const URLConverter: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      {/* Info */}
-      <div className="glass-morphism rounded-2xl p-6">
-        <div className="flex items-start gap-3">
-          <Link2 className="w-6 h-6 text-liquid-300 flex-shrink-0 mt-1" />
-          <div>
-            <h3 className="text-lg font-bold text-white mb-2">URL Encoder/Decoder</h3>
-            <p className="text-slate-300 text-sm leading-relaxed">
-              Codifica e decodifica URL, analizza query parameters, e crea slug URL-friendly.
-              Essenziale per sviluppo web e gestione API.
-            </p>
-          </div>
-        </div>
-      </div>
+      {/* Educational Info Box */}
+      <InfoBox
+        title="URL Encoder/Decoder"
+        description="Gli URL possono contenere solo caratteri ASCII sicuri. URL encoding (percent-encoding) converte caratteri speciali come spazi, simboli e caratteri non-ASCII in formato %XX. È essenziale per inviare dati attraverso URL in modo sicuro e corretto."
+        icon={<Link2 className="w-5 h-5" />}
+        useCases={[
+          "Query parameters: passare dati in URL (search?q=hello%20world)",
+          "API REST: inviare parametri con caratteri speciali in richieste GET",
+          "SEO: creare slug URL-friendly (\"Il Mio Articolo\" → \"il-mio-articolo\")",
+          "Form HTML: dati form vengono URL-encoded automaticamente (application/x-www-form-urlencoded)",
+          "OAuth/Auth: parametri di autenticazione in redirect_uri"
+        ]}
+        examples={[
+          { label: 'Spazio \" \"', value: '%20 o +' },
+          { label: '\"Hello World!\"', value: 'Hello%20World%21' },
+          { label: '\"email@test.com\"', value: 'email%40test.com' }
+        ]}
+        realWorldUse="Quando cerchi 'pizza napoletana' su Google, l'URL diventa google.com/search?q=pizza+napoletana. Il '+' rappresenta lo spazio. Quando condividi un link con parametri (facebook.com/share?url=https%3A%2F%2F...), l'URL interno viene codificato. Gli slug SEO-friendly ('mio-articolo-2024') rendono URL leggibili sia per utenti che motori di ricerca."
+        type="educational"
+      />
 
       <div className="grid md:grid-cols-2 gap-6">
         {/* Encode section */}
