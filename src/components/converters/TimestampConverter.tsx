@@ -4,6 +4,7 @@ import Input from '../ui/Input';
 import Button from '../ui/Button';
 import Card from '../ui/Card';
 import CopyButton from '../shared/CopyButton';
+import InfoBox from '../ui/InfoBox';
 import {
   now,
   nowMilliseconds,
@@ -54,22 +55,26 @@ const TimestampConverter: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      {/* Info */}
-      <div className="glass-morphism rounded-2xl p-6">
-        <div className="flex items-start gap-3">
-          <Clock className="w-6 h-6 text-liquid-300 flex-shrink-0 mt-1" />
-          <div>
-            <h3 className="text-lg font-bold text-white mb-2">Convertitore Timestamp</h3>
-            <p className="text-slate-300 text-sm leading-relaxed">
-              Converti tra Unix timestamp, date ISO 8601, RFC 2822 e formati personalizzati.
-              Unix timestamp è il numero di secondi dal 1 gennaio 1970 (epoch).
-            </p>
-            <p className="text-slate-400 text-xs mt-2">
-              Timezone: {getTimezoneString()}
-            </p>
-          </div>
-        </div>
-      </div>
+      {/* Educational Info Box */}
+      <InfoBox
+        title="Convertitore Timestamp"
+        description="I timestamp sono il modo standard per rappresentare date e orari nei computer. Unix timestamp conta i secondi dal 1 gennaio 1970 00:00:00 UTC (chiamato 'epoch'). ISO 8601 è il formato standard internazionale, RFC 2822 è usato nelle email."
+        icon={<Clock className="w-5 h-5" />}
+        useCases={[
+          "Database: memorizzare date in modo universale (timezone-agnostic)",
+          "API REST: scambiare date tra client e server in formato standard",
+          "Logging: timestamp precisi per eventi e debugging",
+          "Social media: \"pubblicato 2 ore fa\" viene calcolato da timestamp",
+          "Scadenze: verificare se token/sessioni sono scaduti"
+        ]}
+        examples={[
+          { label: '1609459200', value: '1 gennaio 2021 00:00:00 UTC' },
+          { label: 'Ora attuale', value: `${now()} (${new Date().toLocaleString('it-IT')})` },
+          { label: 'ISO 8601', value: new Date().toISOString() }
+        ]}
+        realWorldUse="Quando Twitter dice 'twittato 3 minuti fa', memorizza il timestamp esatto (es: 1699284720) e lo confronta con l'ora attuale per calcolare la differenza. JWT token hanno 'exp' (expiry) come timestamp per sapere quando scadono. GitHub mostra i commit con 'committed 2 days ago' usando timestamp."
+        type="educational"
+      />
 
       {/* Quick action */}
       <div className="flex justify-center">

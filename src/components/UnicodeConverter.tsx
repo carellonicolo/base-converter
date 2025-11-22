@@ -1,6 +1,7 @@
 import { useState } from 'react';
-import { Sparkles, Copy, Check } from 'lucide-react';
+import { Sparkles, Copy, Check, Globe } from 'lucide-react';
 import UnicodeTable from './UnicodeTable';
+import InfoBox from './ui/InfoBox';
 
 function UnicodeConverter() {
   const [textInput, setTextInput] = useState('');
@@ -88,6 +89,27 @@ function UnicodeConverter() {
 
   return (
     <div className="space-y-6">
+      {/* Educational Info Box */}
+      <InfoBox
+        title="Convertitore Unicode"
+        description="Unicode è lo standard universale per rappresentare testi in tutte le lingue del mondo, compresi emoji e simboli speciali. Mentre ASCII supporta solo 128 caratteri (inglese), Unicode ne supporta oltre 140.000 coprendo praticamente tutti i sistemi di scrittura esistenti."
+        icon={<Globe className="w-5 h-5" />}
+        useCases={[
+          "Internazionalizzazione: creare app che supportano tutte le lingue",
+          "Emoji e simboli: usare 😊 👍 ❤️ in applicazioni web e mobile",
+          "Testi multilingua: scrivere in cinese, arabo, russo, ecc.",
+          "Caratteri speciali: simboli matematici, valute (€ $ ¥), frecce (→ ←)",
+          "Analisi testo: identificare il tipo di caratteri in un documento"
+        ]}
+        examples={[
+          { label: "'Hello 👋'", value: 'U+0048 U+0065 U+006C U+006C U+006F U+0020 U+1F44B' },
+          { label: "'€'", value: 'U+20AC (euro)' },
+          { label: "'你好'", value: 'U+4F60 U+597D (ciao in cinese)' }
+        ]}
+        realWorldUse="Ogni emoji che usi su WhatsApp, ogni carattere speciale in Word, ogni lingua su internet usa Unicode. Ad esempio, il cuore ❤️ è U+2764, e quando lo invii in un messaggio, viene trasmesso come questo codice numerico."
+        type="educational"
+      />
+
       <UnicodeTable />
 
       <div className="grid md:grid-cols-2 gap-8">

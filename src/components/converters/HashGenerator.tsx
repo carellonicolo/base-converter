@@ -5,6 +5,7 @@ import Textarea from '../ui/Textarea';
 import Select from '../ui/Select';
 import Card from '../ui/Card';
 import CopyButton from '../shared/CopyButton';
+import InfoBox from '../ui/InfoBox';
 import { generateHash, generateFileHash, HashAlgorithm } from '../../utils/conversions/hash';
 import { useHistory } from '../../hooks/useHistory';
 import { useDebounce } from '../../hooks/useDebounce';
@@ -65,24 +66,26 @@ const HashGenerator: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      {/* Info section */}
-      <div className="glass-morphism rounded-2xl p-6">
-        <div className="flex items-start gap-3">
-          <Shield className="w-6 h-6 text-liquid-300 flex-shrink-0 mt-1" />
-          <div>
-            <h3 className="text-lg font-bold text-white mb-2">Hash Cryptografici</h3>
-            <p className="text-slate-300 text-sm leading-relaxed mb-3">
-              Gli hash crittografici convertono dati di qualsiasi dimensione in una stringa di lunghezza fissa.
-              Sono usati per verificare l'integrità dei dati, archiviare password in modo sicuro, e firme digitali.
-            </p>
-            <div className="glass-morphism rounded-xl p-4 bg-yellow-500/10 border-yellow-500/20">
-              <p className="text-yellow-300 text-xs font-medium">
-                ⚠️ MD5 e SHA-1 sono deprecati per uso crittografico. Usa SHA-256 o SHA-512 per applicazioni di sicurezza.
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
+      {/* Educational Info Box */}
+      <InfoBox
+        title="Generatore Hash Crittografici"
+        description="Gli hash crittografici trasformano qualsiasi dato (testo, file) in una 'impronta digitale' univoca di lunghezza fissa. Anche un piccolo cambiamento nell'input produce un hash completamente diverso. Sono unidirezionali: dall'hash non puoi risalire all'originale."
+        icon={<Shield className="w-5 h-5" />}
+        useCases={[
+          "Password: hash SHA-256 invece di memorizzare password in chiaro",
+          "Integrità file: verificare che un download non sia corrotto o manomesso",
+          "Blockchain: Bitcoin usa SHA-256 per mining e verifica transazioni",
+          "Firme digitali: verificare l'autenticità di documenti e software",
+          "Deduplicazione: identificare file duplicati senza confrontare contenuti"
+        ]}
+        examples={[
+          { label: '"password123"', value: 'SHA-256: ef92b778b... (sempre uguale)' },
+          { label: '"password124"', value: 'SHA-256: 8d969eef6... (completamente diverso!)' },
+          { label: 'File di 1GB', value: 'SHA-256 sempre 64 caratteri' }
+        ]}
+        realWorldUse="Quando scarichi Linux da internet, viene fornito anche l'hash SHA-256. Dopo il download, ricalcoli l'hash del file e lo confronti: se coincide, il file è integro e autentico. Le password su siti sicuri vengono hashate: anche gli admin non vedono la tua password, solo l'hash. ⚠️ MD5 e SHA-1 sono OBSOLETI per sicurezza, usa SHA-256!"
+        type="warning"
+      />
 
       <div className="grid md:grid-cols-3 gap-6">
         <div className="md:col-span-2">

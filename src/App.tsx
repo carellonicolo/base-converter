@@ -17,6 +17,7 @@ const TimestampConverter = lazy(() => import('./components/converters/TimestampC
 const URLConverter = lazy(() => import('./components/converters/URLConverter'));
 const JWTDecoder = lazy(() => import('./components/converters/JWTDecoder'));
 const JSONFormatter = lazy(() => import('./components/converters/JSONFormatter'));
+const SettingsPage = lazy(() => import('./components/Settings'));
 
 function LoadingSpinner() {
   return (
@@ -140,7 +141,7 @@ function AppContent() {
                   <Route path="/jwt" element={<JWTDecoder />} />
                   <Route path="/json" element={<JSONFormatter />} />
                   <Route path="/history" element={<div className="text-white text-center py-12">Cronologia - Coming Soon</div>} />
-                  <Route path="/settings" element={<div className="text-white text-center py-12">Impostazioni - Coming Soon</div>} />
+                  <Route path="/settings" element={<SettingsPage />} />
                   <Route path="*" element={<div className="text-white text-center py-12">Pagina non trovata</div>} />
                 </Routes>
               </div>

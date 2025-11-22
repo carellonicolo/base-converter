@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
-import { ArrowRight, Copy, Check } from 'lucide-react';
+import { ArrowRight, Copy, Check, Calculator } from 'lucide-react';
 import useCopyToClipboard from '../hooks/useCopyToClipboard';
 import { isValidForBase } from '../utils/validation';
+import InfoBox from './ui/InfoBox';
 
 interface ConversionResult {
   base: number;
@@ -27,9 +28,8 @@ function BaseConverter() {
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = e.target;
-    if (isValidForBase(value, inputBase)) {
-      setInputValue(value);
-    }
+    setInputValue(value);
+    setError(''); // Clear error when typing
   };
 
   const commonBases = [
@@ -47,10 +47,34 @@ function BaseConverter() {
     }
 
     try {
-      const cleanValue = inputValue.trim().replace(/^0[bBxXoO]/, '');
-      const decimalValue = parseInt(cleanValue, inputBase);
+      // Remove common prefixes and detect base
+      let cleanValue = inputValue.trim();
+      let detectedBase = inputBase;
 
-      if (isNaN(decimalValue)) {
+      if (cleanValue.startsWith('0x') || cleanValue.startsWith('0X')) {
+        cleanValue = cleanValue.substring(2);
+        detectedBase = 16;
+      } else if (cleanValue.startsWith('0b') || cleanValue.startsWith('0B')) {
+        cleanValue = cleanValue.substring(2);
+        detectedBase = 2;
+      } else if (cleanValue.startsWith('0o') || cleanValue.startsWith('0O')) {
+        cleanValue = cleanValue.substring(2);
+        detectedBase = 8;
+      }
+
+      // Validate for the detected base
+      if (!isValidForBase(cleanValue, detectedBase)) {
+        const maxChar = detectedBase > 10
+          ? (detectedBase - 1).toString(36).toUpperCase()
+          : (detectedBase - 1);
+        setError(`Caratteri non validi per base ${detectedBase}. Usa solo: 0-${maxChar}`);
+        setResults([]);
+        return;
+      }
+
+      const decimalValue = parseInt(cleanValue, detectedBase);
+
+      if (isNaN(decimalValue) || !isFinite(decimalValue)) {
         setError('Valore non valido per la base selezionata');
         setResults([]);
         return;
@@ -85,6 +109,26 @@ function BaseConverter() {
 
   return (
     <div className="space-y-8">
+      {/* Educational Info Box */}
+      <InfoBox
+        title="Convertitore di Basi Numeriche"
+        description="I sistemi di numerazione sono modi diversi di rappresentare gli stessi numeri. Ogni base usa un numero diverso di cifre: binario (2 cifre: 0,1), ottale (8 cifre: 0-7), decimale (10 cifre: 0-9), esadecimale (16 cifre: 0-9,A-F)."
+        icon={<Calculator className="w-5 h-5" />}
+        useCases={[
+          "Programmazione: il binario è il linguaggio dei computer",
+          "Colori web: i codici colore HTML usano l'esadecimale (#FF0000 = rosso)",
+          "Informatica: comprendere come i computer rappresentano i dati",
+          "Permessi file Linux: usano la notazione ottale (chmod 755)",
+          "Indirizzi IP e MAC: spesso rappresentati in esadecimale"
+        ]}
+        examples={[
+          { label: '42 (decimale)', value: '101010 (binario) = 2A (hex)' },
+          { label: '255 (decimale)', value: '11111111 (binario) = FF (hex)' }
+        ]}
+        realWorldUse="Quando scrivi '#FF5733' per un colore arancione in CSS, stai usando esadecimale! FF=255 rosso, 57=87 verde, 33=51 blu. I programmatori usano l'esadecimale perché è più compatto del binario ma più vicino al modo in cui i computer pensano."
+        type="educational"
+      />
+
       <div className="grid md:grid-cols-2 gap-6">
         <div>
           <label className="block text-sm font-semibold text-slate-200 mb-3 tracking-wide">

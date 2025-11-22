@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
-import { FileUp, Download } from 'lucide-react';
+import { FileUp, Download, FileCode } from 'lucide-react';
 import Button from '../ui/Button';
 import Textarea from '../ui/Textarea';
 import Card from '../ui/Card';
 import CopyButton from '../shared/CopyButton';
+import InfoBox from '../ui/InfoBox';
 import { encodeBase64, decodeBase64, encodeFileToBase64, isValidBase64 } from '../../utils/conversions/base64';
 import { useHistory } from '../../hooks/useHistory';
 import { useDebounce } from '../../hooks/useDebounce';
@@ -19,7 +20,10 @@ const Base64Converter: React.FC = () => {
 
   // Encode text to Base64
   const encodedResult = React.useMemo(() => {
-    if (!debouncedText) return '';
+    if (!debouncedText) {
+      setError('');
+      return '';
+    }
     try {
       const result = encodeBase64(debouncedText);
       setError('');
@@ -33,14 +37,22 @@ const Base64Converter: React.FC = () => {
 
   // Decode Base64 to text
   const decodedResult = React.useMemo(() => {
-    if (!debouncedBase64) return '';
+    if (!debouncedBase64) {
+      setError('');
+      return '';
+    }
+    // Skip validation for very short input (user is still typing)
+    if (debouncedBase64.length < 4) {
+      setError('');
+      return '';
+    }
     try {
       const result = decodeBase64(debouncedBase64);
       setError('');
       add('base64', debouncedBase64, result);
       return result;
     } catch (err) {
-      setError('Base64 non valido');
+      setError('Base64 non valido. Verifica che la stringa sia corretta.');
       return '';
     }
   }, [debouncedBase64, add]);
@@ -61,14 +73,26 @@ const Base64Converter: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      <div className="glass-morphism rounded-2xl p-6">
-        <h3 className="text-lg font-bold text-white mb-4">Cos'è Base64?</h3>
-        <p className="text-slate-300 text-sm leading-relaxed">
-          Base64 è un metodo di codifica che converte dati binari in una stringa ASCII.
-          È comunemente usato per incorporare immagini in HTML/CSS, trasferire dati via email,
-          e archiviare dati binari in formati testuali come JSON o XML.
-        </p>
-      </div>
+      {/* Educational Info Box */}
+      <InfoBox
+        title="Codifica Base64"
+        description="Base64 converte dati binari (immagini, file, ecc.) in testo ASCII puro usando solo 64 caratteri sicuri (A-Z, a-z, 0-9, +, /). Permette di inviare file attraverso sistemi che accettano solo testo, come email o JSON."
+        icon={<FileCode className="w-5 h-5" />}
+        useCases={[
+          "Email: allegati codificati in Base64 per passare attraverso server di testo",
+          "Data URLs: incorporare immagini direttamente in HTML/CSS (data:image/png;base64,...)",
+          "JSON/XML: memorizzare file binari in formati testuali",
+          "Autenticazione: credenziali in header HTTP (Basic Auth)",
+          "Trasferimento dati: inviare immagini/file in API REST"
+        ]}
+        examples={[
+          { label: '"Hello"', value: 'SGVsbG8=' },
+          { label: 'Immagine', value: 'iVBORw0KGgoAAAANSUhEU...' },
+          { label: '"user:pass"', value: 'dXNlcjpwYXNz (Basic Auth)' }
+        ]}
+        realWorldUse="Quando invii un'immagine su WhatsApp, potrebbe essere codificata in Base64 nell'API. Le email con allegati usano Base64 perché i server email originali supportavano solo testo ASCII. Il tag <img src='data:image/png;base64,...'> ti permette di incorporare immagini direttamente nell'HTML senza file separati."
+        type="educational"
+      />
 
       <div className="grid md:grid-cols-2 gap-6">
         {/* Encode section */}

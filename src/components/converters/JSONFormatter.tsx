@@ -4,6 +4,7 @@ import Textarea from '../ui/Textarea';
 import Button from '../ui/Button';
 import Card from '../ui/Card';
 import CopyButton from '../shared/CopyButton';
+import InfoBox from '../ui/InfoBox';
 import {
   formatJSON,
   minifyJSON,
@@ -76,18 +77,26 @@ const JSONFormatter: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      {/* Info */}
-      <div className="glass-morphism rounded-2xl p-6">
-        <div className="flex items-start gap-3">
-          <FileJson className="w-6 h-6 text-liquid-300 flex-shrink-0 mt-1" />
-          <div>
-            <h3 className="text-lg font-bold text-white mb-2">JSON Formatter & Validator</h3>
-            <p className="text-slate-300 text-sm leading-relaxed">
-              Formatta, minifica, valida e ordina JSON. Supporta anche escape/unescape di stringhe JSON.
-            </p>
-          </div>
-        </div>
-      </div>
+      {/* Educational Info Box */}
+      <InfoBox
+        title="JSON Formatter & Validator"
+        description="JSON (JavaScript Object Notation) è il formato standard per scambio di dati tra client e server. È human-readable ma spesso viene minificato (tutto su una riga) per risparmiare spazio. Questo tool formatta, valida, e ottimizza JSON."
+        icon={<FileJson className="w-5 h-5" />}
+        useCases={[
+          "API Development: formattare risposte JSON per debugging",
+          "Configurazione: file di config (.json) spesso scritti in una riga",
+          "Validazione: verificare che JSON sia sintatticamente corretto prima di usarlo",
+          "Minify: ridurre dimensione file JSON per produzione (rimuove spazi/newline)",
+          "Sort keys: ordinare chiavi alfabeticamente per confronto o versioning"
+        ]}
+        examples={[
+          { label: 'Compact', value: '{"name":"Mario","age":30}' },
+          { label: 'Formatted', value: '{\n  \"name\": \"Mario\",\n  \"age\": 30\n}' },
+          { label: 'Invalid', value: '{name:Mario} ❌ (mancano virgolette)' }
+        ]}
+        realWorldUse="package.json in Node.js è JSON. Quando chiami un'API (fetch('/api/user')), ricevi JSON che deve essere valido. Strumenti come Postman formattano automaticamente JSON nelle risposte. In produzione, JSON viene minificato per ridurre traffico di rete. Chrome DevTools e altri debugger mostrano JSON formattato per leggibilità."
+        type="educational"
+      />
 
       {/* Validation status */}
       {validation && (

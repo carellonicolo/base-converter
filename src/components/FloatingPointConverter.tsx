@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
-import { Info, Copy, Check } from 'lucide-react';
+import { Info, Copy, Check, Gauge } from 'lucide-react';
+import InfoBox from './ui/InfoBox';
 
 function FloatingPointConverter() {
   const [decimalInput, setDecimalInput] = useState('');
@@ -153,6 +154,27 @@ function FloatingPointConverter() {
 
   return (
     <div className="space-y-8">
+      {/* Educational Info Box */}
+      <InfoBox
+        title="Convertitore Virgola Mobile e Virgola Fissa"
+        description="I numeri decimali nei computer vengono rappresentati in due modi: virgola mobile (floating-point) per numeri molto grandi/piccoli con precisione variabile, e virgola fissa (fixed-point) per calcoli finanziari dove serve precisione costante."
+        icon={<Gauge className="w-5 h-5" />}
+        useCases={[
+          "Grafica 3D: le coordinate usano floating-point per gestire distanze enormi",
+          "Calcoli scientifici: numeri molto piccoli (0.0000001) o grandi (10000000)",
+          "Sviluppo giochi: fisica, posizioni, animazioni usano float",
+          "Finanza: i soldi usano fixed-point per evitare errori di arrotondamento",
+          "Audio/Video: sample audio e pixel usano rappresentazioni precise"
+        ]}
+        examples={[
+          { label: '3.14 (Float32)', value: 'Sign:0 Exp:10000000 Mantissa:10010001111...' },
+          { label: '42.5 (Q16.16)', value: 'Binario: 00000000001010100000000000000000' },
+          { label: '0.1', value: 'Non rappresentabile esattamente in binario!' }
+        ]}
+        realWorldUse="Lo standard IEEE 754 è usato da TUTTI i processori moderni. Quando fai 0.1 + 0.2 in JavaScript e ottieni 0.30000000000000004, è perché 0.1 non può essere rappresentato esattamente in binario - proprio come 1/3 non può essere scritto esattamente in decimale (0.333...)."
+        type="educational"
+      />
+
       <div className="grid md:grid-cols-2 gap-6">
         <div>
           <label className="block text-sm font-semibold text-slate-200 mb-3 tracking-wide">
