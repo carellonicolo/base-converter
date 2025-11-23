@@ -31,6 +31,37 @@ export interface Theme {
 }
 
 export const themes: Record<string, Theme> = {
+  default: {
+    name: 'Default',
+    colors: {
+      background: '#0f172a',
+      backgroundGradient: 'linear-gradient(135deg, #1e293b 0%, #0f172a 50%, #1e293b 100%)',
+      glass: 'rgba(255, 255, 255, 0.05)',
+      glassBorder: 'rgba(255, 255, 255, 0.18)',
+      text: {
+        primary: '#ffffff',
+        secondary: '#cbd5e1',
+        tertiary: '#94a3b8',
+      },
+      accent: {
+        primary: '#38bdf8',
+        secondary: '#0ea5e9',
+        light: '#7dd3fc',
+        dark: '#0284c7',
+      },
+      status: {
+        success: '#10b981',
+        error: '#ef4444',
+        warning: '#f59e0b',
+        info: '#3b82f6',
+      },
+    },
+    effects: {
+      blur: '24px',
+      opacity: 0.05,
+      borderOpacity: 0.18,
+    },
+  },
   dark: {
     name: 'Dark',
     colors: {
@@ -65,14 +96,14 @@ export const themes: Record<string, Theme> = {
   light: {
     name: 'Light',
     colors: {
-      background: '#f8fafc',
-      backgroundGradient: 'linear-gradient(135deg, #ffffff 0%, #f8fafc 50%, #e2e8f0 100%)',
-      glass: 'rgba(255, 255, 255, 0.8)',
-      glassBorder: 'rgba(0, 0, 0, 0.1)',
+      background: '#e2e8f0',
+      backgroundGradient: 'linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 50%, #cbd5e1 100%)',
+      glass: 'rgba(255, 255, 255, 0.7)',
+      glassBorder: 'rgba(71, 85, 105, 0.2)',
       text: {
         primary: '#0f172a',
-        secondary: '#475569',
-        tertiary: '#64748b',
+        secondary: '#334155',
+        tertiary: '#475569',
       },
       accent: {
         primary: '#0ea5e9',
@@ -88,9 +119,9 @@ export const themes: Record<string, Theme> = {
       },
     },
     effects: {
-      blur: '24px',
-      opacity: 0.8,
-      borderOpacity: 0.1,
+      blur: '16px',
+      opacity: 0.7,
+      borderOpacity: 0.2,
     },
   },
   midnight: {
