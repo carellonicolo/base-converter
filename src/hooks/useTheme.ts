@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 import { useSettingsStore } from '../store/useSettingsStore';
 import { themes } from '../types/theme';
 
@@ -11,19 +11,19 @@ export function useTheme() {
   const { mode, preset } = settings.theme;
 
   // Determine actual theme based on mode
-  const getActualTheme = () => {
+  const actualTheme = useMemo(() => {
     if (mode === 'auto') {
       const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
       return isDark ? 'dark' : 'light';
     }
     return mode;
-  };
-
-  const actualTheme = getActualTheme();
+  }, [mode]);
 
   // If light mode is selected, always use light theme (ignore presets in light mode)
   // If dark mode, use the selected preset
-  const theme = actualTheme === 'light' ? themes.light : (themes[preset] || themes.default);
+  const theme = useMemo(() => {
+    return actualTheme === 'light' ? themes.light : (themes[preset] || themes.default);
+  }, [actualTheme, preset]);
 
   // Apply theme to CSS variables
   useEffect(() => {
