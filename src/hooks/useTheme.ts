@@ -20,7 +20,10 @@ export function useTheme() {
   };
 
   const actualTheme = getActualTheme();
-  const theme = themes[preset] || themes[actualTheme];
+
+  // If light mode is selected, always use light theme (ignore presets in light mode)
+  // If dark mode, use the selected preset
+  const theme = actualTheme === 'light' ? themes.light : (themes[preset] || themes.default);
 
   // Apply theme to CSS variables
   useEffect(() => {
