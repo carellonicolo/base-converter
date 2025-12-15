@@ -55,6 +55,7 @@
     "copy": "Copy",
     "copied": "Copied!",
     "error": "Error",
+    "errors": "Errors",
     "loading": "Loading...",
     "examples": "Examples",
     "realWorldUse": "Real World Use",
@@ -83,34 +84,125 @@
     "decodeTitle": "Decode (Base64 → Text)",
     "uploadButton": "Upload File and Convert to Base64",
     "encodedResult": "Base64 Result",
-    "decodedText": "Decoded Text"
+    "decodedText": "Decoded Text",
+    "useCases": [
+      "Email: Base64 encoded attachments",
+      "Data URLs: images in HTML/CSS",
+      "JSON/XML: binary inclusion",
+      "Authentication: Basic Auth headers",
+      "API: binary data transfer"
+    ]
   },
   "hash": {
     "title": "Hash Generator",
-    "description": "Cryptographic hashes transform data into a unique fingerprint. MD5, SHA-256, etc.",
+    "description": "Cryptographic hashes transform data into a unique fingerprint.",
     "inputText": "Text to Hash",
     "algorithm": "Algorithm",
-    "uploadButton": "Hash File"
+    "uploadButton": "Hash File",
+    "useCases": [
+      "Password hashing (SHA-256)",
+      "File integrity verification",
+      "Blockchain and mining",
+      "Digital signatures",
+      "Duplicate identification"
+    ]
   },
   "color": {
     "title": "Color Converter",
-    "description": "Convert between HEX, RGB, HSL, HSV, and CMYK formats. Essential tool for web design and graphics.",
+    "description": "Convert between HEX, RGB, HSL, HSV, and CMYK.",
     "preview": "Color Preview",
-    "palette": "Suggested Palette"
+    "palette": "Suggested Palette",
+    "formats": {
+      "hex": "HEX Format",
+      "rgb": "RGB Format"
+    }
   },
   "url": {
     "title": "URL Encoder/Decoder",
-    "description": "Percent-encoding makes URLs safe and valid. Handles special characters and query strings.",
+    "description": "Percent-encoding makes URLs safe and valid.",
     "encodeTitle": "URL Encode",
     "decodeTitle": "URL Decode",
     "analyzeQuery": "Analyze Query Parameters",
-    "extractedParams": "Extracted Parameters"
+    "extractedParams": "Extracted Parameters",
+    "slugTitle": "URL Slug",
+    "slugDescription": "URL-friendly slug for titles"
   },
   "timestamp": {
     "title": "Timestamp Converter",
-    "description": "Convert Unix Timestamps to readable dates and vice versa. Supports ISO 8601 and RFC 2822.",
+    "description": "Convert Unix Timestamps to readable dates and vice versa.",
     "current": "Current Timestamp",
     "unixLabel": "Unix Timestamp (seconds)",
-    "dateLabel": "Date and Time"
+    "dateLabel": "Date and Time",
+    "allFormats": "All Formats",
+    "milliseconds": "Milliseconds",
+    "custom": "Custom Format",
+    "relative": "Relative Time"
+  },
+  "jwt": {
+    "title": "JWT Decoder",
+    "description": "JSON Web Token (JWT) is a standard for securely transmitting information between parties as JSON. Used for authentication and authorization.",
+    "useCase1": "Authentication: server generates JWT after login",
+    "useCase2": "Single Sign-On (SSO): unified access",
+    "useCase3": "API Authorization: tokens in request headers",
+    "useCase4": "Stateless Sessions",
+    "useCase5": "OAuth 2.0 Tokens",
+    "realWorldUse": "View the content of a JWT token (header and payload) for debugging.",
+    "valid": "Valid Token",
+    "invalid": "Invalid Token",
+    "expired": "Token expired",
+    "notYetValid": "Token not yet valid",
+    "expiresIn": "Expires in: {{hours}} hours",
+    "errors": {
+      "invalid": "Invalid JWT"
+    }
+  },
+  "base": {
+    "title": "Base Converter",
+    "description": "Convert numbers between different bases (binary, octal, decimal, hexadecimal, and custom bases 2-36).",
+    "input": "Number to Convert",
+    "baseFrom": "From Base",
+    "baseTo": "To Base",
+    "swap": "Swap Bases",
+    "errorInvalid": "Invalid number for selected base",
+    "commonBases": {
+      "2": "Binary (Base 2)",
+      "8": "Octal (Base 8)",
+      "10": "Decimal (Base 10)",
+      "16": "Hexadecimal (Base 16)"
+    }
+  },
+  "ascii": {
+    "title": "ASCII Converter",
+    "description": "Convert text to ASCII codes (decimal, binary, hexadecimal) and vice versa.",
+    "textInput": "Text",
+    "asciiOutput": "ASCII Output",
+    "char": "Character",
+    "dec": "Dec",
+    "hex": "Hex",
+    "bin": "Bin"
+  },
+  "floating": {
+    "title": "Floating Point (IEEE 754)",
+    "description": "Visualize how decimal numbers are represented in memory according to IEEE 754 standard (32-bit and 64-bit).",
+    "input": "Decimal Number",
+    "precision": {
+      "single": "Single Precision (32-bit)",
+      "double": "Double Precision (64-bit)"
+    },
+    "components": {
+      "sign": "Sign",
+      "exponent": "Exponent",
+      "mantissa": "Mantissa"
+    }
+  },
+  "json": {
+    "title": "JSON Formatter & Validator",
+    "description": "Format, validate, and minify JSON code. Useful for API debugging and configuration.",
+    "input": "JSON Input",
+    "format": "Format",
+    "minify": "Minify",
+    "valid": "Valid JSON",
+    "invalid": "Invalid JSON",
+    "error": "Syntax Error"
   }
 }

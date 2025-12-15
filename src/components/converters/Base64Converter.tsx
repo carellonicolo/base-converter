@@ -1,5 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { FileUp, Download, FileCode } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import Button from '../ui/Button';
 import Textarea from '../ui/Textarea';
 import Card from '../ui/Card';
@@ -9,6 +10,7 @@ import { encodeBase64, decodeBase64, encodeFileToBase64, isValidBase64 } from '.
 import { useDebounce } from '../../hooks/useDebounce';
 
 const Base64Converter: React.FC = () => {
+  const { t } = useTranslation();
   const [textInput, setTextInput] = useState('');
   const [base64Input, setBase64Input] = useState('');
   const [error, setError] = useState('');
@@ -28,10 +30,10 @@ const Base64Converter: React.FC = () => {
       setError('');
       return result;
     } catch (err) {
-      setError('Errore nella codifica');
+      setError(t('common.error'));
       return '';
     }
-  }, [debouncedText]);
+  }, [debouncedText, t]);
 
   // Decode Base64 to text
   const decodedResult = React.useMemo(() => {
@@ -49,10 +51,10 @@ const Base64Converter: React.FC = () => {
       setError('');
       return result;
     } catch (err) {
-      setError('Base64 non valido. Verifica che la stringa sia corretta.');
+      setError(t('common.error')); // Using generic error or add specific if needed
       return '';
     }
-  }, [debouncedBase64]);
+  }, [debouncedBase64, t]);
 
   // Handle file upload
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -64,7 +66,7 @@ const Base64Converter: React.FC = () => {
       setBase64Input(base64);
       setError('');
     } catch (err) {
-      setError('Errore nella lettura del file');
+      setError(t('common.error'));
     }
   };
 
@@ -72,35 +74,29 @@ const Base64Converter: React.FC = () => {
     <div className="space-y-6">
       {/* Educational Info Box */}
       <InfoBox
-        title="Codifica Base64"
-        description="Base64 converte dati binari (immagini, file, ecc.) in testo ASCII puro usando solo 64 caratteri sicuri (A-Z, a-z, 0-9, +, /). Permette di inviare file attraverso sistemi che accettano solo testo, come email o JSON."
+        title={t('base64.title')}
+        description={t('base64.description')}
         icon={<FileCode className="w-5 h-5" />}
-        useCases={[
-          "Email: allegati codificati in Base64 per passare attraverso server di testo",
-          "Data URLs: incorporare immagini direttamente in HTML/CSS (data:image/png;base64,...)",
-          "JSON/XML: memorizzare file binari in formati testuali",
-          "Autenticazione: credenziali in header HTTP (Basic Auth)",
-          "Trasferimento dati: inviare immagini/file in API REST"
-        ]}
+        useCases={t('base64.useCases', { returnObjects: true }) as string[]}
         examples={[
           { label: '"Hello"', value: 'SGVsbG8=' },
-          { label: 'Immagine', value: 'iVBORw0KGgoAAAANSUhEU...' },
+          { label: t('common.input'), value: 'iVBORw0KGgoAAAANSUhEU...' },
           { label: '"user:pass"', value: 'dXNlcjpwYXNz (Basic Auth)' }
         ]}
-        realWorldUse="Quando invii un'immagine su WhatsApp, potrebbe essere codificata in Base64 nell'API. Le email con allegati usano Base64 perché i server email originali supportavano solo testo ASCII. Il tag <img src='data:image/png;base64,...'> ti permette di incorporare immagini direttamente nell'HTML senza file separati."
+        realWorldUse={t('common.realWorldUse')}
         type="educational"
       />
 
       <div className="grid md:grid-cols-2 gap-6">
         {/* Encode section */}
         <div className="space-y-4">
-          <h3 className="text-xl font-bold text-white">Codifica (Text → Base64)</h3>
+          <h3 className="text-xl font-bold text-white">{t('base64.encodeTitle')}</h3>
 
           <Textarea
-            label="Testo da codificare"
+            label={t('common.input')}
             value={textInput}
             onChange={(e) => setTextInput(e.target.value)}
-            placeholder="Inserisci il testo da codificare in Base64..."
+            placeholder="Inserisci il testo..."
             rows={6}
             fullWidth
           />
@@ -109,7 +105,7 @@ const Base64Converter: React.FC = () => {
             <Card>
               <div className="flex items-center justify-between mb-3">
                 <h4 className="text-sm font-bold text-liquid-300 uppercase tracking-wider">
-                  Risultato Base64
+                  {t('base64.encodedResult')}
                 </h4>
                 <CopyButton text={encodedResult} />
               </div>
@@ -122,13 +118,13 @@ const Base64Converter: React.FC = () => {
 
         {/* Decode section */}
         <div className="space-y-4">
-          <h3 className="text-xl font-bold text-white">Decodifica (Base64 → Text)</h3>
+          <h3 className="text-xl font-bold text-white">{t('base64.decodeTitle')}</h3>
 
           <Textarea
-            label="Base64 da decodificare"
+            label={t('base64.encodedResult')}
             value={base64Input}
             onChange={(e) => setBase64Input(e.target.value)}
-            placeholder="Inserisci la stringa Base64 da decodificare..."
+            placeholder="Inserisci la stringa Base64..."
             rows={6}
             fullWidth
             error={error}
@@ -150,7 +146,7 @@ const Base64Converter: React.FC = () => {
                 fullWidth
                 onClick={() => fileInputRef.current?.click()}
               >
-                Carica File e Converti in Base64
+                {t('base64.uploadButton')}
               </Button>
             </div>
           </div>
@@ -159,7 +155,7 @@ const Base64Converter: React.FC = () => {
             <Card>
               <div className="flex items-center justify-between mb-3">
                 <h4 className="text-sm font-bold text-liquid-300 uppercase tracking-wider">
-                  Testo Decodificato
+                  {t('base64.decodedText')}
                 </h4>
                 <CopyButton text={decodedResult} />
               </div>
@@ -173,7 +169,7 @@ const Base64Converter: React.FC = () => {
 
       {/* Examples */}
       <div className="glass-morphism rounded-2xl p-6">
-        <h4 className="text-sm font-bold text-slate-200 mb-3 tracking-wide">Esempi</h4>
+        <h4 className="text-sm font-bold text-slate-200 mb-3 tracking-wide">{t('common.examples')}</h4>
         <div className="space-y-2 text-sm">
           <div className="flex items-center justify-between">
             <code className="text-slate-400 font-mono">"Hello, World!"</code>

@@ -55,6 +55,7 @@
     "copy": "Copia",
     "copied": "Copiato!",
     "error": "Errore",
+    "errors": "Errori",
     "loading": "Caricamento...",
     "examples": "Esempi",
     "realWorldUse": "Uso nel Mondo Reale",
@@ -83,20 +84,38 @@
     "decodeTitle": "Decodifica (Base64 → Testo)",
     "uploadButton": "Carica File e Converti in Base64",
     "encodedResult": "Risultato Base64",
-    "decodedText": "Testo Decodificato"
+    "decodedText": "Testo Decodificato",
+    "useCases": [
+      "Email: allegati codificati in Base64",
+      "Data URLs: immagini in HTML/CSS",
+      "JSON/XML: inclusione di binari",
+      "Autenticazione: Basic Auth headers",
+      "API: trasferimento dati binari"
+    ]
   },
   "hash": {
     "title": "Generatore Hash",
     "description": "Gli hash crittografici trasformano dati in un'impronta digitale univoca. MD5, SHA-256, etc.",
     "inputText": "Testo da hashare",
     "algorithm": "Algoritmo",
-    "uploadButton": "Hash File"
+    "uploadButton": "Hash File",
+    "useCases": [
+      "Password hashing (SHA-256)",
+      "Verifica integrità file",
+      "Blockchain e mining",
+      "Firme digitali",
+      "Identificazione duplicati"
+    ]
   },
   "color": {
     "title": "Convertitore Colori",
     "description": "Converti tra formati HEX, RGB, HSL, HSV e CMYK. Strumento essenziale per web design e grafica.",
     "preview": "Anteprima Colore",
-    "palette": "Palette Suggerita"
+    "palette": "Palette Suggerita",
+    "formats": {
+      "hex": "Formato HEX",
+      "rgb": "Formato RGB"
+    }
   },
   "url": {
     "title": "Encoder/Decoder URL",
@@ -104,13 +123,86 @@
     "encodeTitle": "Codifica URL",
     "decodeTitle": "Decodifica URL",
     "analyzeQuery": "Analizza Query Parameters",
-    "extractedParams": "Parametri Estratti"
+    "extractedParams": "Parametri Estratti",
+    "slugTitle": "URL Slug",
+    "slugDescription": "Slug URL-friendly per titoli"
   },
   "timestamp": {
     "title": "Convertitore Timestamp",
     "description": "Converti Unix Timestamp in date leggibili e viceversa. Supporta ISO 8601 e RFC 2822.",
     "current": "Timestamp Corrente",
     "unixLabel": "Unix Timestamp (secondi)",
-    "dateLabel": "Data e Ora"
+    "dateLabel": "Data e Ora",
+    "allFormats": "Tutti i Formati",
+    "milliseconds": "Millisecondi",
+    "custom": "Formato Personalizzato",
+    "relative": "Tempo Relativo"
+  },
+  "jwt": {
+    "title": "Decoder JWT",
+    "description": "JSON Web Token (JWT) è uno standard per trasmettere informazioni in modo sicuro tra parti come JSON. Usato per autenticazione e autorizzazione.",
+    "useCase1": "Autenticazione: server genera JWT dopo login",
+    "useCase2": "Single Sign-On (SSO): accesso unificato",
+    "useCase3": "API Autorizzazione: token nei request header",
+    "useCase4": "Sessioni Stateless",
+    "useCase5": "OAuth 2.0 Tokens",
+    "realWorldUse": "Visualizza il contenuto di un token JWT (header e payload) per debug.",
+    "valid": "Token Valido",
+    "invalid": "Token Non Valido",
+    "expired": "Token scaduto",
+    "notYetValid": "Token non ancora valido",
+    "expiresIn": "Scade tra: {{hours}} ore",
+    "errors": {
+      "invalid": "JWT non valido"
+    }
+  },
+  "base": {
+    "title": "Convertitore di Basi",
+    "description": "Converti numeri tra diverse basi (binario, ottale, decimale, esadecimale e basi personalizzate 2-36).",
+    "input": "Numero da Convertire",
+    "baseFrom": "Base di Partenza",
+    "baseTo": "Base di Arrivo",
+    "swap": "Scambia Basi",
+    "errorInvalid": "Numero non valido per la base selezionata",
+    "commonBases": {
+      "2": "Binario (Base 2)",
+      "8": "Ottale (Base 8)",
+      "10": "Decimale (Base 10)",
+      "16": "Esadecimale (Base 16)"
+    }
+  },
+  "ascii": {
+    "title": "Convertitore ASCII",
+    "description": "Converti testo in codici ASCII (decimale, binario, esadecimale) e viceversa.",
+    "textInput": "Testo",
+    "asciiOutput": "Output ASCII",
+    "char": "Carattere",
+    "dec": "Dec",
+    "hex": "Hex",
+    "bin": "Bin"
+  },
+  "floating": {
+    "title": "Virgola Mobile (IEEE 754)",
+    "description": "Visualizza come i numeri decimali sono rappresentati in memoria secondo lo standard IEEE 754 (32-bit e 64-bit).",
+    "input": "Numero Decimale",
+    "precision": {
+      "single": "Singola Precisione (32-bit)",
+      "double": "Doppia Precisione (64-bit)"
+    },
+    "components": {
+      "sign": "Segno",
+      "exponent": "Esponente",
+      "mantissa": "Mantissa"
+    }
+  },
+  "json": {
+    "title": "Formatter & Validatore JSON",
+    "description": "Formatta, valida e minifica codice JSON. Utile per debug di API e configurazioni.",
+    "input": "JSON Input",
+    "format": "Formatta",
+    "minify": "Minifica",
+    "valid": "JSON Valido",
+    "invalid": "JSON Non Valido",
+    "error": "Errore di sintassi"
   }
 }

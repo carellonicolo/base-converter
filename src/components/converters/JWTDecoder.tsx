@@ -1,13 +1,15 @@
 import React, { useState } from 'react';
-import { Shield, AlertTriangle, CheckCircle, Key } from 'lucide-react';
+import { AlertTriangle, CheckCircle, Key } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import Textarea from '../ui/Textarea';
 import Card from '../ui/Card';
 import CopyButton from '../shared/CopyButton';
 import InfoBox from '../ui/InfoBox';
-import { decodeJWT, validateJWT, formatJWT } from '../../utils/conversions/jwt';
+import { decodeJWT, validateJWT } from '../../utils/conversions/jwt';
 import { useDebounce } from '../../hooks/useDebounce';
 
 const JWTDecoder: React.FC = () => {
+  const { t } = useTranslation();
   const [jwtInput, setJwtInput] = useState('');
   const [error, setError] = useState('');
 
@@ -20,10 +22,10 @@ const JWTDecoder: React.FC = () => {
       setError('');
       return result;
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'JWT non valido');
+      setError(err instanceof Error ? err.message : t('jwt.errors.invalid'));
       return null;
     }
-  }, [debouncedJWT]);
+  }, [debouncedJWT, t]);
 
   const validation = React.useMemo(() => {
     if (!debouncedJWT) return null;
@@ -34,16 +36,6 @@ const JWTDecoder: React.FC = () => {
     }
   }, [debouncedJWT]);
 
-  React.useEffect(() => {
-    if (decoded && validation) {
-      add('jwt', debouncedJWT.substring(0, 50) + '...', {
-        header: decoded.header,
-        payload: decoded.payload,
-        valid: validation.valid,
-      });
-    }
-  }, [decoded, validation, debouncedJWT, add]);
-
   const formatTimestamp = (timestamp?: number) => {
     if (!timestamp) return 'N/A';
     return new Date(timestamp * 1000).toLocaleString('it-IT');
@@ -53,22 +45,22 @@ const JWTDecoder: React.FC = () => {
     <div className="space-y-6">
       {/* Educational Info Box */}
       <InfoBox
-        title="JWT Decoder"
-        description="JSON Web Token (JWT) è uno standard per trasmettere informazioni in modo sicuro tra parti come JSON. Sono firmati crittograficamente e contengono claims (affermazioni) su un utente. Usati principalmente per autenticazione e autorizzazione in API moderne."
+        title={t('jwt.title')}
+        description={t('jwt.description')}
         icon={<Key className="w-5 h-5" />}
         useCases={[
-          "Autenticazione: dopo login, il server genera un JWT che identifica l'utente",
-          "Single Sign-On (SSO): un token per accedere a più servizi",
-          "API autorizzazione: ogni richiesta include JWT per verificare permessi",
-          "Sessioni stateless: non serve salvare sessioni sul server",
-          "OAuth 2.0: access_token e id_token sono spesso JWT"
+          t('jwt.useCase1'),
+          t('jwt.useCase2'),
+          t('jwt.useCase3'),
+          t('jwt.useCase4'),
+          t('jwt.useCase5')
         ]}
         examples={[
           { label: 'Header', value: '{"alg":"HS256","typ":"JWT"}' },
           { label: 'Payload', value: '{"sub":"user123","exp":1735689600}' },
           { label: 'Token', value: 'eyJhbGc...{header}.{payload}.{signature}' }
         ]}
-        realWorldUse="Quando fai login su un'app, ricevi un JWT. Ad ogni richiesta API, il browser invia questo token nell'header 'Authorization: Bearer eyJhbGc...'. Il server verifica la firma del JWT (questo tool NON lo fa!) e legge chi sei senza controllare un database. ⚠️ ATTENZIONE: Non inserire JWT reali qui - contengono dati sensibili!"
+        realWorldUse={t('jwt.realWorldUse')}
         type="warning"
       />
 
@@ -77,7 +69,7 @@ const JWTDecoder: React.FC = () => {
         label="JWT Token"
         value={jwtInput}
         onChange={(e) => setJwtInput(e.target.value)}
-        placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c"
+        placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
         rows={4}
         fullWidth
         error={error}
@@ -94,20 +86,20 @@ const JWTDecoder: React.FC = () => {
             )}
             <div>
               <h4 className="text-lg font-bold text-white">
-                {validation.valid ? 'Token Valido' : 'Token Non Valido'}
+                {validation.valid ? t('jwt.valid') : t('jwt.invalid')}
               </h4>
               {validation.expired && (
-                <p className="text-sm text-red-400">Token scaduto</p>
+                <p className="text-sm text-red-400">{t('jwt.expired')}</p>
               )}
               {validation.notYetValid && (
-                <p className="text-sm text-yellow-400">Token non ancora valido</p>
+                <p className="text-sm text-yellow-400">{t('jwt.notYetValid')}</p>
               )}
             </div>
           </div>
 
           {validation.errors.length > 0 && (
             <div className="glass-morphism rounded-xl p-4 bg-red-500/10">
-              <h5 className="text-sm font-bold text-red-400 mb-2">Errori:</h5>
+              <h5 className="text-sm font-bold text-red-400 mb-2">{t('common.errors')}:</h5>
               <ul className="text-sm text-red-300 space-y-1 list-disc list-inside">
                 {validation.errors.map((err, i) => (
                   <li key={i}>{err}</li>
@@ -118,7 +110,7 @@ const JWTDecoder: React.FC = () => {
 
           {validation.expiresIn !== null && validation.expiresIn > 0 && (
             <p className="text-sm text-slate-400 mt-3">
-              Scade tra: {Math.floor(validation.expiresIn / 3600)} ore
+              {t('jwt.expiresIn', { hours: Math.floor(validation.expiresIn / 3600) })}
             </p>
           )}
         </Card>

@@ -3,6 +3,7 @@ import { ChevronDown, ChevronUp, Copy, Check, Search, Info } from 'lucide-react'
 import CharacterDetailModal from './CharacterDetailModal';
 import { unicodeCharacterDetails } from '../data/unicodeCharacterDetails';
 import { getEmojiName } from '../utils/emojiNames';
+import { useTranslation } from 'react-i18next';
 
 interface UnicodeChar {
   dec: number;
@@ -229,14 +230,10 @@ const categoryColors = {
   'supplemental': 'bg-green-400/10 border-green-400/20',
 };
 
-const categoryLabels = {
-  control: 'Caratteri di Controllo ASCII',
-  special: 'Simboli e Caratteri Speciali ASCII',
-  number: 'Numeri',
-  uppercase: 'Lettere Maiuscole ASCII',
-  lowercase: 'Lettere Minuscole ASCII',
-  'latin1-symbols': 'Simboli Latin-1 Supplement',
-  'latin1-uppercase': 'Maiuscole Latin-1 Supplement',
+const categoryLabels: Record<string, string> = {
+  'control': 'Caratteri di Controllo ASCII',
+  'basic-latin': 'Basic Latin (ASCII)',
+  'latin1-supplement': 'Latin-1 Supplement',
   'latin1-lowercase': 'Minuscole Latin-1 Supplement',
   'latin-extended-a': 'Latin Extended-A',
   'latin-extended-b': 'Latin Extended-B',
@@ -247,6 +244,7 @@ const categoryLabels = {
 };
 
 function UnicodeTable() {
+  const { t } = useTranslation();
   const [isExpanded, setIsExpanded] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [copiedCell, setCopiedCell] = useState<string | null>(null);
@@ -296,6 +294,10 @@ function UnicodeTable() {
     return acc;
   }, {} as Record<string, UnicodeChar[]>);
 
+  // Sort categories to ensure consistent order if needed, 
+  // currently reusing the order from Object.entries(groupedData) is fine 
+  // or we can sort by a predefined list.
+
   return (
     <>
       <CharacterDetailModal
@@ -311,7 +313,7 @@ function UnicodeTable() {
         >
           <div className="flex items-center gap-3">
             <h4 className="text-sm font-bold text-slate-200 tracking-wide">
-              Tabella Unicode Estesa (inclusi Emoji)
+              {t('unicode.tableTitle')}
             </h4>
             {isExpanded && (
               <span className="text-xs text-slate-400">
@@ -342,8 +344,12 @@ function UnicodeTable() {
             <div className="space-y-6 max-h-[600px] overflow-y-auto pr-2 custom-scrollbar">
               {Object.entries(groupedData).map(([category, items]) => (
                 <div key={category} className="space-y-2">
-                  <h5 className="text-xs font-bold text-liquid-300 uppercase tracking-wider sticky top-0 bg-slate-900/80 backdrop-blur-sm py-2 z-10">
-                    {categoryLabels[category as keyof typeof categoryLabels]}
+                  <h5 className="text-xs font-bold text-liquid-300 uppercase tracking-wider sticky top-0 bg-slate-900/80 backdrop-blur-sm py-2 z-10 flex items-center gap-2">
+                    {/* Show colored dot for category */}
+                    <span className={`w-2 h-2 rounded-full inline-block ${categoryColors[category as keyof typeof categoryColors]?.split(' ')[0].replace('/10', '')}`}></span>
+                    {['misc', 'emoticon', 'transport', 'supplemental'].includes(category)
+                      ? t(`unicode.categories.${category}`)
+                      : categoryLabels[category] || category}
                   </h5>
                   <div className="overflow-x-auto">
                     <table className="w-full text-sm">
