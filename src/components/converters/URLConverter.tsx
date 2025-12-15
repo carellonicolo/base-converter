@@ -52,11 +52,7 @@ const URLConverter: React.FC = () => {
 
   const slugified = debouncedText ? slugify(debouncedText) : '';
 
-  React.useEffect(() => {
-    if (encodedURL && debouncedText) {
-      add('url', debouncedText, { encoded: encodedURL, slugified });
-    }
-  }, [encodedURL, debouncedText, slugified, add]);
+
 
   return (
     <div className="space-y-6">

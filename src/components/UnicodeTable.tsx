@@ -97,6 +97,20 @@ const generateUnicodeData = (): UnicodeChar[] => {
     });
   }
 
+  // Add Emojis (U+1F600 - U+1F64F)
+  for (let i = 0x1F600; i <= 0x1F64F; i++) {
+    const char = String.fromCodePoint(i);
+    data.push({
+      dec: i,
+      hex: i.toString(16).toUpperCase().padStart(4, '0'),
+      bin: i.toString(2).padStart(16, '0'),
+      char: char,
+      description: 'Emoji / Emoticon',
+      category: 'emoji',
+      unicode: `U+${i.toString(16).toUpperCase().padStart(4, '0')}`
+    });
+  }
+
   return data;
 };
 
@@ -166,6 +180,7 @@ const categoryColors = {
   'latin1-lowercase': 'bg-teal-500/10 border-teal-500/20',
   'latin-extended-a': 'bg-orange-500/10 border-orange-500/20',
   'latin-extended-b': 'bg-pink-500/10 border-pink-500/20',
+  'emoji': 'bg-yellow-400/10 border-yellow-400/20',
 };
 
 const categoryLabels = {
@@ -179,6 +194,7 @@ const categoryLabels = {
   'latin1-lowercase': 'Minuscole Latin-1 Supplement',
   'latin-extended-a': 'Latin Extended-A',
   'latin-extended-b': 'Latin Extended-B',
+  'emoji': 'Emoticon & Emoji (U+1F600 - U+1F64F)',
 };
 
 function UnicodeTable() {
@@ -246,7 +262,7 @@ function UnicodeTable() {
         >
           <div className="flex items-center gap-3">
             <h4 className="text-sm font-bold text-slate-200 tracking-wide">
-              Tabella Unicode Completa (U+0000 - U+024F)
+              Tabella Unicode Estesa (inclusi Emoji)
             </h4>
             {isExpanded && (
               <span className="text-xs text-slate-400">
@@ -296,9 +312,8 @@ function UnicodeTable() {
                         {items.map((item) => (
                           <tr
                             key={item.dec}
-                            className={`border-b border-white/5 hover:bg-white/5 transition-colors ${
-                              categoryColors[category as keyof typeof categoryColors]
-                            }`}
+                            className={`border-b border-white/5 hover:bg-white/5 transition-colors ${categoryColors[category as keyof typeof categoryColors]
+                              }`}
                           >
                             <td
                               className="py-2 px-3 font-mono text-slate-200 cursor-pointer hover:text-liquid-300 transition-colors relative group"
@@ -356,11 +371,10 @@ function UnicodeTable() {
                               )}
                             </td>
                             <td
-                              className={`py-2 px-3 text-slate-300 ${
-                                unicodeCharacterDetails[item.char]
-                                  ? 'cursor-pointer hover:text-liquid-300 hover:bg-white/5 transition-all duration-200 group/desc'
-                                  : ''
-                              }`}
+                              className={`py-2 px-3 text-slate-300 ${unicodeCharacterDetails[item.char]
+                                ? 'cursor-pointer hover:text-liquid-300 hover:bg-white/5 transition-all duration-200 group/desc'
+                                : ''
+                                }`}
                               onClick={() => unicodeCharacterDetails[item.char] && handleDescriptionClick(item)}
                             >
                               <div className="flex items-center gap-2">

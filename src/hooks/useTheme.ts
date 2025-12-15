@@ -22,7 +22,18 @@ export function useTheme() {
   // If light mode is selected, always use light theme (ignore presets in light mode)
   // If dark mode, use the selected preset
   const theme = useMemo(() => {
-    return actualTheme === 'light' ? themes.light : (themes[preset] || themes.default);
+    if (actualTheme === 'light') {
+      const baseLight = themes.light;
+      const presetTheme = themes[preset] || themes.default;
+      return {
+        ...baseLight,
+        colors: {
+          ...baseLight.colors,
+          accent: presetTheme.colors.accent,
+        },
+      };
+    }
+    return themes[preset] || themes.default;
   }, [actualTheme, preset]);
 
   // Apply theme to CSS variables

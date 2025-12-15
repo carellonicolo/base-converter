@@ -19,22 +19,28 @@ const CopyButton: React.FC<CopyButtonProps> = ({ text, className = '', size = 'm
   };
 
   const sizeStyles = {
-    sm: 'p-1.5 w-3.5 h-3.5',
-    md: 'p-2.5 w-4 h-4',
-    lg: 'p-3 w-5 h-5',
+    sm: 'p-1.5',
+    md: 'p-2',
+    lg: 'p-3',
+  };
+
+  const iconSizes = {
+    sm: 'w-4 h-4',
+    md: 'w-5 h-5',
+    lg: 'w-6 h-6',
   };
 
   return (
     <button
       onClick={handleCopy}
-      className={`glass-morphism rounded-xl transition-all duration-300 hover:scale-110 hover:bg-white/10 ${className}`}
-      title={copied ? 'Copiato!' : 'Copia'}
+      className={`rounded-lg bg-white/5 border border-white/10 hover:bg-white/10 hover:border-white/20 hover:scale-105 active:scale-95 transition-all duration-200 flex items-center justify-center ${sizeStyles[size]} ${className}`}
+      title={copied ? 'Copiato!' : 'Copia negli appunti'}
       aria-label={copied ? 'Copiato' : 'Copia negli appunti'}
     >
       {copied || copyStatus === 'copied' ? (
-        <Check className={`${sizeStyles[size]} text-green-400`} />
+        <Check className={`${iconSizes[size]} text-green-400`} />
       ) : (
-        <Copy className={`${sizeStyles[size]} text-slate-300 hover:text-white transition-colors`} />
+        <Copy className={`${iconSizes[size]} text-slate-300 group-hover:text-white transition-colors`} />
       )}
     </button>
   );

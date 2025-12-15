@@ -35,7 +35,6 @@ const HashGenerator: React.FC = () => {
       try {
         const result = await generateHash(debouncedInput, algorithm);
         setHash(result);
-        add('hash', debouncedInput, { algorithm, hash: result });
       } catch (error) {
         setHash('');
       } finally {
@@ -44,7 +43,7 @@ const HashGenerator: React.FC = () => {
     };
 
     generateHashAsync();
-  }, [debouncedInput, algorithm, add]);
+  }, [debouncedInput, algorithm]);
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -54,7 +53,6 @@ const HashGenerator: React.FC = () => {
     try {
       const fileHash = await generateFileHash(file, algorithm as 'SHA256' | 'SHA512');
       setHash(fileHash);
-      add('hash', `File: ${file.name}`, { algorithm, hash: fileHash });
     } catch (error) {
       console.error('Error generating file hash:', error);
     } finally {

@@ -52,19 +52,7 @@ const ColorConverter: React.FC = () => {
 
   const colorPreview = `rgb(${currentColor.r}, ${currentColor.g}, ${currentColor.b})`;
 
-  const handleSave = () => {
-    add('color', hexInput, {
-      hex: hexInput,
-      rgb: `rgb(${currentColor.r}, ${currentColor.g}, ${currentColor.b})`,
-      hsl: `hsl(${hsl.h}, ${hsl.s}%, ${hsl.l}%)`,
-      hsv: `hsv(${hsv.h}, ${hsv.s}%, ${hsv.v}%)`,
-      cmyk: `cmyk(${cmyk.c}%, ${cmyk.m}%, ${cmyk.y}%, ${cmyk.k}%)`,
-    });
-  };
 
-  useEffect(() => {
-    handleSave();
-  }, [currentColor]);
 
   return (
     <div className="space-y-6">

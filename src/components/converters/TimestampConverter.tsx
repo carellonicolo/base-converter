@@ -44,12 +44,7 @@ const TimestampConverter: React.FC = () => {
     const timestamp = now();
     setUnixTimestamp(timestamp);
     setDateString(new Date().toISOString().slice(0, 16));
-    add('timestamp', 'Now', formats);
   };
-
-  useEffect(() => {
-    add('timestamp', unixTimestamp.toString(), formats);
-  }, [unixTimestamp]);
 
   return (
     <div className="space-y-6">

@@ -28,7 +28,7 @@ const Dashboard: React.FC = () => {
       {/* Hero section */}
       <div className="text-center">
         <h1 className="text-5xl font-bold text-white mb-4 animate-float">
-          Base Converter Pro
+          Base Converter
         </h1>
         <p className="text-xl text-slate-300 mb-2">
           La suite completa per conversioni e encoding

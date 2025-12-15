@@ -24,7 +24,7 @@ const InfoBox: React.FC<InfoBoxProps> = ({
   type = 'educational',
   icon,
   expandable = true,
-  defaultExpanded = true,
+  defaultExpanded = false,
 }) => {
   const [isExpanded, setIsExpanded] = useState(defaultExpanded);
 
@@ -66,8 +66,8 @@ const InfoBox: React.FC<InfoBoxProps> = ({
   );
 
   const hasExpandableContent = (useCases && useCases.length > 0) ||
-                                (examples && examples.length > 0) ||
-                                realWorldUse;
+    (examples && examples.length > 0) ||
+    realWorldUse;
 
   return (
     <div className={`glass-morphism rounded-2xl border ${styles.border} ${styles.bg} overflow-hidden`}>

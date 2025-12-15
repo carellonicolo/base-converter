@@ -6,7 +6,6 @@ import {
   Accessibility,
 } from 'lucide-react';
 import Card from './ui/Card';
-import Button from './ui/Button';
 import Select from './ui/Select';
 import { useSettingsStore } from '../store/useSettingsStore';
 import { ThemeMode, Language } from '../types/settings';
@@ -19,7 +18,6 @@ const Settings: React.FC = () => {
     setThemePreset,
     setLanguage,
     updateSettings,
-    resetSettings,
     toggleHighContrast,
     toggleReducedMotion,
     setFontSize,
@@ -66,14 +64,12 @@ const Settings: React.FC = () => {
       </div>
       <button
         onClick={onChange}
-        className={`relative inline-flex h-6 w-12 items-center rounded-full transition-colors flex-shrink-0 ml-3 ${
-          enabled ? 'bg-liquid-400' : 'bg-slate-700'
-        }`}
+        className={`relative inline-flex h-6 w-12 items-center rounded-full transition-colors flex-shrink-0 ml-3 ${enabled ? 'bg-liquid-400' : 'bg-slate-700'
+          }`}
       >
         <span
-          className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-            enabled ? 'translate-x-7' : 'translate-x-1'
-          }`}
+          className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${enabled ? 'translate-x-7' : 'translate-x-1'
+            }`}
         />
       </button>
     </div>
@@ -192,49 +188,12 @@ const Settings: React.FC = () => {
         </div>
       </Card>
 
-      {/* Danger Zone */}
-      <Card>
-        <div className="border-l-4 border-red-500 pl-3 mb-3">
-          <h3 className="text-base font-bold text-red-400">{t('settings.danger.title')}</h3>
-          <p className="text-slate-400 text-xs">{t('settings.danger.subtitle')}</p>
-        </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-          <Button
-            variant="danger"
-            onClick={() => {
-              if (
-                window.confirm(t('settings.danger.resetConfirm'))
-              ) {
-                resetSettings();
-              }
-            }}
-            fullWidth
-          >
-            {t('settings.danger.reset')}
-          </Button>
-
-          <Button
-            variant="ghost"
-            onClick={() => {
-              if (
-                window.confirm(t('settings.danger.clearAllConfirm'))
-              ) {
-                localStorage.clear();
-                window.location.reload();
-              }
-            }}
-            fullWidth
-          >
-            {t('settings.danger.clearAll')}
-          </Button>
-        </div>
-      </Card>
 
       {/* Info */}
       <div className="glass-morphism rounded-xl p-3 text-center">
         <p className="text-slate-400 text-xs">
-          Base Converter Pro v2.0.0 - © 2025 Prof. Carello Nicolò
+          Base Converter v2.0.0 - © 2025 Prof. Carello Nicolò
         </p>
       </div>
     </div>

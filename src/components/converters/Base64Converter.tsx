@@ -25,13 +25,12 @@ const Base64Converter: React.FC = () => {
     try {
       const result = encodeBase64(debouncedText);
       setError('');
-      add('base64', debouncedText, result);
       return result;
     } catch (err) {
       setError('Errore nella codifica');
       return '';
     }
-  }, [debouncedText, add]);
+  }, [debouncedText]);
 
   // Decode Base64 to text
   const decodedResult = React.useMemo(() => {
@@ -47,13 +46,12 @@ const Base64Converter: React.FC = () => {
     try {
       const result = decodeBase64(debouncedBase64);
       setError('');
-      add('base64', debouncedBase64, result);
       return result;
     } catch (err) {
       setError('Base64 non valido. Verifica che la stringa sia corretta.');
       return '';
     }
-  }, [debouncedBase64, add]);
+  }, [debouncedBase64]);
 
   // Handle file upload
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {

@@ -9,26 +9,26 @@ function UnicodeConverter() {
   const [copiedField, setCopiedField] = useState<string | null>(null);
 
   const textToUnicode = (text: string): string => {
-    return text
-      .split('')
+    return Array.from(text)
       .map((char) => {
-        const code = char.charCodeAt(0);
+        const code = char.codePointAt(0) || 0;
         return `U+${code.toString(16).toUpperCase().padStart(4, '0')}`;
       })
       .join(' ');
   };
 
   const textToUnicodeDecimal = (text: string): string => {
-    return text
-      .split('')
-      .map((char) => char.charCodeAt(0))
+    return Array.from(text)
+      .map((char) => char.codePointAt(0) || 0)
       .join(' ');
   };
 
   const textToUnicodeHex = (text: string): string => {
-    return text
-      .split('')
-      .map((char) => '0x' + char.charCodeAt(0).toString(16).toUpperCase())
+    return Array.from(text)
+      .map((char) => {
+        const code = char.codePointAt(0) || 0;
+        return '0x' + code.toString(16).toUpperCase();
+      })
       .join(' ');
   };
 
@@ -49,7 +49,7 @@ function UnicodeConverter() {
   };
 
   const getCharDetails = (char: string) => {
-    const code = char.charCodeAt(0);
+    const code = char.codePointAt(0) || 0;
     return {
       char,
       decimal: code,
@@ -236,7 +236,7 @@ function UnicodeConverter() {
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {textInput.split('').map((char, index) => {
+            {Array.from(textInput).map((char, index) => {
               const details = getCharDetails(char);
               return (
                 <div
