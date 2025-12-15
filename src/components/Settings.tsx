@@ -193,7 +193,7 @@ const Settings: React.FC = () => {
       {/* Info */}
       <div className="glass-morphism rounded-xl p-3 text-center">
         <p className="text-slate-400 text-xs">
-          Base Converter v2.0.0 - © 2025 Prof. Carello Nicolò
+          Base Converter v2.0.0 - {t('app.footer')}
         </p>
       </div>
     </div>

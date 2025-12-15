@@ -4,23 +4,25 @@ import {
   Hash, Type, Binary, Gauge, FileText, Shield,
   Palette, Clock, Link2, Key, FileJson
 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import Card from './ui/Card';
 
 const Dashboard: React.FC = () => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   const converters = [
-    { name: 'Basi Numeriche', path: '/base', icon: Hash, color: 'text-blue-400', description: 'Converti tra basi 2-36' },
-    { name: 'ASCII', path: '/ascii', icon: Type, color: 'text-green-400', description: 'Testo ↔ ASCII' },
-    { name: 'Unicode', path: '/unicode', icon: Binary, color: 'text-purple-400', description: 'Testo ↔ Unicode' },
-    { name: 'Virgola Mobile', path: '/floating', icon: Gauge, color: 'text-yellow-400', description: 'IEEE 754 & Fixed-point' },
-    { name: 'Base64', path: '/base64', icon: FileText, color: 'text-cyan-400', description: 'Codifica/Decodifica Base64' },
-    { name: 'Hash', path: '/hash', icon: Shield, color: 'text-red-400', description: 'MD5, SHA-256, SHA-512' },
-    { name: 'Colori', path: '/color', icon: Palette, color: 'text-pink-400', description: 'HEX ↔ RGB ↔ HSL ↔ CMYK' },
-    { name: 'Timestamp', path: '/timestamp', icon: Clock, color: 'text-orange-400', description: 'Unix ↔ Date ↔ ISO' },
-    { name: 'URL', path: '/url', icon: Link2, color: 'text-indigo-400', description: 'Encode/Decode URL' },
-    { name: 'JWT', path: '/jwt', icon: Key, color: 'text-emerald-400', description: 'Decoder JWT Token' },
-    { name: 'JSON', path: '/json', icon: FileJson, color: 'text-teal-400', description: 'Formatta e Valida JSON' },
+    { name: t('dashboard.tools.base.name'), path: '/base', icon: Hash, color: 'text-blue-400', description: t('dashboard.tools.base.desc') },
+    { name: t('dashboard.tools.ascii.name'), path: '/ascii', icon: Type, color: 'text-green-400', description: t('dashboard.tools.ascii.desc') },
+    { name: t('dashboard.tools.unicode.name'), path: '/unicode', icon: Binary, color: 'text-purple-400', description: t('dashboard.tools.unicode.desc') },
+    { name: t('dashboard.tools.floating.name'), path: '/floating', icon: Gauge, color: 'text-yellow-400', description: t('dashboard.tools.floating.desc') },
+    { name: t('dashboard.tools.base64.name'), path: '/base64', icon: FileText, color: 'text-cyan-400', description: t('dashboard.tools.base64.desc') },
+    { name: t('dashboard.tools.hash.name'), path: '/hash', icon: Shield, color: 'text-red-400', description: t('dashboard.tools.hash.desc') },
+    { name: t('dashboard.tools.color.name'), path: '/color', icon: Palette, color: 'text-pink-400', description: t('dashboard.tools.color.desc') },
+    { name: t('dashboard.tools.timestamp.name'), path: '/timestamp', icon: Clock, color: 'text-orange-400', description: t('dashboard.tools.timestamp.desc') },
+    { name: t('dashboard.tools.url.name'), path: '/url', icon: Link2, color: 'text-indigo-400', description: t('dashboard.tools.url.desc') },
+    { name: t('dashboard.tools.jwt.name'), path: '/jwt', icon: Key, color: 'text-emerald-400', description: t('dashboard.tools.jwt.desc') },
+    { name: t('dashboard.tools.json.name'), path: '/json', icon: FileJson, color: 'text-teal-400', description: t('dashboard.tools.json.desc') },
   ];
 
   return (
@@ -28,19 +30,19 @@ const Dashboard: React.FC = () => {
       {/* Hero section */}
       <div className="text-center">
         <h1 className="text-5xl font-bold text-white mb-4 animate-float">
-          Base Converter
+          {t('dashboard.hero.title')}
         </h1>
         <p className="text-xl text-slate-300 mb-2">
-          La suite completa per conversioni e encoding
+          {t('dashboard.hero.subtitle')}
         </p>
         <p className="text-sm text-slate-400">
-          11 strumenti professionali in un'unica applicazione
+          {t('dashboard.hero.description')}
         </p>
       </div>
 
       {/* Converters grid */}
       <div>
-        <h2 className="text-2xl font-bold text-white mb-6">Scegli uno Strumento</h2>
+        <h2 className="text-2xl font-bold text-white mb-6">{t('dashboard.toolsTitle')}</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {converters.map((converter) => (
             <Card
@@ -67,36 +69,7 @@ const Dashboard: React.FC = () => {
         </div>
       </div>
 
-      {/* Features */}
-      <div className="glass-morphism rounded-2xl p-6">
-        <h3 className="text-lg font-bold text-white mb-4">Caratteristiche</h3>
-        <div className="grid md:grid-cols-2 gap-4 text-sm text-slate-300">
-          <div className="flex items-center gap-2">
-            <span className="text-green-400">✓</span>
-            <span>Conversioni in tempo reale</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <span className="text-green-400">✓</span>
-            <span>Copia con un click</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <span className="text-green-400">✓</span>
-            <span>Temi personalizzabili</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <span className="text-green-400">✓</span>
-            <span>PWA - Funziona offline</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <span className="text-green-400">✓</span>
-            <span>100% Privacy - Locale</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <span className="text-green-400">✓</span>
-            <span>Interfaccia multilingua</span>
-          </div>
-        </div>
-      </div>
+
     </div>
   );
 };

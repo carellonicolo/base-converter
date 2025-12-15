@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { ArrowRight, Copy, Check, Calculator } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import useCopyToClipboard from '../hooks/useCopyToClipboard';
 import { isValidForBase } from '../utils/validation';
 import InfoBox from './ui/InfoBox';
@@ -12,6 +13,7 @@ interface ConversionResult {
 }
 
 function BaseConverter() {
+  const { t } = useTranslation();
   const [inputValue, setInputValue] = useState('');
   const [inputBase, setInputBase] = useState(10);
   const [customBase, setCustomBase] = useState('');
@@ -33,10 +35,10 @@ function BaseConverter() {
   };
 
   const commonBases = [
-    { base: 2, label: 'Binario', prefix: '0b' },
-    { base: 8, label: 'Ottale', prefix: '0o' },
-    { base: 10, label: 'Decimale', prefix: '' },
-    { base: 16, label: 'Esadecimale', prefix: '0x' },
+    { base: 2, label: t('base.bases.binary'), prefix: '0b' },
+    { base: 8, label: t('base.bases.octal'), prefix: '0o' },
+    { base: 10, label: t('base.bases.decimal'), prefix: '' },
+    { base: 16, label: t('base.bases.hex'), prefix: '0x' },
   ];
 
   useEffect(() => {
@@ -67,7 +69,7 @@ function BaseConverter() {
         const maxChar = detectedBase > 10
           ? (detectedBase - 1).toString(36).toUpperCase()
           : (detectedBase - 1);
-        setError(`Caratteri non validi per base ${detectedBase}. Usa solo: 0-${maxChar}`);
+        setError(`${t('base.errorInvalid')} (${detectedBase}). Use: 0-${maxChar}`);
         setResults([]);
         return;
       }
@@ -75,7 +77,7 @@ function BaseConverter() {
       const decimalValue = parseInt(cleanValue, detectedBase);
 
       if (isNaN(decimalValue) || !isFinite(decimalValue)) {
-        setError('Valore non valido per la base selezionata');
+        setError(t('base.errorInvalid'));
         setResults([]);
         return;
       }
@@ -102,60 +104,53 @@ function BaseConverter() {
 
       setResults(conversions);
     } catch (err) {
-      setError('Errore nella conversione');
+      setError(t('base.errorInvalid'));
       setResults([]);
     }
-  }, [inputValue, inputBase, customBase]);
+  }, [inputValue, inputBase, customBase, t]);
 
   return (
     <div className="space-y-8">
       {/* Educational Info Box */}
       <InfoBox
-        title="Convertitore di Basi Numeriche"
-        description="I sistemi di numerazione sono modi diversi di rappresentare gli stessi numeri. Ogni base usa un numero diverso di cifre: binario (2 cifre: 0,1), ottale (8 cifre: 0-7), decimale (10 cifre: 0-9), esadecimale (16 cifre: 0-9,A-F)."
+        title={t('base.title')}
+        description={t('base.description')}
         icon={<Calculator className="w-5 h-5" />}
-        useCases={[
-          "Programmazione: il binario è il linguaggio dei computer",
-          "Colori web: i codici colore HTML usano l'esadecimale (#FF0000 = rosso)",
-          "Informatica: comprendere come i computer rappresentano i dati",
-          "Permessi file Linux: usano la notazione ottale (chmod 755)",
-          "Indirizzi IP e MAC: spesso rappresentati in esadecimale"
-        ]}
+        useCases={t('base.useCases', { returnObjects: true }) as string[]}
         examples={[
-          { label: '42 (decimale)', value: '101010 (binario) = 2A (hex)' },
-          { label: '255 (decimale)', value: '11111111 (binario) = FF (hex)' }
+          { label: '42 (dec)', value: '101010 (bin) = 2A (hex)' },
+          { label: '255 (dec)', value: '11111111 (bin) = FF (hex)' }
         ]}
-        realWorldUse="Quando scrivi '#FF5733' per un colore arancione in CSS, stai usando esadecimale! FF=255 rosso, 57=87 verde, 33=51 blu. I programmatori usano l'esadecimale perché è più compatto del binario ma più vicino al modo in cui i computer pensano."
+        realWorldUse={t('common.realWorldUse')}
         type="educational"
       />
 
       <div className="grid md:grid-cols-2 gap-6">
         <div>
           <label className="block text-sm font-semibold text-slate-200 mb-3 tracking-wide">
-            Valore da Convertire
+            {t('base.valueLabel')}
           </label>
           <input
             type="text"
             value={inputValue}
             onChange={handleInputChange}
-            placeholder="Inserisci un numero..."
+            placeholder="123, 0xFF, 1010..."
             className="liquid-input w-full text-white placeholder-slate-400"
           />
         </div>
 
         <div>
           <label className="block text-sm font-semibold text-slate-200 mb-3 tracking-wide">
-            Base di Input
+            {t('base.baseLabel')}
           </label>
           <select
             value={inputBase}
             onChange={(e) => setInputBase(parseInt(e.target.value))}
             className="liquid-input w-full text-white appearance-none cursor-pointer"
           >
-            <option value={2}>Binario (Base 2)</option>
-            <option value={8}>Ottale (Base 8)</option>
-            <option value={10}>Decimale (Base 10)</option>
-            <option value={16}>Esadecimale (Base 16)</option>
+            {commonBases.map((b) => (
+              <option key={b.base} value={b.base}>{b.label}</option>
+            ))}
             <option value={32}>Base 32</option>
             <option value={36}>Base 36</option>
           </select>
@@ -164,7 +159,7 @@ function BaseConverter() {
 
       <div>
         <label className="block text-sm font-semibold text-slate-200 mb-3 tracking-wide">
-          Base Personalizzata (2-36) - Opzionale
+          {t('base.customBaseLabel')}
         </label>
         <input
           type="number"
@@ -172,7 +167,7 @@ function BaseConverter() {
           max="36"
           value={customBase}
           onChange={(e) => setCustomBase(e.target.value)}
-          placeholder="Es. 7, 12, 24..."
+          placeholder="7, 12, 24..."
           className="liquid-input w-full text-white placeholder-slate-400"
         />
       </div>
@@ -190,7 +185,7 @@ function BaseConverter() {
               <div className="absolute inset-0 bg-liquid-400 blur-lg opacity-40"></div>
               <ArrowRight className="w-6 h-6 text-liquid-300 relative z-10" />
             </div>
-            <h3 className="text-2xl font-bold text-white">Risultati</h3>
+            <h3 className="text-2xl font-bold text-white">{t('base.results')}</h3>
           </div>
 
           <div className="grid md:grid-cols-2 gap-5">
@@ -231,7 +226,7 @@ function BaseConverter() {
       {!inputValue && (
         <div className="text-center py-16">
           <div className="glass-morphism rounded-2xl p-8 inline-block">
-            <p className="text-slate-300 text-lg font-light">Inserisci un numero per vedere le conversioni</p>
+            <p className="text-slate-300 text-lg font-light">{t('base.title')}: Inserisci un numero</p>
           </div>
         </div>
       )}

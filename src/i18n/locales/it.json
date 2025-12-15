@@ -49,11 +49,64 @@
   },
   "dashboard": {
     "welcome": "Benvenuto in Base Converter",
-    "description": "Strumento professionale per la conversione di basi numeriche, codifiche e formati"
+    "description": "Strumento professionale per la conversione di basi numeriche, codifiche e formati",
+    "hero": {
+      "title": "Base Converter",
+      "subtitle": "La suite completa per conversioni e encoding",
+      "description": "11 strumenti professionali in un'unica applicazione"
+    },
+    "toolsTitle": "Scegli uno Strumento",
+    "tools": {
+      "base": {
+        "name": "Basi Numeriche",
+        "desc": "Converti tra basi 2-36"
+      },
+      "ascii": {
+        "name": "ASCII",
+        "desc": "Testo ↔ ASCII"
+      },
+      "unicode": {
+        "name": "Unicode",
+        "desc": "Testo ↔ Unicode"
+      },
+      "floating": {
+        "name": "Virgola Mobile",
+        "desc": "IEEE 754 & Fixed-point"
+      },
+      "base64": {
+        "name": "Base64",
+        "desc": "Codifica/Decodifica Base64"
+      },
+      "hash": {
+        "name": "Hash",
+        "desc": "MD5, SHA-256, SHA-512"
+      },
+      "color": {
+        "name": "Colori",
+        "desc": "HEX ↔ RGB ↔ HSL ↔ CMYK"
+      },
+      "timestamp": {
+        "name": "Timestamp",
+        "desc": "Unix ↔ Date ↔ ISO"
+      },
+      "url": {
+        "name": "URL",
+        "desc": "Encode/Decode URL"
+      },
+      "jwt": {
+        "name": "JWT",
+        "desc": "Decoder JWT Token"
+      },
+      "json": {
+        "name": "JSON",
+        "desc": "Formatta e Valida JSON"
+      }
+    }
   },
   "common": {
     "copy": "Copia",
     "copied": "Copiato!",
+    "copyToClipboard": "Copia negli appunti",
     "error": "Errore",
     "errors": "Errori",
     "loading": "Caricamento...",
@@ -62,6 +115,41 @@
     "input": "Input",
     "output": "Output",
     "result": "Risultato"
+  },
+  "jwt": {
+    "title": "Decoder JWT",
+    "description": "JSON Web Token (JWT) è uno standard per trasmettere informazioni in modo sicuro tra parti come JSON. Usato per autenticazione e autorizzazione.",
+    "useCase1": "Autenticazione: server genera JWT dopo login",
+    "useCase2": "Single Sign-On (SSO): accesso unificato",
+    "useCase3": "API Autorizzazione: token nei request header",
+    "useCase4": "Sessioni Stateless",
+    "useCase5": "OAuth 2.0 Tokens",
+    "realWorldUse": "Visualizza il contenuto di un token JWT (header e payload) per debug.",
+    "valid": "Token Valido",
+    "invalid": "Token Non Valido",
+    "expired": "Token scaduto",
+    "notYetValid": "Token non ancora valido",
+    "expiresIn": "Scade tra: {{hours}} ore",
+    "errors": {
+      "invalid": "JWT non valido"
+    },
+    "signatureTitle": "Firma",
+    "signatureDesc": "La firma garantisce che il token non sia stato alterato",
+    "exampleTitle": "Esempio JWT",
+    "exampleDesc": "Prova con questo token di esempio:",
+    "headerTitle": "Header",
+    "payloadTitle": "Payload",
+    "standardClaims": "Credenziali Standard (Standard Claims)",
+    "algo": "Algoritmo",
+    "type": "Tipo",
+    "claims": {
+      "iss": "Emittente (iss)",
+      "sub": "Soggetto (sub)",
+      "aud": "Audience (aud)",
+      "exp": "Scadenza (exp)",
+      "nbf": "Valido da (nbf)",
+      "iat": "Emesso il (iat)"
+    }
   },
   "unicode": {
     "title": "Convertitore Unicode",
@@ -99,13 +187,27 @@
     "inputText": "Testo da hashare",
     "algorithm": "Algoritmo",
     "uploadButton": "Hash File",
+    "uploadHint": "Carica un file per calcolarne l'hash",
     "useCases": [
       "Password hashing (SHA-256)",
       "Verifica integrità file",
       "Blockchain e mining",
       "Firme digitali",
       "Identificazione duplicati"
-    ]
+    ],
+    "table": {
+      "title": "Confronto Algoritmi",
+      "algorithm": "Algoritmo",
+      "length": "Lunghezza",
+      "security": "Sicurezza",
+      "usage": "Uso"
+    },
+    "status": {
+      "insecure": "❌ Insicuro",
+      "deprecated": "⚠ Deprecato",
+      "secure": "✅ Sicuro",
+      "verySecure": "✅ Molto Sicuro"
+    }
   },
   "color": {
     "title": "Convertitore Colori",
@@ -114,18 +216,42 @@
     "palette": "Palette Suggerita",
     "formats": {
       "hex": "Formato HEX",
-      "rgb": "Formato RGB"
-    }
+      "rgb": "Formato RGB",
+      "hsl": "Formato HSL",
+      "hsv": "Formato HSV",
+      "cmyk": "Formato CMYK"
+    },
+    "useCases": [
+      "Web Design: CSS usa HEX (#FF0000) e RGB (rgb(255,0,0))",
+      "Grafica digitale: HSL permette di regolare luminosità saturazione",
+      "Stampa: CMYK è lo standard per stampanti (Ciano, Magenta, Giallo, Nero)",
+      "Photo editing: HSV/HSB usato in Photoshop",
+      "Accessibilità: trovare colori con contrasto sufficiente"
+    ],
+    "infoCMYK": "ℹ️ CMYK è usato per la stampa professionale"
   },
   "url": {
     "title": "Encoder/Decoder URL",
     "description": "Percent-encoding per rendere gli URL sicuri e validi. Gestisce caratteri speciali e query string.",
     "encodeTitle": "Codifica URL",
     "decodeTitle": "Decodifica URL",
+    "inputToEncode": "Testo da codificare",
+    "inputToDecode": "URL da decodificare",
+    "encodedResult": "URL Codificato",
+    "decodedResult": "URL Decodificato",
+    "urlOrQuery": "URL o Query String",
     "analyzeQuery": "Analizza Query Parameters",
     "extractedParams": "Parametri Estratti",
     "slugTitle": "URL Slug",
-    "slugDescription": "Slug URL-friendly per titoli"
+    "slugDescription": "Slug URL-friendly per titoli",
+    "commonChars": "Caratteri Comuni Codificati",
+    "useCases": [
+      "Query parameters: passare dati in URL",
+      "API REST: inviare parametri speciali",
+      "SEO: creare slug leggibili",
+      "Form HTML: encoding automatico",
+      "OAuth: parametri di redirect"
+    ]
   },
   "timestamp": {
     "title": "Convertitore Timestamp",
@@ -136,73 +262,132 @@
     "allFormats": "Tutti i Formati",
     "milliseconds": "Millisecondi",
     "custom": "Formato Personalizzato",
-    "relative": "Tempo Relativo"
-  },
-  "jwt": {
-    "title": "Decoder JWT",
-    "description": "JSON Web Token (JWT) è uno standard per trasmettere informazioni in modo sicuro tra parti come JSON. Usato per autenticazione e autorizzazione.",
-    "useCase1": "Autenticazione: server genera JWT dopo login",
-    "useCase2": "Single Sign-On (SSO): accesso unificato",
-    "useCase3": "API Autorizzazione: token nei request header",
-    "useCase4": "Sessioni Stateless",
-    "useCase5": "OAuth 2.0 Tokens",
-    "realWorldUse": "Visualizza il contenuto di un token JWT (header e payload) per debug.",
-    "valid": "Token Valido",
-    "invalid": "Token Non Valido",
-    "expired": "Token scaduto",
-    "notYetValid": "Token non ancora valido",
-    "expiresIn": "Scade tra: {{hours}} ore",
-    "errors": {
-      "invalid": "JWT non valido"
+    "relative": "Tempo Relativo",
+    "examplesTitle": "Esempi Famosi",
+    "useCases": [
+      "Database: date universali",
+      "API: scambio date standard",
+      "Logging: eventi precisi",
+      "Social: tempo relativo",
+      "Token: scadenza sessioni"
+    ],
+    "formatsDesc": {
+      "unix": "Standard Unix",
+      "milliseconds": "JavaScript Date.now()",
+      "iso": "Standard internazionale",
+      "rfc": "Email headers, HTTP",
+      "custom": "DD/MM/YYYY HH:mm:ss",
+      "relative": "Leggibile dall'uomo"
     }
   },
   "base": {
     "title": "Convertitore di Basi",
-    "description": "Converti numeri tra diverse basi (binario, ottale, decimale, esadecimale e basi personalizzate 2-36).",
-    "input": "Numero da Convertire",
-    "baseFrom": "Base di Partenza",
-    "baseTo": "Base di Arrivo",
-    "swap": "Scambia Basi",
-    "errorInvalid": "Numero non valido per la base selezionata",
-    "commonBases": {
-      "2": "Binario (Base 2)",
-      "8": "Ottale (Base 8)",
-      "10": "Decimale (Base 10)",
-      "16": "Esadecimale (Base 16)"
-    }
+    "description": "Converti numeri tra Binario, Ottale, Decimale, Esadecimale e basi personalizzate.",
+    "valueLabel": "Valore da Convertire",
+    "baseLabel": "Base di Input",
+    "customBaseLabel": "Base Personalizzata (2-36)",
+    "results": "Risultati",
+    "errorInvalid": "Caratteri non validi per la base selezionata",
+    "bases": {
+      "binary": "Binario (Base 2)",
+      "octal": "Ottale (Base 8)",
+      "decimal": "Decimale (Base 10)",
+      "hex": "Esadecimale (Base 16)"
+    },
+    "useCases": [
+      "Programmazione: binario e hex sono fondamentali",
+      "Colori web: capire i codici #FF0000",
+      "Reti: Indirizzi IP e MAC",
+      "Permessi Linux: chmod 755 (ottale)",
+      "Elettronica: segnali digitali (0/1)"
+    ]
   },
   "ascii": {
     "title": "Convertitore ASCII",
-    "description": "Converti testo in codici ASCII (decimale, binario, esadecimale) e viceversa.",
-    "textInput": "Testo",
-    "asciiOutput": "Output ASCII",
-    "char": "Carattere",
-    "dec": "Dec",
-    "hex": "Hex",
-    "bin": "Bin"
+    "description": "ASCII (American Standard Code for Information Interchange) assegna un numero a ogni carattere.",
+    "textLabel": "Testo da Convertire",
+    "asciiLabel": "Codici ASCII da Convertire",
+    "decimal": "ASCII Decimale",
+    "binary": "Binario",
+    "hex": "Esadecimale",
+    "textResult": "Testo Risultante",
+    "table": {
+      "title": "Tabella ASCII Completa (0-127)",
+      "charsCount": "caratteri",
+      "searchPlaceholder": "Cerca per decimale, hex, binario, carattere o descrizione...",
+      "noResults": "Nessun carattere trovato per",
+      "headers": {
+        "dec": "Dec",
+        "hex": "Hex",
+        "bin": "Binario",
+        "char": "Char",
+        "description": "Descrizione"
+      }
+    },
+    "category": {
+      "control": "Caratteri di Controllo",
+      "special": "Simboli e Caratteri Speciali",
+      "number": "Numeri",
+      "uppercase": "Lettere Maiuscole",
+      "lowercase": "Lettere Minuscole"
+    },
+    "useCases": [
+      "Programmazione: capire come i computer memorizzano il testo",
+      "Debugging: identificare caratteri speciali",
+      "Comunicazione dati: trasmissione di testo tra sistemi",
+      "Crittografia base: manipolare caratteri a livello numerico",
+      "Analisi file: vedere i dati grezzi"
+    ]
   },
   "floating": {
     "title": "Virgola Mobile (IEEE 754)",
-    "description": "Visualizza come i numeri decimali sono rappresentati in memoria secondo lo standard IEEE 754 (32-bit e 64-bit).",
-    "input": "Numero Decimale",
-    "precision": {
-      "single": "Singola Precisione (32-bit)",
-      "double": "Doppia Precisione (64-bit)"
-    },
-    "components": {
-      "sign": "Segno",
-      "exponent": "Esponente",
-      "mantissa": "Mantissa"
-    }
+    "description": "Visualizza come i numeri decimali sono memorizzati in memoria in formato Float32 e Float64.",
+    "decimalLabel": "Numero Decimale",
+    "floatFormatLabel": "Formato Virgola Mobile",
+    "binaryConvertLabel": "Converti da Binario a Decimale",
+    "sign": "SEGNO",
+    "exponent": "ESPONENTE",
+    "mantissa": "MANTISSA",
+    "binaryFull": "Binario Completo",
+    "hex": "Esadecimale",
+    "fixedTitle": "Virgola Fissa",
+    "fractionalBits": "Bit Frazionari",
+    "integerScaled": "Valore Intero Scalato",
+    "positive": "Positivo",
+    "negative": "Negativo",
+    "useCases": [
+      "Grafica 3D: coordinate e trasformazioni",
+      "Calcoli scientifici: precisione variabile",
+      "Sviluppo giochi: fisica e posizioni",
+      "Finanza: Fixed-point per evitare errori arrotondamento",
+      "Audio/Video: elaborazione segnali"
+    ]
   },
   "json": {
-    "title": "Formatter & Validatore JSON",
-    "description": "Formatta, valida e minifica codice JSON. Utile per debug di API e configurazioni.",
-    "input": "JSON Input",
+    "title": "JSON Formatter & Validator",
+    "description": "Formatta, valida, mimifica e correggi i tuoi dati JSON.",
+    "inputLabel": "JSON Input",
+    "outputLabel": "Output",
     "format": "Formatta",
     "minify": "Minifica",
+    "sort": "Ordina Chiavi",
+    "escape": "Escape",
+    "unescape": "Unescape",
+    "indentation": "Indentazione",
     "valid": "JSON Valido",
     "invalid": "JSON Non Valido",
-    "error": "Errore di sintassi"
+    "compact": "Compatto",
+    "formatted": "Formattato",
+    "simpleObject": "Oggetto Semplice",
+    "arrayObjects": "Array con Oggetti",
+    "size": "Dimensione",
+    "lines": "Righe",
+    "useCases": [
+      "API Development: debug risposte JSON",
+      "Configurazione: file .json",
+      "Validazione: check sintassi",
+      "Compressione: minify per produzione",
+      "Log: leggere log in formato JSON"
+    ]
   }
 }

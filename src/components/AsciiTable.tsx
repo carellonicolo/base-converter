@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { ChevronDown, ChevronUp, Copy, Check, Search, Info } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import CharacterDetailModal from './CharacterDetailModal';
 import { controlCharacterDetails } from '../data/controlCharacterDetails';
 
@@ -166,15 +167,8 @@ const categoryColors = {
   lowercase: 'bg-cyan-500/10 border-cyan-500/20',
 };
 
-const categoryLabels = {
-  control: 'Caratteri di Controllo',
-  special: 'Simboli e Caratteri Speciali',
-  number: 'Numeri',
-  uppercase: 'Lettere Maiuscole',
-  lowercase: 'Lettere Minuscole',
-};
-
 function AsciiTable() {
+  const { t } = useTranslation();
   const [isExpanded, setIsExpanded] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [copiedCell, setCopiedCell] = useState<string | null>(null);
@@ -232,140 +226,138 @@ function AsciiTable() {
         details={selectedCharacter ? controlCharacterDetails[selectedCharacter.char] : null}
       />
       <div className="glass-morphism rounded-2xl overflow-hidden">
-      <button
-        onClick={() => setIsExpanded(!isExpanded)}
-        className="w-full px-6 py-4 flex items-center justify-between hover:bg-white/5 transition-all duration-300"
-      >
-        <div className="flex items-center gap-3">
-          <h4 className="text-sm font-bold text-slate-200 tracking-wide">
-            Tabella ASCII Completa (0-127)
-          </h4>
-          {isExpanded && (
-            <span className="text-xs text-slate-400">
-              {filteredData.length} caratteri
-            </span>
+        <button
+          onClick={() => setIsExpanded(!isExpanded)}
+          className="w-full px-6 py-4 flex items-center justify-between hover:bg-white/5 transition-all duration-300"
+        >
+          <div className="flex items-center gap-3">
+            <h4 className="text-sm font-bold text-slate-200 tracking-wide">
+              {t('ascii.table.title')}
+            </h4>
+            {isExpanded && (
+              <span className="text-xs text-slate-400">
+                {filteredData.length} {t('ascii.table.charsCount')}
+              </span>
+            )}
+          </div>
+          {isExpanded ? (
+            <ChevronUp className="w-5 h-5 text-liquid-300" />
+          ) : (
+            <ChevronDown className="w-5 h-5 text-liquid-300" />
           )}
-        </div>
-        {isExpanded ? (
-          <ChevronUp className="w-5 h-5 text-liquid-300" />
-        ) : (
-          <ChevronDown className="w-5 h-5 text-liquid-300" />
-        )}
-      </button>
+        </button>
 
-      {isExpanded && (
-        <div className="border-t border-white/10 p-6 space-y-4 animate-slideDown">
-          <div className="relative">
-            <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-4 h-4 text-slate-400" />
-            <input
-              type="text"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              placeholder="Cerca per decimale, hex, binario, carattere o descrizione..."
-              className="liquid-input w-full pl-11 text-white placeholder-slate-400"
-            />
-          </div>
-
-          <div className="space-y-6 max-h-[600px] overflow-y-auto pr-2 custom-scrollbar">
-            {Object.entries(groupedData).map(([category, items]) => (
-              <div key={category} className="space-y-2">
-                <h5 className="text-xs font-bold text-liquid-300 uppercase tracking-wider sticky top-0 bg-slate-900/80 backdrop-blur-sm py-2 z-10">
-                  {categoryLabels[category as keyof typeof categoryLabels]}
-                </h5>
-                <div className="overflow-x-auto">
-                  <table className="w-full text-sm">
-                    <thead>
-                      <tr className="border-b border-white/10">
-                        <th className="text-left py-2 px-3 text-xs font-semibold text-slate-300">Dec</th>
-                        <th className="text-left py-2 px-3 text-xs font-semibold text-slate-300">Hex</th>
-                        <th className="text-left py-2 px-3 text-xs font-semibold text-slate-300">Binario</th>
-                        <th className="text-left py-2 px-3 text-xs font-semibold text-slate-300">Char</th>
-                        <th className="text-left py-2 px-3 text-xs font-semibold text-slate-300">Descrizione</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {items.map((item) => (
-                        <tr
-                          key={item.dec}
-                          className={`border-b border-white/5 hover:bg-white/5 transition-colors ${
-                            categoryColors[category as keyof typeof categoryColors]
-                          }`}
-                        >
-                          <td
-                            className="py-2 px-3 font-mono text-slate-200 cursor-pointer hover:text-liquid-300 transition-colors relative group"
-                            onClick={() => copyToClipboard(item.dec.toString(), `dec-${item.dec}`)}
-                          >
-                            {item.dec}
-                            {copiedCell === `dec-${item.dec}` ? (
-                              <Check className="w-3 h-3 text-green-400 absolute right-1 top-1/2 -translate-y-1/2" />
-                            ) : (
-                              <Copy className="w-3 h-3 text-slate-400 opacity-0 group-hover:opacity-100 absolute right-1 top-1/2 -translate-y-1/2 transition-opacity" />
-                            )}
-                          </td>
-                          <td
-                            className="py-2 px-3 font-mono text-slate-200 cursor-pointer hover:text-liquid-300 transition-colors relative group"
-                            onClick={() => copyToClipboard(item.hex, `hex-${item.dec}`)}
-                          >
-                            {item.hex}
-                            {copiedCell === `hex-${item.dec}` ? (
-                              <Check className="w-3 h-3 text-green-400 absolute right-1 top-1/2 -translate-y-1/2" />
-                            ) : (
-                              <Copy className="w-3 h-3 text-slate-400 opacity-0 group-hover:opacity-100 absolute right-1 top-1/2 -translate-y-1/2 transition-opacity" />
-                            )}
-                          </td>
-                          <td
-                            className="py-2 px-3 font-mono text-xs text-slate-200 cursor-pointer hover:text-liquid-300 transition-colors relative group"
-                            onClick={() => copyToClipboard(item.bin, `bin-${item.dec}`)}
-                          >
-                            {item.bin}
-                            {copiedCell === `bin-${item.dec}` ? (
-                              <Check className="w-3 h-3 text-green-400 absolute right-1 top-1/2 -translate-y-1/2" />
-                            ) : (
-                              <Copy className="w-3 h-3 text-slate-400 opacity-0 group-hover:opacity-100 absolute right-1 top-1/2 -translate-y-1/2 transition-opacity" />
-                            )}
-                          </td>
-                          <td
-                            className="py-2 px-3 font-mono text-lg text-white cursor-pointer hover:text-liquid-300 transition-colors relative group text-center"
-                            onClick={() => copyToClipboard(item.char, `char-${item.dec}`)}
-                          >
-                            {item.char === ' ' ? '␣' : item.char}
-                            {copiedCell === `char-${item.dec}` ? (
-                              <Check className="w-3 h-3 text-green-400 absolute right-1 top-1/2 -translate-y-1/2" />
-                            ) : (
-                              <Copy className="w-3 h-3 text-slate-400 opacity-0 group-hover:opacity-100 absolute right-1 top-1/2 -translate-y-1/2 transition-opacity" />
-                            )}
-                          </td>
-                          <td
-                            className={`py-2 px-3 text-slate-300 ${
-                              controlCharacterDetails[item.char]
-                                ? 'cursor-pointer hover:text-liquid-300 hover:bg-white/5 transition-all duration-200 group/desc'
-                                : ''
-                            }`}
-                            onClick={() => controlCharacterDetails[item.char] && handleDescriptionClick(item)}
-                          >
-                            <div className="flex items-center gap-2">
-                              <span>{item.description}</span>
-                              {controlCharacterDetails[item.char] && (
-                                <Info className="w-3.5 h-3.5 text-liquid-400 opacity-0 group-hover/desc:opacity-100 transition-opacity" />
-                              )}
-                            </div>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          {filteredData.length === 0 && (
-            <div className="text-center py-8 text-slate-400">
-              Nessun carattere trovato per "{searchTerm}"
+        {isExpanded && (
+          <div className="border-t border-white/10 p-6 space-y-4 animate-slideDown">
+            <div className="relative">
+              <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-4 h-4 text-slate-400" />
+              <input
+                type="text"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                placeholder={t('ascii.table.searchPlaceholder')}
+                className="liquid-input w-full pl-11 text-white placeholder-slate-400"
+              />
             </div>
-          )}
-        </div>
-      )}
+
+            <div className="space-y-6 max-h-[600px] overflow-y-auto pr-2 custom-scrollbar">
+              {Object.entries(groupedData).map(([category, items]) => (
+                <div key={category} className="space-y-2">
+                  <h5 className="text-xs font-bold text-liquid-300 uppercase tracking-wider sticky top-0 bg-slate-900/80 backdrop-blur-sm py-2 z-10">
+                    {t(`ascii.category.${category}`)}
+                  </h5>
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-sm">
+                      <thead>
+                        <tr className="border-b border-white/10">
+                          <th className="text-left py-2 px-3 text-xs font-semibold text-slate-300">{t('ascii.table.headers.dec')}</th>
+                          <th className="text-left py-2 px-3 text-xs font-semibold text-slate-300">{t('ascii.table.headers.hex')}</th>
+                          <th className="text-left py-2 px-3 text-xs font-semibold text-slate-300">{t('ascii.table.headers.bin')}</th>
+                          <th className="text-left py-2 px-3 text-xs font-semibold text-slate-300">{t('ascii.table.headers.char')}</th>
+                          <th className="text-left py-2 px-3 text-xs font-semibold text-slate-300">{t('ascii.table.headers.description')}</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {items.map((item) => (
+                          <tr
+                            key={item.dec}
+                            className={`border-b border-white/5 hover:bg-white/5 transition-colors ${categoryColors[item.category as keyof typeof categoryColors]
+                              }`}
+                          >
+                            <td
+                              className="py-2 px-3 font-mono text-slate-200 cursor-pointer hover:text-liquid-300 transition-colors relative group"
+                              onClick={() => copyToClipboard(item.dec.toString(), `dec-${item.dec}`)}
+                            >
+                              {item.dec}
+                              {copiedCell === `dec-${item.dec}` ? (
+                                <Check className="w-3 h-3 text-green-400 absolute right-1 top-1/2 -translate-y-1/2" />
+                              ) : (
+                                <Copy className="w-3 h-3 text-slate-400 opacity-0 group-hover:opacity-100 absolute right-1 top-1/2 -translate-y-1/2 transition-opacity" />
+                              )}
+                            </td>
+                            <td
+                              className="py-2 px-3 font-mono text-slate-200 cursor-pointer hover:text-liquid-300 transition-colors relative group"
+                              onClick={() => copyToClipboard(item.hex, `hex-${item.dec}`)}
+                            >
+                              {item.hex}
+                              {copiedCell === `hex-${item.dec}` ? (
+                                <Check className="w-3 h-3 text-green-400 absolute right-1 top-1/2 -translate-y-1/2" />
+                              ) : (
+                                <Copy className="w-3 h-3 text-slate-400 opacity-0 group-hover:opacity-100 absolute right-1 top-1/2 -translate-y-1/2 transition-opacity" />
+                              )}
+                            </td>
+                            <td
+                              className="py-2 px-3 font-mono text-xs text-slate-200 cursor-pointer hover:text-liquid-300 transition-colors relative group"
+                              onClick={() => copyToClipboard(item.bin, `bin-${item.dec}`)}
+                            >
+                              {item.bin}
+                              {copiedCell === `bin-${item.dec}` ? (
+                                <Check className="w-3 h-3 text-green-400 absolute right-1 top-1/2 -translate-y-1/2" />
+                              ) : (
+                                <Copy className="w-3 h-3 text-slate-400 opacity-0 group-hover:opacity-100 absolute right-1 top-1/2 -translate-y-1/2 transition-opacity" />
+                              )}
+                            </td>
+                            <td
+                              className="py-2 px-3 font-mono text-lg text-white cursor-pointer hover:text-liquid-300 transition-colors relative group text-center"
+                              onClick={() => copyToClipboard(item.char, `char-${item.dec}`)}
+                            >
+                              {item.char === ' ' ? '␣' : item.char}
+                              {copiedCell === `char-${item.dec}` ? (
+                                <Check className="w-3 h-3 text-green-400 absolute right-1 top-1/2 -translate-y-1/2" />
+                              ) : (
+                                <Copy className="w-3 h-3 text-slate-400 opacity-0 group-hover:opacity-100 absolute right-1 top-1/2 -translate-y-1/2 transition-opacity" />
+                              )}
+                            </td>
+                            <td
+                              className={`py-2 px-3 text-slate-300 ${controlCharacterDetails[item.char]
+                                  ? 'cursor-pointer hover:text-liquid-300 hover:bg-white/5 transition-all duration-200 group/desc'
+                                  : ''
+                                }`}
+                              onClick={() => controlCharacterDetails[item.char] && handleDescriptionClick(item)}
+                            >
+                              <div className="flex items-center gap-2">
+                                <span>{item.description}</span>
+                                {controlCharacterDetails[item.char] && (
+                                  <Info className="w-3.5 h-3.5 text-liquid-400 opacity-0 group-hover/desc:opacity-100 transition-opacity" />
+                                )}
+                              </div>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {filteredData.length === 0 && (
+              <div className="text-center py-8 text-slate-400">
+                {t('ascii.table.noResults')} "{searchTerm}"
+              </div>
+            )}
+          </div>
+        )}
       </div>
     </>
   );

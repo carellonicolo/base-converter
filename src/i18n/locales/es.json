@@ -1,16 +1,16 @@
 {
   "app": {
     "title": "Base Converter Pro",
-    "subtitle": "by Prof. Carello Nicolò",
-    "footer": "© 2025 Base Converter Pro - Powered by Prof. Carello Nicolò"
+    "subtitle": "por Prof. Carello Nicolò",
+    "footer": "© 2025 Base Converter Pro - Desarrollado por Prof. Carello Nicolò"
   },
   "nav": {
     "home": "Inicio",
     "base": "Bases",
-    "settings": "Configuración"
+    "settings": "Ajustes"
   },
   "settings": {
-    "title": "Configuración",
+    "title": "Ajustes",
     "subtitle": "Personaliza la apariencia y el comportamiento de la aplicación",
     "appearance": {
       "title": "Apariencia e Idioma",
@@ -18,7 +18,7 @@
       "themeModeDark": "Oscuro",
       "themeModeLight": "Claro",
       "themeModeAuto": "Auto",
-      "themeColor": "Tema de Color",
+      "themeColor": "Color del Tema",
       "themeDefault": "Predeterminado (Cian)",
       "themeMidnight": "Medianoche (Púrpura)",
       "themeSunset": "Atardecer (Naranja)",
@@ -29,26 +29,365 @@
     "accessibility": {
       "title": "Accesibilidad y Preferencias",
       "highContrast": "Alto Contraste",
-      "reducedMotion": "Movimiento Reducido",
+      "reducedMotion": "Reducir Movimiento",
       "notifications": "Notificaciones",
       "soundEffects": "Efectos de Sonido",
-      "autoSave": "Guardado Automático",
+      "autoSave": "Autoguardado",
       "fontSize": "Tamaño de Fuente",
       "fontSizeSmall": "Pequeño",
-      "fontSizeMedium": "Medio",
+      "fontSizeMedium": "Mediano",
       "fontSizeLarge": "Grande"
     },
     "danger": {
       "title": "Zona de Peligro",
       "subtitle": "Acciones irreversibles",
       "reset": "Restablecer",
-      "resetConfirm": "¿Restablecer la configuración predeterminada?",
-      "clearAll": "Eliminar Todos los Datos",
-      "clearAllConfirm": "¿Eliminar todos los datos? Esta acción es irreversible."
+      "resetConfirm": "¿Restablecer a la configuración predeterminada?",
+      "clearAll": "Borrar Todos los Datos",
+      "clearAllConfirm": "¿Borrar todos los datos? Esta acción es irreversible."
     }
   },
   "dashboard": {
-    "welcome": "Bienvenido a Base Converter Pro",
-    "description": "Herramienta profesional para convertir bases numéricas, codificaciones y formatos"
+    "welcome": "Bienvenido a Base Converter",
+    "description": "Herramienta profesional para convertir bases numéricas, codificaciones y formatos",
+    "hero": {
+      "title": "Base Converter",
+      "subtitle": "La suite completa para conversiones y codificación",
+      "description": "11 herramientas profesionales en una sola aplicación"
+    },
+    "toolsTitle": "Elige una Herramienta",
+    "tools": {
+      "base": {
+        "name": "Bases Numéricas",
+        "desc": "Convierte entre bases 2-36"
+      },
+      "ascii": {
+        "name": "ASCII",
+        "desc": "Texto ↔ ASCII"
+      },
+      "unicode": {
+        "name": "Unicode",
+        "desc": "Texto ↔ Unicode"
+      },
+      "floating": {
+        "name": "Punto Flotante",
+        "desc": "IEEE 754 & Punto fijo"
+      },
+      "base64": {
+        "name": "Base64",
+        "desc": "Codificar/Decodificar Base64"
+      },
+      "hash": {
+        "name": "Hash",
+        "desc": "MD5, SHA-256, SHA-512"
+      },
+      "color": {
+        "name": "Colores",
+        "desc": "HEX ↔ RGB ↔ HSL ↔ CMYK"
+      },
+      "timestamp": {
+        "name": "Timestamp",
+        "desc": "Unix ↔ Fecha ↔ ISO"
+      },
+      "url": {
+        "name": "URL",
+        "desc": "Codificar/Decodificar URL"
+      },
+      "jwt": {
+        "name": "JWT",
+        "desc": "Decodificador de Token JWT"
+      },
+      "json": {
+        "name": "JSON",
+        "desc": "Formatear y Validar JSON"
+      }
+    }
+  },
+  "common": {
+    "copy": "Copiar",
+    "copied": "¡Copiado!",
+    "copyToClipboard": "Copiar al portapapeles",
+    "error": "Error",
+    "errors": "Errores",
+    "loading": "Cargando...",
+    "examples": "Ejemplos",
+    "realWorldUse": "Uso en el Mundo Real",
+    "input": "Entrada",
+    "output": "Salida",
+    "result": "Resultado"
+  },
+  "unicode": {
+    "title": "Convertidor Unicode",
+    "description": "Unicode es el estándar universal para representar texto en todos los idiomas, incluidos emojis y símbolos especiales.",
+    "textToUnicode": "Texto a Unicode",
+    "unicodeToText": "Unicode a Texto",
+    "charDetails": "Detalles del Carácter",
+    "tableTitle": "Tabla Unicode Extendida (incluyendo Emojis)",
+    "categories": {
+      "emoji": "Emoji y Emoticonos (U+1F600+)",
+      "misc": "Símbolos Varios",
+      "transport": "Transporte y Mapas",
+      "supplemental": "Suplementarios"
+    }
+  },
+  "base64": {
+    "title": "Codificador Base64",
+    "description": "Base64 convierte datos binarios en texto ASCII puro usando 64 caracteres seguros. Esencial para correos electrónicos y APIs.",
+    "encodeTitle": "Codificar (Texto → Base64)",
+    "decodeTitle": "Decodificar (Base64 → Texto)",
+    "uploadButton": "Subir Archivo y Convertir a Base64",
+    "encodedResult": "Resultado Base64",
+    "decodedText": "Texto Decodificado",
+    "useCases": [
+      "Email: adjuntos codificados en Base64",
+      "Data URLs: imágenes en HTML/CSS",
+      "JSON/XML: inclusión de binarios",
+      "Autenticación: cabeceras Basic Auth",
+      "API: transferencia de datos binarios"
+    ]
+  },
+  "hash": {
+    "title": "Generador de Hash",
+    "description": "Los hashes criptográficos transforman datos en una huella digital única.",
+    "inputText": "Texto para hashear",
+    "algorithm": "Algoritmo",
+    "uploadButton": "Hashear Archivo",
+    "uploadHint": "Sube un archivo para calcular su hash",
+    "useCases": [
+      "Hashing de contraseñas (SHA-256)",
+      "Verificación de integridad de archivos",
+      "Blockchain y minería",
+      "Firmas digitales",
+      "Identificación de duplicados"
+    ],
+    "table": {
+      "title": "Comparación de Algoritmos",
+      "algorithm": "Algoritmo",
+      "length": "Longitud",
+      "security": "Seguridad",
+      "usage": "Uso"
+    },
+    "status": {
+      "insecure": "❌ Inseguro",
+      "deprecated": "⚠ Obsoleto",
+      "secure": "✅ Seguro",
+      "verySecure": "✅ Muy Seguro"
+    }
+  },
+  "color": {
+    "title": "Convertidor de Colores",
+    "description": "Convierte entre formatos HEX, RGB, HSL, HSV y CMYK.",
+    "preview": "Vista Previa del Color",
+    "palette": "Paleta Sugerida",
+    "formats": {
+      "hex": "Formato HEX",
+      "rgb": "Formato RGB",
+      "hsl": "Formato HSL",
+      "hsv": "Formato HSV",
+      "cmyk": "Formato CMYK"
+    },
+    "useCases": [
+      "Diseño Web: CSS usa HEX (#FF0000) y RGB",
+      "Gráficos Digitales: HSL para brillo/saturación",
+      "Impresión: CMYK es el estándar",
+      "Edición de Fotos: HSV/HSB en Photoshop",
+      "Accesibilidad: comprobación de contraste"
+    ],
+    "infoCMYK": "ℹ️ CMYK se usa para impresión profesional"
+  },
+  "url": {
+    "title": "Codificador/Decodificador URL",
+    "description": "La codificación porcentual hace que las URL sean seguras y válidas.",
+    "encodeTitle": "Codificar URL",
+    "decodeTitle": "Decodificar URL",
+    "inputToEncode": "Texto para Codificar",
+    "inputToDecode": "URL para Decodificar",
+    "encodedResult": "URL Codificada",
+    "decodedResult": "URL Decodificada",
+    "urlOrQuery": "URL o Cadena de Consulta",
+    "analyzeQuery": "Analizar Parámetros de Consulta",
+    "extractedParams": "Parámetros Extraídos",
+    "slugTitle": "Slug de URL",
+    "slugDescription": "Slug amigable para URLs",
+    "commonChars": "Caracteres Codificados Comunes",
+    "useCases": [
+      "Parámetros de consulta: pasar datos en URL",
+      "API REST: soporte de caracteres especiales",
+      "SEO: slugs legibles",
+      "Formularios HTML: codificación automática",
+      "OAuth: parámetros de redirección"
+    ]
+  },
+  "timestamp": {
+    "title": "Convertidor de Timestamp",
+    "description": "Convierte Timestamps Unix a fechas legibles y viceversa.",
+    "current": "Timestamp Actual",
+    "unixLabel": "Timestamp Unix (segundos)",
+    "dateLabel": "Fecha y Hora",
+    "allFormats": "Todos los Formatos",
+    "milliseconds": "Milisegundos",
+    "custom": "Formato Personalizado",
+    "relative": "Tiempo Relativo",
+    "examplesTitle": "Ejemplos Famosos",
+    "useCases": [
+      "Base de datos: fechas universales",
+      "API: intercambio de fechas estándar",
+      "Registro: eventos precisos",
+      "Social: tiempo relativo",
+      "Tokens: caducidad de sesión"
+    ],
+    "formatsDesc": {
+      "unix": "Estándar Unix",
+      "milliseconds": "JavaScript Date.now()",
+      "iso": "Estándar Internacional",
+      "rfc": "Cabeceras de Email, HTTP",
+      "custom": "DD/MM/YYYY HH:mm:ss",
+      "relative": "Legible por humanos"
+    }
+  },
+  "jwt": {
+    "title": "Decodificador JWT",
+    "description": "JSON Web Token (JWT) es un estándar para transmitir información de forma segura. Usado para autenticación y autorización.",
+    "useCase1": "Autenticación: el servidor genera JWT tras login",
+    "useCase2": "Single Sign-On (SSO): acceso unificado",
+    "useCase3": "Autorización API: tokens en cabeceras",
+    "useCase4": "Sesiones sin estado",
+    "useCase5": "Tokens OAuth 2.0",
+    "realWorldUse": "Ver el contenido de un token JWT (header y payload) para depuración.",
+    "valid": "Token Válido",
+    "invalid": "Token Inválido",
+    "expired": "Token expirado",
+    "notYetValid": "Token aún no válido",
+    "expiresIn": "Expira en: {{hours}} horas",
+    "errors": {
+      "invalid": "JWT inválido"
+    },
+    "signatureTitle": "Firma",
+    "signatureDesc": "La firma asegura que el token no ha sido alterado",
+    "exampleTitle": "Ejemplo JWT",
+    "exampleDesc": "Prueba con este token de ejemplo:",
+    "headerTitle": "Encabezado (Header)",
+    "payloadTitle": "Carga útil (Payload)",
+    "standardClaims": "Reclamaciones Estándar",
+    "algo": "Algoritmo",
+    "type": "Tipo",
+    "claims": {
+      "iss": "Emisor (iss)",
+      "sub": "Sujeto (sub)",
+      "aud": "Audiencia (aud)",
+      "exp": "Expiración (exp)",
+      "nbf": "No antes de (nbf)",
+      "iat": "Emitido en (iat)"
+    }
+  },
+  "base": {
+    "title": "Convertidor de Bases",
+    "description": "Convierte números entre Binario, Octal, Decimal, Hexadecimal y bases personalizadas.",
+    "valueLabel": "Valor a Convertir",
+    "baseLabel": "Base de Entrada",
+    "customBaseLabel": "Base Personalizada (2-36)",
+    "results": "Resultados",
+    "errorInvalid": "Caracteres inválidos para la base seleccionada",
+    "bases": {
+      "binary": "Binario (Base 2)",
+      "octal": "Octal (Base 8)",
+      "decimal": "Decimal (Base 10)",
+      "hex": "Hexadecimal (Base 16)"
+    },
+    "useCases": [
+      "Programación: binario y hex son fundamentales",
+      "Colores web: entender #FF0000",
+      "Redes: Direcciones IP y MAC",
+      "Permisos Linux: chmod 755 (octal)",
+      "Electrónica: señales digitales (0/1)"
+    ]
+  },
+  "ascii": {
+    "title": "Convertidor ASCII",
+    "description": "ASCII asigna un número a cada carácter.",
+    "textLabel": "Texto a Convertir",
+    "asciiLabel": "Códigos ASCII a Convertir",
+    "decimal": "ASCII Decimal",
+    "binary": "Binario",
+    "hex": "Hexadecimal",
+    "textResult": "Texto Resultante",
+    "table": {
+      "title": "Tabla ASCII Completa (0-127)",
+      "charsCount": "caracteres",
+      "searchPlaceholder": "Buscar por decimal, hex, binario, carácter o descripción...",
+      "noResults": "No se encontraron caracteres para",
+      "headers": {
+        "dec": "Dec",
+        "hex": "Hex",
+        "bin": "Binario",
+        "char": "Car",
+        "description": "Descripción"
+      }
+    },
+    "category": {
+      "control": "Caracteres de Control",
+      "special": "Símbolos y Caracteres Especiales",
+      "number": "Números",
+      "uppercase": "Letras Mayúsculas",
+      "lowercase": "Letras Minúsculas"
+    },
+    "useCases": [
+      "Programación: entender almacenamiento de texto",
+      "Depuración: identificar caracteres ocultos",
+      "Comunicaciones: transmisión de texto",
+      "Criptografía: manipulación básica de caracteres",
+      "Análisis de archivos: visor de datos en bruto"
+    ]
+  },
+  "floating": {
+    "title": "Punto Flotante (IEEE 754)",
+    "description": "Visualiza cómo se almacenan los números decimales en memoria como Float32 y Float64.",
+    "decimalLabel": "Número Decimal",
+    "floatFormatLabel": "Formato de Punto Flotante",
+    "binaryConvertLabel": "Convertir Binario a Decimal",
+    "sign": "SIGNO",
+    "exponent": "EXPONENTE",
+    "mantissa": "MANTISA",
+    "binaryFull": "Binario Completo",
+    "hex": "Hexadecimal",
+    "fixedTitle": "Punto Fijo",
+    "fractionalBits": "Bits Fraccionarios",
+    "integerScaled": "Valor Entero Escalado",
+    "positive": "Positivo",
+    "negative": "Negativo",
+    "useCases": [
+      "Gráficos 3D: coordenadas y transformaciones",
+      "Cálculo científico: precisión variable",
+      "Desarrollo de juegos: física y posicionamiento",
+      "Finanzas: Punto fijo evita errores de redondeo",
+      "Audio/Video: procesamiento de señales"
+    ]
+  },
+  "json": {
+    "title": "Formateador y Validador JSON",
+    "description": "Formatea, valida, minifica y corrige tus datos JSON.",
+    "inputLabel": "Entrada JSON",
+    "outputLabel": "Salida",
+    "format": "Formatear",
+    "minify": "Minificar",
+    "sort": "Ordenar Claves",
+    "escape": "Escapar",
+    "unescape": "Desescapar",
+    "indentation": "Indentación",
+    "valid": "JSON Válido",
+    "invalid": "JSON Inválido",
+    "compact": "Compacto",
+    "formatted": "Formateado",
+    "simpleObject": "Objeto Simple",
+    "arrayObjects": "Array con Objetos",
+    "size": "Tamaño",
+    "lines": "Líneas",
+    "useCases": [
+      "Desarrollo API: depurar respuestas JSON",
+      "Configuración: archivos .json",
+      "Validación: comprobar sintaxis",
+      "Compresión: minificar para producción",
+      "Logs: leer registros en formato JSON"
+    ]
   }
 }

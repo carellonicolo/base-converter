@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Palette } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import Input from '../ui/Input';
 import Card from '../ui/Card';
 import CopyButton from '../shared/CopyButton';
@@ -10,14 +11,12 @@ import {
   rgbToHsl,
   hslToRgb,
   rgbToHsv,
-  hsvToRgb,
   rgbToCmyk,
-  cmykToRgb,
   isValidHex,
-  formatHex,
 } from '../../utils/conversions/color';
 
 const ColorConverter: React.FC = () => {
+  const { t } = useTranslation();
   const [hexInput, setHexInput] = useState('#38bdf8');
   const [rgbR, setRgbR] = useState(56);
   const [rgbG, setRgbG] = useState(189);
@@ -52,34 +51,26 @@ const ColorConverter: React.FC = () => {
 
   const colorPreview = `rgb(${currentColor.r}, ${currentColor.g}, ${currentColor.b})`;
 
-
-
   return (
     <div className="space-y-6">
       {/* Educational Info Box */}
       <InfoBox
-        title="Convertitore di Colori"
-        description="I colori digitali possono essere rappresentati in diversi modi: HEX per il web, RGB per gli schermi, HSL per design intuitivo, HSV per editor grafici, e CMYK per la stampa. Ogni formato è ottimizzato per uno scopo specifico."
+        title={t('color.title')}
+        description={t('color.description')}
         icon={<Palette className="w-5 h-5" />}
-        useCases={[
-          "Web Design: CSS usa HEX (#FF0000) e RGB (rgb(255,0,0))",
-          "Grafica digitale: HSL permette di regolare luminosità e saturazione facilmente",
-          "Stampa: CMYK è lo standard per stampanti (Cyan, Magenta, Yellow, blacK)",
-          "Photo editing: HSV/HSB usato in Photoshop e altri editor",
-          "Accessibilità: trovare colori con contrasto sufficiente"
-        ]}
+        useCases={t('color.useCases', { returnObjects: true }) as string[]}
         examples={[
-          { label: 'Rosso', value: '#FF0000 = RGB(255,0,0) = HSL(0°,100%,50%)' },
-          { label: 'Azzurro', value: '#38BDF8 = RGB(56,189,248)' },
-          { label: 'Grigio', value: 'RGB(128,128,128) = HSL(0°,0%,50%)' }
+          { label: 'Rosso', value: '#FF0000' },
+          { label: 'Azzurro', value: '#38BDF8' },
+          { label: 'Grigio', value: 'RGB(128,128,128)' }
         ]}
-        realWorldUse="Quando scegli un colore in Figma o Photoshop, il color picker usa HSV/HSL perché è più intuitivo (ruota dei colori). Ma quando lo usi in CSS, diventa HEX o RGB. Se lo stampi, viene convertito in CMYK automaticamente dalla stampante."
+        realWorldUse={t('common.realWorldUse')}
         type="educational"
       />
 
       {/* Color preview */}
       <Card className="text-center">
-        <h4 className="text-sm font-bold text-slate-200 mb-4 tracking-wide">Anteprima Colore</h4>
+        <h4 className="text-sm font-bold text-slate-200 mb-4 tracking-wide">{t('color.preview')}</h4>
         <div
           className="w-full h-40 rounded-2xl border-4 border-white/20 shadow-glass-lg mb-4"
           style={{ background: colorPreview }}
@@ -91,7 +82,7 @@ const ColorConverter: React.FC = () => {
       <div className="grid md:grid-cols-2 gap-6">
         <Card>
           <h4 className="text-sm font-bold text-liquid-300 uppercase tracking-wider mb-4">
-            Formato HEX
+            {t('color.formats.hex')}
           </h4>
           <Input
             type="text"
@@ -110,7 +101,7 @@ const ColorConverter: React.FC = () => {
 
         <Card>
           <h4 className="text-sm font-bold text-liquid-300 uppercase tracking-wider mb-4">
-            Formato RGB
+            {t('color.formats.rgb')}
           </h4>
           <div className="space-y-3">
             <Input
@@ -187,14 +178,14 @@ const ColorConverter: React.FC = () => {
             cmyk({cmyk.c}%, {cmyk.m}%, {cmyk.y}%, {cmyk.k}%)
           </p>
           <p className="text-xs text-slate-400 mt-2">
-            ℹ️ CMYK è usato per la stampa professionale
+            {t('color.infoCMYK', 'ℹ️ CMYK è usato per la stampa professionale')}
           </p>
         </Card>
       </div>
 
       {/* Color palette suggestions */}
       <div className="glass-morphism rounded-2xl p-6">
-        <h4 className="text-sm font-bold text-slate-200 mb-4 tracking-wide">Palette Suggerita</h4>
+        <h4 className="text-sm font-bold text-slate-200 mb-4 tracking-wide">{t('color.palette')}</h4>
         <div className="grid grid-cols-5 gap-3">
           {[0, 20, 40, 60, 80].map((offset) => {
             const adjustedL = Math.max(0, Math.min(100, hsl.l + offset - 40));
@@ -208,7 +199,7 @@ const ColorConverter: React.FC = () => {
                   className="w-full h-20 rounded-xl border-2 border-white/20 cursor-pointer hover:scale-105 transition-transform"
                   style={{ background: paletteColor }}
                   onClick={() => handleHexChange(paletteHex)}
-                  title={`Click per usare ${paletteHex}`}
+                  title={`Click: ${paletteHex}`}
                 />
                 <p className="text-xs text-slate-400 mt-2 font-mono">{paletteHex}</p>
               </div>

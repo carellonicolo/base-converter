@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Link2, ExternalLink } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import Textarea from '../ui/Textarea';
 import Card from '../ui/Card';
 import CopyButton from '../shared/CopyButton';
@@ -8,13 +9,12 @@ import {
   encodeURL,
   decodeURL,
   parseQueryString,
-  objectToQueryString,
-  parseURL,
   slugify,
 } from '../../utils/conversions/url';
 import { useDebounce } from '../../hooks/useDebounce';
 
 const URLConverter: React.FC = () => {
+  const { t } = useTranslation();
   const [textInput, setTextInput] = useState('');
   const [urlInput, setURLInput] = useState('');
   const [queryInput, setQueryInput] = useState('');
@@ -52,38 +52,30 @@ const URLConverter: React.FC = () => {
 
   const slugified = debouncedText ? slugify(debouncedText) : '';
 
-
-
   return (
     <div className="space-y-6">
       {/* Educational Info Box */}
       <InfoBox
-        title="URL Encoder/Decoder"
-        description="Gli URL possono contenere solo caratteri ASCII sicuri. URL encoding (percent-encoding) converte caratteri speciali come spazi, simboli e caratteri non-ASCII in formato %XX. È essenziale per inviare dati attraverso URL in modo sicuro e corretto."
+        title={t('url.title')}
+        description={t('url.description')}
         icon={<Link2 className="w-5 h-5" />}
-        useCases={[
-          "Query parameters: passare dati in URL (search?q=hello%20world)",
-          "API REST: inviare parametri con caratteri speciali in richieste GET",
-          "SEO: creare slug URL-friendly (\"Il Mio Articolo\" → \"il-mio-articolo\")",
-          "Form HTML: dati form vengono URL-encoded automaticamente (application/x-www-form-urlencoded)",
-          "OAuth/Auth: parametri di autenticazione in redirect_uri"
-        ]}
+        useCases={t('url.useCases', { returnObjects: true }) as string[]}
         examples={[
-          { label: 'Spazio \" \"', value: '%20 o +' },
-          { label: '\"Hello World!\"', value: 'Hello%20World%21' },
-          { label: '\"email@test.com\"', value: 'email%40test.com' }
+          { label: 'Space " "', value: '%20 or +' },
+          { label: '"Hello World!"', value: 'Hello%20World%21' },
+          { label: '"email@test.com"', value: 'email%40test.com' }
         ]}
-        realWorldUse="Quando cerchi 'pizza napoletana' su Google, l'URL diventa google.com/search?q=pizza+napoletana. Il '+' rappresenta lo spazio. Quando condividi un link con parametri (facebook.com/share?url=https%3A%2F%2F...), l'URL interno viene codificato. Gli slug SEO-friendly ('mio-articolo-2024') rendono URL leggibili sia per utenti che motori di ricerca."
+        realWorldUse={t('common.realWorldUse')}
         type="educational"
       />
 
       <div className="grid md:grid-cols-2 gap-6">
         {/* Encode section */}
         <div className="space-y-4">
-          <h3 className="text-xl font-bold text-white">Codifica URL</h3>
+          <h3 className="text-xl font-bold text-white">{t('url.encodeTitle')}</h3>
 
           <Textarea
-            label="Testo da codificare"
+            label={t('url.inputToEncode')}
             value={textInput}
             onChange={(e) => setTextInput(e.target.value)}
             placeholder="Hello World! #test"
@@ -94,7 +86,7 @@ const URLConverter: React.FC = () => {
           {encodedURL && (
             <Card>
               <div className="flex items-center justify-between mb-3">
-                <h4 className="text-sm font-bold text-liquid-300 uppercase">URL Codificato</h4>
+                <h4 className="text-sm font-bold text-liquid-300 uppercase">{t('url.encodedResult')}</h4>
                 <CopyButton text={encodedURL} />
               </div>
               <p className="text-white font-mono text-sm break-all bg-black/20 p-3 rounded-lg">
@@ -106,14 +98,14 @@ const URLConverter: React.FC = () => {
           {slugified && (
             <Card>
               <div className="flex items-center justify-between mb-3">
-                <h4 className="text-sm font-bold text-liquid-300 uppercase">URL Slug</h4>
+                <h4 className="text-sm font-bold text-liquid-300 uppercase">{t('url.slugTitle')}</h4>
                 <CopyButton text={slugified} />
               </div>
               <p className="text-white font-mono text-sm break-all bg-black/20 p-3 rounded-lg">
                 {slugified}
               </p>
               <p className="text-xs text-slate-400 mt-2">
-                Slug URL-friendly per titoli e permalink
+                {t('url.slugDescription')}
               </p>
             </Card>
           )}
@@ -121,10 +113,10 @@ const URLConverter: React.FC = () => {
 
         {/* Decode section */}
         <div className="space-y-4">
-          <h3 className="text-xl font-bold text-white">Decodifica URL</h3>
+          <h3 className="text-xl font-bold text-white">{t('url.decodeTitle')}</h3>
 
           <Textarea
-            label="URL da decodificare"
+            label={t('url.inputToDecode')}
             value={urlInput}
             onChange={(e) => setURLInput(e.target.value)}
             placeholder="Hello%20World%21%20%23test"
@@ -135,7 +127,7 @@ const URLConverter: React.FC = () => {
           {decodedURL && (
             <Card>
               <div className="flex items-center justify-between mb-3">
-                <h4 className="text-sm font-bold text-liquid-300 uppercase">URL Decodificato</h4>
+                <h4 className="text-sm font-bold text-liquid-300 uppercase">{t('url.decodedResult')}</h4>
                 <CopyButton text={decodedURL} />
               </div>
               <p className="text-white text-sm break-all bg-black/20 p-3 rounded-lg">
@@ -148,20 +140,20 @@ const URLConverter: React.FC = () => {
 
       {/* Query string parser */}
       <div className="space-y-4">
-        <h3 className="text-xl font-bold text-white">Analizza Query Parameters</h3>
+        <h3 className="text-xl font-bold text-white">{t('url.analyzeQuery')}</h3>
 
         <Textarea
-          label="URL o Query String"
+          label={t('url.urlOrQuery')}
           value={queryInput}
           onChange={(e) => setQueryInput(e.target.value)}
-          placeholder="?name=John&age=30&city=Rome oppure URL completo"
+          placeholder="?name=John&age=30&city=Rome"
           rows={3}
           fullWidth
         />
 
         {queryParams && Object.keys(queryParams).length > 0 && (
           <Card>
-            <h4 className="text-sm font-bold text-liquid-300 uppercase mb-4">Parametri Estratti</h4>
+            <h4 className="text-sm font-bold text-liquid-300 uppercase mb-4">{t('url.extractedParams')}</h4>
             <div className="space-y-2">
               {Object.entries(queryParams).map(([key, value]) => (
                 <div key={key} className="flex items-center justify-between p-3 bg-black/20 rounded-lg">
@@ -180,7 +172,7 @@ const URLConverter: React.FC = () => {
 
       {/* Examples */}
       <div className="glass-morphism rounded-2xl p-6">
-        <h4 className="text-sm font-bold text-slate-200 mb-3 tracking-wide">Caratteri Comuni Codificati</h4>
+        <h4 className="text-sm font-bold text-slate-200 mb-3 tracking-wide">{t('url.commonChars')}</h4>
         <div className="grid md:grid-cols-2 gap-2 text-sm">
           <div className="flex items-center justify-between">
             <code className="text-slate-400">spazio</code>

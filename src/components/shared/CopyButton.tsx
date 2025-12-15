@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Copy, Check } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import useCopyToClipboard from '../../hooks/useCopyToClipboard';
 
 interface CopyButtonProps {
@@ -9,6 +10,7 @@ interface CopyButtonProps {
 }
 
 const CopyButton: React.FC<CopyButtonProps> = ({ text, className = '', size = 'md' }) => {
+  const { t } = useTranslation();
   const [copyStatus, copy] = useCopyToClipboard();
   const [copied, setCopied] = useState(false);
 
@@ -34,8 +36,8 @@ const CopyButton: React.FC<CopyButtonProps> = ({ text, className = '', size = 'm
     <button
       onClick={handleCopy}
       className={`rounded-lg bg-white/5 border border-white/10 hover:bg-white/10 hover:border-white/20 hover:scale-105 active:scale-95 transition-all duration-200 flex items-center justify-center ${sizeStyles[size]} ${className}`}
-      title={copied ? 'Copiato!' : 'Copia negli appunti'}
-      aria-label={copied ? 'Copiato' : 'Copia negli appunti'}
+      title={copied ? t('common.copied') : t('common.copyToClipboard')}
+      aria-label={copied ? t('common.copied') : t('common.copyToClipboard')}
     >
       {copied || copyStatus === 'copied' ? (
         <Check className={`${iconSizes[size]} text-green-400`} />

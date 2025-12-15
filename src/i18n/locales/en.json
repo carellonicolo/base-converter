@@ -49,11 +49,64 @@
   },
   "dashboard": {
     "welcome": "Welcome to Base Converter",
-    "description": "Professional tool for converting numeric bases, encodings, and formats"
+    "description": "Professional tool for converting numeric bases, encodings, and formats",
+    "hero": {
+      "title": "Base Converter",
+      "subtitle": "The complete suite for conversions and encoding",
+      "description": "11 professional tools in one application"
+    },
+    "toolsTitle": "Choose a Tool",
+    "tools": {
+      "base": {
+        "name": "Number Bases",
+        "desc": "Convert between bases 2-36"
+      },
+      "ascii": {
+        "name": "ASCII",
+        "desc": "Text ↔ ASCII"
+      },
+      "unicode": {
+        "name": "Unicode",
+        "desc": "Text ↔ Unicode"
+      },
+      "floating": {
+        "name": "Floating Point",
+        "desc": "IEEE 754 & Fixed-point"
+      },
+      "base64": {
+        "name": "Base64",
+        "desc": "Base64 Encode/Decode"
+      },
+      "hash": {
+        "name": "Hash",
+        "desc": "MD5, SHA-256, SHA-512"
+      },
+      "color": {
+        "name": "Colors",
+        "desc": "HEX ↔ RGB ↔ HSL ↔ CMYK"
+      },
+      "timestamp": {
+        "name": "Timestamp",
+        "desc": "Unix ↔ Date ↔ ISO"
+      },
+      "url": {
+        "name": "URL",
+        "desc": "Encode/Decode URL"
+      },
+      "jwt": {
+        "name": "JWT",
+        "desc": "JWT Token Decoder"
+      },
+      "json": {
+        "name": "JSON",
+        "desc": "Format and Validate JSON"
+      }
+    }
   },
   "common": {
     "copy": "Copy",
     "copied": "Copied!",
+    "copyToClipboard": "Copy to clipboard",
     "error": "Error",
     "errors": "Errors",
     "loading": "Loading...",
@@ -99,13 +152,27 @@
     "inputText": "Text to Hash",
     "algorithm": "Algorithm",
     "uploadButton": "Hash File",
+    "uploadHint": "Upload a file to calculate its hash",
     "useCases": [
       "Password hashing (SHA-256)",
       "File integrity verification",
       "Blockchain and mining",
       "Digital signatures",
       "Duplicate identification"
-    ]
+    ],
+    "table": {
+      "title": "Algorithm Comparison",
+      "algorithm": "Algorithm",
+      "length": "Length",
+      "security": "Security",
+      "usage": "Usage"
+    },
+    "status": {
+      "insecure": "❌ Insecure",
+      "deprecated": "⚠ Deprecated",
+      "secure": "✅ Secure",
+      "verySecure": "✅ Very Secure"
+    }
   },
   "color": {
     "title": "Color Converter",
@@ -114,18 +181,42 @@
     "palette": "Suggested Palette",
     "formats": {
       "hex": "HEX Format",
-      "rgb": "RGB Format"
-    }
+      "rgb": "RGB Format",
+      "hsl": "HSL Format",
+      "hsv": "HSV Format",
+      "cmyk": "CMYK Format"
+    },
+    "useCases": [
+      "Web Design: CSS uses HEX (#FF0000) and RGB",
+      "Digital Graphics: HSL for brightness/saturation",
+      "Printing: CMYK is the standard",
+      "Photo Editing: HSV/HSB in Photoshop",
+      "Accessibility: contrast checking"
+    ],
+    "infoCMYK": "ℹ️ CMYK is used for professional printing"
   },
   "url": {
     "title": "URL Encoder/Decoder",
     "description": "Percent-encoding makes URLs safe and valid.",
     "encodeTitle": "URL Encode",
     "decodeTitle": "URL Decode",
+    "inputToEncode": "Text to Encode",
+    "inputToDecode": "URL to Decode",
+    "encodedResult": "Encoded URL",
+    "decodedResult": "Decoded URL",
+    "urlOrQuery": "URL or Query String",
     "analyzeQuery": "Analyze Query Parameters",
     "extractedParams": "Extracted Parameters",
     "slugTitle": "URL Slug",
-    "slugDescription": "URL-friendly slug for titles"
+    "slugDescription": "URL-friendly slug for titles",
+    "commonChars": "Common Encoded Characters",
+    "useCases": [
+      "Query parameters: passing data in URL",
+      "REST API: special characters support",
+      "SEO: readable slugs",
+      "HTML Forms: automatic encoding",
+      "OAuth: redirect parameters"
+    ]
   },
   "timestamp": {
     "title": "Timestamp Converter",
@@ -136,7 +227,23 @@
     "allFormats": "All Formats",
     "milliseconds": "Milliseconds",
     "custom": "Custom Format",
-    "relative": "Relative Time"
+    "relative": "Relative Time",
+    "examplesTitle": "Famous Examples",
+    "useCases": [
+      "Database: universal dates",
+      "API: standard date exchange",
+      "Logging: precise events",
+      "Social: relative time",
+      "Tokens: session expiry"
+    ],
+    "formatsDesc": {
+      "unix": "Unix Standard",
+      "milliseconds": "JavaScript Date.now()",
+      "iso": "International Standard",
+      "rfc": "Email headers, HTTP",
+      "custom": "DD/MM/YYYY HH:mm:ss",
+      "relative": "Human readable"
+    }
   },
   "jwt": {
     "title": "JWT Decoder",
@@ -154,55 +261,133 @@
     "expiresIn": "Expires in: {{hours}} hours",
     "errors": {
       "invalid": "Invalid JWT"
+    },
+    "signatureTitle": "Signature",
+    "signatureDesc": "The signature ensures that the token has not been altered",
+    "exampleTitle": "Example JWT",
+    "exampleDesc": "Try with this example token:",
+    "headerTitle": "Header",
+    "payloadTitle": "Payload",
+    "standardClaims": "Standard Claims",
+    "algo": "Algorithm",
+    "type": "Type",
+    "claims": {
+      "iss": "Issuer (iss)",
+      "sub": "Subject (sub)",
+      "aud": "Audience (aud)",
+      "exp": "Expiration (exp)",
+      "nbf": "Not Before (nbf)",
+      "iat": "Issued At (iat)"
     }
   },
   "base": {
     "title": "Base Converter",
-    "description": "Convert numbers between different bases (binary, octal, decimal, hexadecimal, and custom bases 2-36).",
-    "input": "Number to Convert",
-    "baseFrom": "From Base",
-    "baseTo": "To Base",
-    "swap": "Swap Bases",
-    "errorInvalid": "Invalid number for selected base",
-    "commonBases": {
-      "2": "Binary (Base 2)",
-      "8": "Octal (Base 8)",
-      "10": "Decimal (Base 10)",
-      "16": "Hexadecimal (Base 16)"
-    }
+    "description": "Convert numbers between Binary, Octal, Decimal, Hexadecimal and custom bases.",
+    "valueLabel": "Value to Convert",
+    "baseLabel": "Input Base",
+    "customBaseLabel": "Custom Base (2-36)",
+    "results": "Results",
+    "errorInvalid": "Invalid characters for selected base",
+    "bases": {
+      "binary": "Binary (Base 2)",
+      "octal": "Octal (Base 8)",
+      "decimal": "Decimal (Base 10)",
+      "hex": "Hexadecimal (Base 16)"
+    },
+    "useCases": [
+      "Programming: binary and hex are fundamental",
+      "Web Colors: understanding #FF0000",
+      "Networking: IP and MAC addresses",
+      "Linux Permissions: chmod 755 (octal)",
+      "Electronics: digital signals (0/1)"
+    ]
   },
   "ascii": {
     "title": "ASCII Converter",
-    "description": "Convert text to ASCII codes (decimal, binary, hexadecimal) and vice versa.",
-    "textInput": "Text",
-    "asciiOutput": "ASCII Output",
-    "char": "Character",
-    "dec": "Dec",
-    "hex": "Hex",
-    "bin": "Bin"
+    "description": "ASCII (American Standard Code for Information Interchange) maps numbers to characters.",
+    "textLabel": "Text to Convert",
+    "asciiLabel": "ASCII Codes to Convert",
+    "decimal": "Decimal ASCII",
+    "binary": "Binary",
+    "hex": "Hexadecimal",
+    "textResult": "Resulting Text",
+    "table": {
+      "title": "Full ASCII Table (0-127)",
+      "charsCount": "characters",
+      "searchPlaceholder": "Search by decimal, hex, binary, char or description...",
+      "noResults": "No characters found for",
+      "headers": {
+        "dec": "Dec",
+        "hex": "Hex",
+        "bin": "Binary",
+        "char": "Char",
+        "description": "Description"
+      }
+    },
+    "category": {
+      "control": "Control Characters",
+      "special": "Symbols and Special Characters",
+      "number": "Numbers",
+      "uppercase": "Uppercase Letters",
+      "lowercase": "Lowercase Letters"
+    },
+    "useCases": [
+      "Programming: understanding text storage",
+      "Debugging: identifying hidden characters",
+      "Data Comms: text transmission",
+      "Cryptography: basic character manipulation",
+      "File Analysis: raw data viewer"
+    ]
   },
   "floating": {
     "title": "Floating Point (IEEE 754)",
-    "description": "Visualize how decimal numbers are represented in memory according to IEEE 754 standard (32-bit and 64-bit).",
-    "input": "Decimal Number",
-    "precision": {
-      "single": "Single Precision (32-bit)",
-      "double": "Double Precision (64-bit)"
-    },
-    "components": {
-      "sign": "Sign",
-      "exponent": "Exponent",
-      "mantissa": "Mantissa"
-    }
+    "description": "Visualize how decimal numbers are stored in memory as Float32 and Float64.",
+    "decimalLabel": "Decimal Number",
+    "floatFormatLabel": "Floating Point Format",
+    "binaryConvertLabel": "Convert Binary to Decimal",
+    "sign": "SIGN",
+    "exponent": "EXPONENT",
+    "mantissa": "MANTISSA",
+    "binaryFull": "Full Binary",
+    "hex": "Hexadecimal",
+    "fixedTitle": "Fixed Point",
+    "fractionalBits": "Fractional Bits",
+    "integerScaled": "Scaled Integer Value",
+    "positive": "Positive",
+    "negative": "Negative",
+    "useCases": [
+      "3D Graphics: coordinates and transforms",
+      "Scientific Calc: variable precision",
+      "Game Dev: physics and positioning",
+      "Finance: Fixed-point avoids rounding errors",
+      "Audio/Video: signal processing"
+    ]
   },
   "json": {
     "title": "JSON Formatter & Validator",
-    "description": "Format, validate, and minify JSON code. Useful for API debugging and configuration.",
-    "input": "JSON Input",
+    "description": "Format, validate, minify and fix your JSON data.",
+    "inputLabel": "JSON Input",
+    "outputLabel": "Output",
     "format": "Format",
     "minify": "Minify",
+    "sort": "Sort Keys",
+    "escape": "Escape",
+    "unescape": "Unescape",
+    "indentation": "Indentation",
     "valid": "Valid JSON",
     "invalid": "Invalid JSON",
-    "error": "Syntax Error"
+    "compact": "Compact",
+    "formatted": "Formatted",
+    "simpleObject": "Simple Object",
+    "arrayObjects": "Array with Objects",
+    "size": "Size",
+    "lines": "Lines",
+    "useCases": [
+      "API Development: debug JSON responses",
+      "Configuration: .json files",
+      "Validation: syntax check",
+      "Compression: minify for production",
+      "Logs: reading JSON logs"
+    ]
   }
 }

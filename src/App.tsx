@@ -9,7 +9,8 @@ import {
   Palette,
   Accessibility,
   Check,
-  Settings
+  Settings,
+  Github
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useTheme } from './hooks/useTheme';
@@ -230,6 +231,18 @@ function Header() {
             </div>
           </HeaderDropdown>
 
+          <div className="w-px h-6 bg-white/10 mx-1"></div>
+
+          <a
+            href="https://github.com/carellonicolo/BASE-CONVERTER"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="p-2 hover:bg-white/10 rounded-lg transition-colors text-slate-300 hover:text-white group"
+            title="GitHub Repository"
+          >
+            <Github className="w-5 h-5 group-hover:rotate-12 transition-transform" />
+          </a>
+
         </div>
       </div>
     </header>
@@ -237,6 +250,7 @@ function Header() {
 }
 
 function AppContent() {
+  const { t } = useTranslation();
   useTheme(); // Initialize theme
   useLanguage(); // Initialize language
 
@@ -273,7 +287,7 @@ function AppContent() {
 
         {/* Footer */}
         <footer className="text-center mt-8 text-slate-400 text-sm opacity-70">
-          <p>© 2025 Base Converter - Powered by Prof. Carello Nicolò</p>
+          <p>{t('app.footer')}</p>
           <p className="mt-1">
             <a href="mailto:info@nicolocarello.it" className="hover:text-liquid-300 transition-colors">
               info@nicolocarello.it

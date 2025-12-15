@@ -122,7 +122,7 @@ const JWTDecoder: React.FC = () => {
           {/* Header */}
           <Card>
             <div className="flex items-center justify-between mb-4">
-              <h4 className="text-lg font-bold text-liquid-300">Header</h4>
+              <h4 className="text-lg font-bold text-liquid-300">{t('jwt.headerTitle')}</h4>
               <CopyButton text={JSON.stringify(decoded.header, null, 2)} />
             </div>
             <div className="glass-morphism rounded-xl p-4 bg-black/20">
@@ -132,11 +132,11 @@ const JWTDecoder: React.FC = () => {
             </div>
             <div className="mt-4 space-y-2 text-sm">
               <div className="flex justify-between">
-                <span className="text-slate-400">Algorithm:</span>
+                <span className="text-slate-400">{t('jwt.algo')}:</span>
                 <span className="text-white font-mono">{decoded.header.alg}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-slate-400">Type:</span>
+                <span className="text-slate-400">{t('jwt.type')}:</span>
                 <span className="text-white font-mono">{decoded.header.typ}</span>
               </div>
             </div>
@@ -145,7 +145,7 @@ const JWTDecoder: React.FC = () => {
           {/* Payload */}
           <Card>
             <div className="flex items-center justify-between mb-4">
-              <h4 className="text-lg font-bold text-liquid-300">Payload</h4>
+              <h4 className="text-lg font-bold text-liquid-300">{t('jwt.payloadTitle')}</h4>
               <CopyButton text={JSON.stringify(decoded.payload, null, 2)} />
             </div>
             <div className="glass-morphism rounded-xl p-4 bg-black/20 max-h-96 overflow-y-auto custom-scrollbar">
@@ -160,41 +160,41 @@ const JWTDecoder: React.FC = () => {
       {/* Payload details */}
       {decoded?.payload && (
         <Card>
-          <h4 className="text-lg font-bold text-white mb-4">Standard Claims</h4>
+          <h4 className="text-lg font-bold text-white mb-4">{t('jwt.standardClaims')}</h4>
           <div className="grid md:grid-cols-2 gap-4">
             {decoded.payload.iss && (
               <div>
-                <p className="text-xs text-slate-400 mb-1">Issuer (iss)</p>
+                <p className="text-xs text-slate-400 mb-1">{t('jwt.claims.iss')}</p>
                 <p className="text-white font-mono text-sm">{decoded.payload.iss}</p>
               </div>
             )}
             {decoded.payload.sub && (
               <div>
-                <p className="text-xs text-slate-400 mb-1">Subject (sub)</p>
+                <p className="text-xs text-slate-400 mb-1">{t('jwt.claims.sub')}</p>
                 <p className="text-white font-mono text-sm">{decoded.payload.sub}</p>
               </div>
             )}
             {decoded.payload.aud && (
               <div>
-                <p className="text-xs text-slate-400 mb-1">Audience (aud)</p>
+                <p className="text-xs text-slate-400 mb-1">{t('jwt.claims.aud')}</p>
                 <p className="text-white font-mono text-sm">{decoded.payload.aud}</p>
               </div>
             )}
             {decoded.payload.exp && (
               <div>
-                <p className="text-xs text-slate-400 mb-1">Expiration Time (exp)</p>
+                <p className="text-xs text-slate-400 mb-1">{t('jwt.claims.exp')}</p>
                 <p className="text-white text-sm">{formatTimestamp(decoded.payload.exp)}</p>
               </div>
             )}
             {decoded.payload.nbf && (
               <div>
-                <p className="text-xs text-slate-400 mb-1">Not Before (nbf)</p>
+                <p className="text-xs text-slate-400 mb-1">{t('jwt.claims.nbf')}</p>
                 <p className="text-white text-sm">{formatTimestamp(decoded.payload.nbf)}</p>
               </div>
             )}
             {decoded.payload.iat && (
               <div>
-                <p className="text-xs text-slate-400 mb-1">Issued At (iat)</p>
+                <p className="text-xs text-slate-400 mb-1">{t('jwt.claims.iat')}</p>
                 <p className="text-white text-sm">{formatTimestamp(decoded.payload.iat)}</p>
               </div>
             )}
@@ -207,9 +207,9 @@ const JWTDecoder: React.FC = () => {
         <Card>
           <div className="flex items-center justify-between mb-4">
             <div>
-              <h4 className="text-lg font-bold text-liquid-300">Signature</h4>
+              <h4 className="text-lg font-bold text-liquid-300">{t('jwt.signatureTitle')}</h4>
               <p className="text-xs text-slate-400 mt-1">
-                La firma garantisce che il token non sia stato alterato
+                {t('jwt.signatureDesc')}
               </p>
             </div>
             <CopyButton text={decoded.signature} />
@@ -224,8 +224,8 @@ const JWTDecoder: React.FC = () => {
 
       {/* Example JWT */}
       <div className="glass-morphism rounded-2xl p-6">
-        <h4 className="text-sm font-bold text-slate-200 mb-3 tracking-wide">Esempio JWT</h4>
-        <p className="text-xs text-slate-400 mb-2">Prova con questo token di esempio:</p>
+        <h4 className="text-sm font-bold text-slate-200 mb-3 tracking-wide">{t('jwt.exampleTitle')}</h4>
+        <p className="text-xs text-slate-400 mb-2">{t('jwt.exampleDesc')}</p>
         <div className="glass-morphism rounded-xl p-3 bg-black/20">
           <code className="text-liquid-300 font-mono text-xs break-all">
             eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c

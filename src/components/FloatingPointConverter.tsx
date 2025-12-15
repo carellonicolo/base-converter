@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react';
 import { Info, Copy, Check, Gauge } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import InfoBox from './ui/InfoBox';
 
 function FloatingPointConverter() {
+  const { t } = useTranslation();
   const [decimalInput, setDecimalInput] = useState('');
   const [binaryInput, setBinaryInput] = useState('');
   const [fixedPointBits, setFixedPointBits] = useState(8);
@@ -156,50 +158,44 @@ function FloatingPointConverter() {
     <div className="space-y-8">
       {/* Educational Info Box */}
       <InfoBox
-        title="Convertitore Virgola Mobile e Virgola Fissa"
-        description="I numeri decimali nei computer vengono rappresentati in due modi: virgola mobile (floating-point) per numeri molto grandi/piccoli con precisione variabile, e virgola fissa (fixed-point) per calcoli finanziari dove serve precisione costante."
+        title={t('floating.title')}
+        description={t('floating.description')}
         icon={<Gauge className="w-5 h-5" />}
-        useCases={[
-          "Grafica 3D: le coordinate usano floating-point per gestire distanze enormi",
-          "Calcoli scientifici: numeri molto piccoli (0.0000001) o grandi (10000000)",
-          "Sviluppo giochi: fisica, posizioni, animazioni usano float",
-          "Finanza: i soldi usano fixed-point per evitare errori di arrotondamento",
-          "Audio/Video: sample audio e pixel usano rappresentazioni precise"
-        ]}
+        useCases={t('floating.useCases', { returnObjects: true }) as string[]}
         examples={[
-          { label: '3.14 (Float32)', value: 'Sign:0 Exp:10000000 Mantissa:10010001111...' },
-          { label: '42.5 (Q16.16)', value: 'Binario: 00000000001010100000000000000000' },
-          { label: '0.1', value: 'Non rappresentabile esattamente in binario!' }
+          { label: '3.14', value: 'Float32 (IEEE 754)' },
+          { label: '42.5', value: 'Fixed Point (Q16.16)' },
+          { label: '0.1', value: 'Approximation' }
         ]}
-        realWorldUse="Lo standard IEEE 754 è usato da TUTTI i processori moderni. Quando fai 0.1 + 0.2 in JavaScript e ottieni 0.30000000000000004, è perché 0.1 non può essere rappresentato esattamente in binario - proprio come 1/3 non può essere scritto esattamente in decimale (0.333...)."
+        realWorldUse={t('common.realWorldUse')}
         type="educational"
       />
 
       <div className="grid md:grid-cols-2 gap-6">
         <div>
           <label className="block text-sm font-semibold text-slate-200 mb-3 tracking-wide">
-            Numero Decimale
+            {t('floating.decimalLabel')}
           </label>
           <input
             type="text"
             value={decimalInput}
             onChange={(e) => setDecimalInput(e.target.value)}
-            placeholder="Es. 3.14159, -42.5, 0.125"
+            placeholder="3.14159, -42.5, 0.125"
             className="liquid-input w-full text-white placeholder-slate-400"
           />
         </div>
 
         <div>
           <label className="block text-sm font-semibold text-slate-200 mb-3 tracking-wide">
-            Formato Virgola Mobile
+            {t('floating.floatFormatLabel')}
           </label>
           <select
             value={floatFormat}
             onChange={(e) => setFloatFormat(e.target.value as 'float32' | 'float64')}
             className="liquid-input w-full text-white cursor-pointer appearance-none"
           >
-            <option value="float32">Float 32-bit (IEEE 754 Single)</option>
-            <option value="float64">Float 64-bit (IEEE 754 Double)</option>
+            <option value="float32">Float 32-bit (Single)</option>
+            <option value="float64">Float 64-bit (Double)</option>
           </select>
         </div>
       </div>
@@ -210,7 +206,7 @@ function FloatingPointConverter() {
             <div className="flex items-center gap-3 mb-6">
               <div className="relative">
                 <div className="absolute inset-0 bg-liquid-400 blur-lg opacity-40"></div>
-                <h3 className="text-2xl font-bold text-white relative z-10">Virgola Mobile IEEE 754</h3>
+                <h3 className="text-2xl font-bold text-white relative z-10">{t('floating.title')}</h3>
               </div>
             </div>
 
@@ -218,14 +214,14 @@ function FloatingPointConverter() {
               <div className="grid grid-cols-3 gap-4">
                 <div>
                   <div className="flex items-center justify-between mb-2">
-                    <h4 className="text-xs font-bold text-liquid-300 uppercase tracking-wider">SEGNO (1 bit)</h4>
+                    <h4 className="text-xs font-bold text-liquid-300 uppercase tracking-wider">{t('floating.sign')} (1 bit)</h4>
                   </div>
                   <div className="glass-morphism rounded-xl p-3 text-center bg-white/5">
                     <span className="text-2xl font-mono text-white">
                       {floatingPointResult.sign}
                     </span>
                     <p className="text-xs text-slate-400 mt-1">
-                      {floatingPointResult.sign === '0' ? 'Positivo' : 'Negativo'}
+                      {floatingPointResult.sign === '0' ? t('floating.positive') : t('floating.negative')}
                     </p>
                   </div>
                 </div>
@@ -233,7 +229,7 @@ function FloatingPointConverter() {
                 <div>
                   <div className="flex items-center justify-between mb-2">
                     <h4 className="text-xs font-bold text-liquid-300 uppercase tracking-wider">
-                      ESPONENTE ({floatFormat === 'float32' ? '8' : '11'} bit)
+                      {t('floating.exponent')} ({floatFormat === 'float32' ? '8' : '11'} bit)
                     </h4>
                   </div>
                   <div className="glass-morphism rounded-xl p-3 text-center bg-white/5">
@@ -249,7 +245,7 @@ function FloatingPointConverter() {
                 <div>
                   <div className="flex items-center justify-between mb-2">
                     <h4 className="text-xs font-bold text-liquid-300 uppercase tracking-wider">
-                      MANTISSA ({floatFormat === 'float32' ? '23' : '52'} bit)
+                      {t('floating.mantissa')} ({floatFormat === 'float32' ? '23' : '52'} bit)
                     </h4>
                   </div>
                   <div className="glass-morphism rounded-xl p-3 bg-white/5">
@@ -262,7 +258,7 @@ function FloatingPointConverter() {
 
               <div className="border-t border-slate-700 pt-4 space-y-3">
                 <div className="flex items-center justify-between">
-                  <h4 className="text-sm font-bold text-liquid-300 uppercase tracking-wider">Binario Completo</h4>
+                  <h4 className="text-sm font-bold text-liquid-300 uppercase tracking-wider">{t('floating.binaryFull')}</h4>
                   <button
                     onClick={() => copyToClipboard(floatingPointResult.binary, 'binary')}
                     className="glass-morphism p-2.5 rounded-xl transition-all duration-300 hover:scale-110 hover:bg-white/10"
@@ -281,7 +277,7 @@ function FloatingPointConverter() {
               </div>
 
               <div className="flex items-center justify-between">
-                <h4 className="text-sm font-bold text-liquid-300 uppercase tracking-wider">Esadecimale</h4>
+                <h4 className="text-sm font-bold text-liquid-300 uppercase tracking-wider">{t('floating.hex')}</h4>
                 <button
                   onClick={() => copyToClipboard(floatingPointResult.hex, 'hex')}
                   className="glass-morphism p-2.5 rounded-xl transition-all duration-300 hover:scale-110 hover:bg-white/10"
@@ -306,11 +302,11 @@ function FloatingPointConverter() {
                 <div className="flex items-center gap-3">
                   <div className="relative">
                     <div className="absolute inset-0 bg-liquid-400 blur-lg opacity-40"></div>
-                    <h3 className="text-2xl font-bold text-white relative z-10">Virgola Fissa (Q24.{fixedPointBits})</h3>
+                    <h3 className="text-2xl font-bold text-white relative z-10">{t('floating.fixedTitle')} (Q24.{fixedPointBits})</h3>
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
-                  <label className="text-sm text-slate-300">Bit Frazionari:</label>
+                  <label className="text-sm text-slate-300">{t('floating.fractionalBits')}:</label>
                   <input
                     type="number"
                     min="0"
@@ -325,7 +321,7 @@ function FloatingPointConverter() {
               <div className="glass-morphism rounded-2xl p-6 space-y-4 glass-reflection">
                 <div>
                   <div className="flex items-center justify-between mb-2">
-                    <h4 className="text-sm font-bold text-liquid-300 uppercase tracking-wider">Binario (32-bit)</h4>
+                    <h4 className="text-sm font-bold text-liquid-300 uppercase tracking-wider">{t('floating.binaryFull')} (32-bit)</h4>
                     <button
                       onClick={() => copyToClipboard(fixedPointResult.binary, 'fixed-binary')}
                       className="glass-morphism p-2.5 rounded-xl transition-all duration-300 hover:scale-110 hover:bg-white/10"
@@ -345,7 +341,7 @@ function FloatingPointConverter() {
 
                 <div>
                   <div className="flex items-center justify-between mb-2">
-                    <h4 className="text-sm font-bold text-liquid-300 uppercase tracking-wider">Esadecimale</h4>
+                    <h4 className="text-sm font-bold text-liquid-300 uppercase tracking-wider">{t('floating.hex')}</h4>
                     <button
                       onClick={() => copyToClipboard(fixedPointResult.hex, 'fixed-hex')}
                       className="glass-morphism p-2.5 rounded-xl transition-all duration-300 hover:scale-110 hover:bg-white/10"
@@ -365,7 +361,7 @@ function FloatingPointConverter() {
 
                 <div>
                   <div className="flex items-center justify-between mb-2">
-                    <h4 className="text-sm font-bold text-liquid-300 uppercase tracking-wider">Valore Intero Scalato</h4>
+                    <h4 className="text-sm font-bold text-liquid-300 uppercase tracking-wider">{t('floating.integerScaled')}</h4>
                     <button
                       onClick={() => copyToClipboard(fixedPointResult.decimal, 'fixed-decimal')}
                       className="glass-morphism p-2.5 rounded-xl transition-all duration-300 hover:scale-110 hover:bg-white/10"
@@ -382,7 +378,7 @@ function FloatingPointConverter() {
                     {fixedPointResult.decimal}
                   </p>
                   <p className="text-xs text-slate-400 mt-2">
-                    Moltiplicato per 2^{fixedPointBits} = {Math.pow(2, fixedPointBits)}
+                    * 2^{fixedPointBits} = {Math.pow(2, fixedPointBits)}
                   </p>
                 </div>
               </div>
@@ -396,7 +392,7 @@ function FloatingPointConverter() {
           <div className="relative">
             <div className="absolute inset-0 bg-liquid-400 blur-lg opacity-40"></div>
             <h3 className="text-2xl font-bold text-white relative z-10">
-              Converti da Binario a Decimale
+              {t('floating.binaryConvertLabel')}
             </h3>
           </div>
         </div>
@@ -406,7 +402,7 @@ function FloatingPointConverter() {
               type="text"
               value={binaryInput}
               onChange={(e) => setBinaryInput(e.target.value)}
-              placeholder={`Inserisci ${floatFormat === 'float32' ? '32' : '64'} bit binari...`}
+              placeholder={`01000000010010010000111111011011...`}
               className="liquid-input w-full text-white placeholder-slate-400 font-mono"
             />
           </div>
@@ -414,7 +410,7 @@ function FloatingPointConverter() {
             onClick={handleBinaryConvert}
             className="liquid-button text-white font-semibold hover:bg-white/10 shadow-liquid"
           >
-            Converti
+            Convert
           </button>
         </div>
       </div>
@@ -428,10 +424,8 @@ function FloatingPointConverter() {
           <div className="space-y-2 text-sm text-slate-300">
             <p className="font-semibold">Note:</p>
             <ul className="list-disc list-inside space-y-1 text-slate-400">
-              <li>IEEE 754 Float32: 1 bit segno, 8 bit esponente, 23 bit mantissa</li>
-              <li>IEEE 754 Float64: 1 bit segno, 11 bit esponente, 52 bit mantissa</li>
-              <li>Virgola Fissa: rappresenta numeri con un punto decimale fisso usando interi scalati</li>
-              <li>Q24.8 significa 24 bit per la parte intera e 8 bit per la parte frazionaria</li>
+              <li>IEEE 754 Float32: 1 bit {t('floating.sign')}, 8 bit {t('floating.exponent')}, 23 bit {t('floating.mantissa')}</li>
+              <li>IEEE 754 Float64: 1 bit {t('floating.sign')}, 11 bit {t('floating.exponent')}, 52 bit {t('floating.mantissa')}</li>
             </ul>
           </div>
         </div>
@@ -440,7 +434,7 @@ function FloatingPointConverter() {
       {!decimalInput && (
         <div className="text-center py-16">
           <div className="glass-morphism rounded-2xl p-8 inline-block">
-            <p className="text-slate-300 text-lg font-light">Inserisci un numero decimale per vedere le conversioni</p>
+            <p className="text-slate-300 text-lg font-light">{t('floating.decimalLabel')}: Inserisci un numero</p>
           </div>
         </div>
       )}

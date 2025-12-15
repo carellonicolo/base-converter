@@ -1,8 +1,8 @@
 {
   "app": {
     "title": "Base Converter Pro",
-    "subtitle": "by Prof. Carello Nicolò",
-    "footer": "© 2025 Base Converter Pro - Powered by Prof. Carello Nicolò"
+    "subtitle": "von Prof. Carello Nicolò",
+    "footer": "© 2025 Base Converter Pro - Entwickelt von Prof. Carello Nicolò"
   },
   "nav": {
     "home": "Startseite",
@@ -13,12 +13,12 @@
     "title": "Einstellungen",
     "subtitle": "Passen Sie das Aussehen und Verhalten der Anwendung an",
     "appearance": {
-      "title": "Aussehen und Sprache",
+      "title": "Aussehen & Sprache",
       "themeMode": "Themenmodus",
       "themeModeDark": "Dunkel",
       "themeModeLight": "Hell",
       "themeModeAuto": "Auto",
-      "themeColor": "Farbthema",
+      "themeColor": "Themenfarbe",
       "themeDefault": "Standard (Cyan)",
       "themeMidnight": "Mitternacht (Lila)",
       "themeSunset": "Sonnenuntergang (Orange)",
@@ -27,7 +27,7 @@
       "language": "Sprache"
     },
     "accessibility": {
-      "title": "Barrierefreiheit und Einstellungen",
+      "title": "Zugänglichkeit & Präferenzen",
       "highContrast": "Hoher Kontrast",
       "reducedMotion": "Reduzierte Bewegung",
       "notifications": "Benachrichtigungen",
@@ -43,12 +43,351 @@
       "subtitle": "Irreversible Aktionen",
       "reset": "Zurücksetzen",
       "resetConfirm": "Auf Standardeinstellungen zurücksetzen?",
-      "clearAll": "Alle Daten Löschen",
-      "clearAllConfirm": "Alle Daten löschen? Diese Aktion ist irreversibel."
+      "clearAll": "Alle Daten löschen",
+      "clearAllConfirm": "Alle Daten löschen? Dies ist irreversibel."
     }
   },
   "dashboard": {
-    "welcome": "Willkommen bei Base Converter Pro",
-    "description": "Professionelles Tool zum Konvertieren von Zahlensystemen, Codierungen und Formaten"
+    "welcome": "Willkommen beim Base Converter",
+    "description": "Professionelles Tool zum Konvertieren von Zahlenbasen, Kodierungen und Formaten",
+    "hero": {
+      "title": "Base Converter",
+      "subtitle": "Die komplette Suite für Konvertierungen und Kodierung",
+      "description": "11 professionelle Tools in einer Anwendung"
+    },
+    "toolsTitle": "Wählen Sie ein Werkzeug",
+    "tools": {
+      "base": {
+        "name": "Zahlenbasen",
+        "desc": "Konvertieren zwischen Basen 2-36"
+      },
+      "ascii": {
+        "name": "ASCII",
+        "desc": "Text ↔ ASCII"
+      },
+      "unicode": {
+        "name": "Unicode",
+        "desc": "Text ↔ Unicode"
+      },
+      "floating": {
+        "name": "Gleitkomma",
+        "desc": "IEEE 754 & Festkomma"
+      },
+      "base64": {
+        "name": "Base64",
+        "desc": "Base64 Kodieren/Dekodieren"
+      },
+      "hash": {
+        "name": "Hash",
+        "desc": "MD5, SHA-256, SHA-512"
+      },
+      "color": {
+        "name": "Farben",
+        "desc": "HEX ↔ RGB ↔ HSL ↔ CMYK"
+      },
+      "timestamp": {
+        "name": "Zeitstempel",
+        "desc": "Unix ↔ Datum ↔ ISO"
+      },
+      "url": {
+        "name": "URL",
+        "desc": "URL Kodieren/Dekodieren"
+      },
+      "jwt": {
+        "name": "JWT",
+        "desc": "JWT Token Decoder"
+      },
+      "json": {
+        "name": "JSON",
+        "desc": "JSON Formatieren & Validieren"
+      }
+    }
+  },
+  "common": {
+    "copy": "Kopieren",
+    "copied": "Kopiert!",
+    "copyToClipboard": "In die Zwischenablage kopieren",
+    "error": "Fehler",
+    "errors": "Fehler",
+    "loading": "Laden...",
+    "examples": "Beispiele",
+    "realWorldUse": "Verwendung in der Praxis",
+    "input": "Eingabe",
+    "output": "Ausgabe",
+    "result": "Ergebnis"
+  },
+  "unicode": {
+    "title": "Unicode Konverter",
+    "description": "Unicode ist der universelle Standard zur Darstellung von Text in allen Sprachen, einschließlich Emojis und Sonderzeichen.",
+    "textToUnicode": "Text zu Unicode",
+    "unicodeToText": "Unicode zu Text",
+    "charDetails": "Zeichendetails",
+    "tableTitle": "Erweiterte Unicode-Tabelle (inkl. Emojis)",
+    "categories": {
+      "emoji": "Emoji & Emoticons (U+1F600+)",
+      "misc": "Diverse Symbole",
+      "transport": "Transport & Karten",
+      "supplemental": "Ergänzend"
+    }
+  },
+  "base64": {
+    "title": "Base64 Encoder",
+    "description": "Base64 konvertiert Binärdaten in reinen ASCII-Text unter Verwendung von 64 sicheren Zeichen. Unverzichtbar für E-Mails und APIs.",
+    "encodeTitle": "Kodieren (Text → Base64)",
+    "decodeTitle": "Dekodieren (Base64 → Text)",
+    "uploadButton": "Datei hochladen & zu Base64 konvertieren",
+    "encodedResult": "Base64 Ergebnis",
+    "decodedText": "Dekodierter Text",
+    "useCases": [
+      "E-Mail: Base64 kodierte Anhänge",
+      "Data URLs: Bilder in HTML/CSS",
+      "JSON/XML: Einbindung von Binärdaten",
+      "Authentifizierung: Basic Auth Header",
+      "API: Binärdatenübertragung"
+    ]
+  },
+  "hash": {
+    "title": "Hash Generator",
+    "description": "Kryptografische Hashes wandeln Daten in einen eindeutigen Fingerabdruck um.",
+    "inputText": "Text zum Hashen",
+    "algorithm": "Algorithmus",
+    "uploadButton": "Datei Hashen",
+    "uploadHint": "Laden Sie eine Datei hoch, um ihren Hash zu berechnen",
+    "useCases": [
+      "Passwort-Hashing (SHA-256)",
+      "Dateiintegritätsprüfung",
+      "Blockchain und Mining",
+      "Digitale Signaturen",
+      "Duplikat-Identifizierung"
+    ],
+    "table": {
+      "title": "Algorithmus-Vergleich",
+      "algorithm": "Algorithmus",
+      "length": "Länge",
+      "security": "Sicherheit",
+      "usage": "Verwendung"
+    },
+    "status": {
+      "insecure": "❌ Unsicher",
+      "deprecated": "⚠ Veraltet",
+      "secure": "✅ Sicher",
+      "verySecure": "✅ Sehr Sicher"
+    }
+  },
+  "color": {
+    "title": "Farbkonverter",
+    "description": "Konvertieren Sie zwischen HEX, RGB, HSL, HSV und CMYK Formaten.",
+    "preview": "Farbvorschau",
+    "palette": "Vorgeschlagene Palette",
+    "formats": {
+      "hex": "HEX Format",
+      "rgb": "RGB Format",
+      "hsl": "HSL Format",
+      "hsv": "HSV Format",
+      "cmyk": "CMYK Format"
+    },
+    "useCases": [
+      "Webdesign: CSS verwendet HEX (#FF0000) und RGB",
+      "Digitale Grafik: HSL für Helligkeit/Sättigung",
+      "Druck: CMYK ist der Standard",
+      "Fotobearbeitung: HSV/HSB in Photoshop",
+      "Barrierefreiheit: Kontrastprüfung"
+    ],
+    "infoCMYK": "ℹ️ CMYK wird für den professionellen Druck verwendet"
+  },
+  "url": {
+    "title": "URL Encoder/Decoder",
+    "description": "Prozentkodierung macht URLs sicher und gültig.",
+    "encodeTitle": "URL Kodieren",
+    "decodeTitle": "URL Dekodieren",
+    "inputToEncode": "Text zum Kodieren",
+    "inputToDecode": "URL zum Dekodieren",
+    "encodedResult": "Kodierte URL",
+    "decodedResult": "Dekodierte URL",
+    "urlOrQuery": "URL oder Query String",
+    "analyzeQuery": "Query-Parameter analysieren",
+    "extractedParams": "Extrahierte Parameter",
+    "slugTitle": "URL Slug",
+    "slugDescription": "URL-freundlicher Slug für Titel",
+    "commonChars": "Häufig kodierte Zeichen",
+    "useCases": [
+      "Query-Parameter: Daten in URL übergeben",
+      "REST API: Unterstützung von Sonderzeichen",
+      "SEO: lesbare Slugs",
+      "HTML-Formulare: automatische Kodierung",
+      "OAuth: Weiterleitungs-Parameter"
+    ]
+  },
+  "timestamp": {
+    "title": "Zeitstempel Konverter",
+    "description": "Konvertieren Sie Unix-Zeitstempel in lesbare Datumsangaben und umgekehrt.",
+    "current": "Aktueller Zeitstempel",
+    "unixLabel": "Unix Zeitstempel (Sekunden)",
+    "dateLabel": "Datum und Uhrzeit",
+    "allFormats": "Alle Formate",
+    "milliseconds": "Millisekunden",
+    "custom": "Benutzerdefiniertes Format",
+    "relative": "Relative Zeit",
+    "examplesTitle": "Berühmte Beispiele",
+    "useCases": [
+      "Datenbank: universelle Daten",
+      "API: Standard-Datumsaustausch",
+      "Logging: präzise Ereignisse",
+      "Social: relative Zeit",
+      "Token: Sitzungsablauf"
+    ],
+    "formatsDesc": {
+      "unix": "Unix Standard",
+      "milliseconds": "JavaScript Date.now()",
+      "iso": "Internationaler Standard",
+      "rfc": "E-Mail Header, HTTP",
+      "custom": "TT/MM/JJJJ HH:mm:ss",
+      "relative": "Menschenlesbar"
+    }
+  },
+  "jwt": {
+    "title": "JWT Decoder",
+    "description": "JSON Web Token (JWT) ist ein Standard zur sicheren Übertragung von Informationen. Wird für Authentifizierung verwendet.",
+    "useCase1": "Authentifizierung: Server generiert JWT nach Login",
+    "useCase2": "Single Sign-On (SSO): einheitlicher Zugriff",
+    "useCase3": "API Autorisierung: Token in Request Headern",
+    "useCase4": "Zustandslose Sitzungen",
+    "useCase5": "OAuth 2.0 Tokens",
+    "realWorldUse": "Anzeigen des Inhalts eines JWT Tokens (Header und Payload) zum Debuggen.",
+    "valid": "Gültiges Token",
+    "invalid": "Ungültiges Token",
+    "expired": "Token abgelaufen",
+    "notYetValid": "Token noch nicht gültig",
+    "expiresIn": "Läuft ab in: {{hours}} Stunden",
+    "errors": {
+      "invalid": "Ungültiges JWT"
+    },
+    "signatureTitle": "Signatur",
+    "signatureDesc": "Die Signatur stellt sicher, dass das Token nicht verändert wurde",
+    "exampleTitle": "Beispiel JWT",
+    "exampleDesc": "Versuchen Sie es mit diesem Beispiel-Token:",
+    "headerTitle": "Kopfzeile (Header)",
+    "payloadTitle": "Nutzlast (Payload)",
+    "standardClaims": "Standardansprüche",
+    "algo": "Algorithmus",
+    "type": "Typ",
+    "claims": {
+      "iss": "Aussteller (iss)",
+      "sub": "Betreff (sub)",
+      "aud": "Publikum (aud)",
+      "exp": "Ablauf (exp)",
+      "nbf": "Nicht vor (nbf)",
+      "iat": "Ausgestellt am (iat)"
+    }
+  },
+  "base": {
+    "title": "Basiskonverter",
+    "description": "Konvertieren Sie Zahlen zwischen Binär, Oktal, Dezimal, Hexadezimal und benutzerdefinierten Basen.",
+    "valueLabel": "Wert zum Konvertieren",
+    "baseLabel": "Eingabebasis",
+    "customBaseLabel": "Benutzerdefinierte Basis (2-36)",
+    "results": "Ergebnisse",
+    "errorInvalid": "Ungültige Zeichen für ausgewählte Basis",
+    "bases": {
+      "binary": "Binär (Basis 2)",
+      "octal": "Oktal (Basis 8)",
+      "decimal": "Dezimal (Basis 10)",
+      "hex": "Hexadezimal (Basis 16)"
+    },
+    "useCases": [
+      "Programmierung: Binär und Hex sind grundlegend",
+      "Webfarben: #FF0000 verstehen",
+      "Netzwerk: IP- und MAC-Adressen",
+      "Linux-Berechtigungen: chmod 755 (oktal)",
+      "Elektronik: digitale Signale (0/1)"
+    ]
+  },
+  "ascii": {
+    "title": "ASCII Konverter",
+    "description": "ASCII ordnet jedem Zeichen eine Nummer zu.",
+    "textLabel": "Text zum Konvertieren",
+    "asciiLabel": "ASCII-Codes zum Konvertieren",
+    "decimal": "ASCII Dezimal",
+    "binary": "Binär",
+    "hex": "Hexadezimal",
+    "textResult": "Ergebnis Text",
+    "table": {
+      "title": "Vollständige ASCII-Tabelle (0-127)",
+      "charsCount": "Zeichen",
+      "searchPlaceholder": "Suchen nach Dezimal, Hex, Binär, Zeichen oder Beschreibung...",
+      "noResults": "Keine Zeichen gefunden für",
+      "headers": {
+        "dec": "Dez",
+        "hex": "Hex",
+        "bin": "Binär",
+        "char": "Zeichen",
+        "description": "Beschreibung"
+      }
+    },
+    "category": {
+      "control": "Steuerzeichen",
+      "special": "Symbole und Sonderzeichen",
+      "number": "Zahlen",
+      "uppercase": "Großbuchstaben",
+      "lowercase": "Kleinbuchstaben"
+    },
+    "useCases": [
+      "Programmierung: Textspeicherung verstehen",
+      "Debugging: versteckte Zeichen identifizieren",
+      "Datenkommunikation: Textübertragung",
+      "Kryptografie: grundlegende Zeichenmanipulation",
+      "Dateianalyse: Rohdatenbetrachter"
+    ]
+  },
+  "floating": {
+    "title": "Gleitkomma (IEEE 754)",
+    "description": "Visualisieren Sie, wie Dezimalzahlen als Float32 und Float64 im Speicher abgelegt werden.",
+    "decimalLabel": "Dezimalzahl",
+    "floatFormatLabel": "Gleitkommaformat",
+    "binaryConvertLabel": "Binär in Dezimal konvertieren",
+    "sign": "VORZEICHEN",
+    "exponent": "EXPONENT",
+    "mantissa": "MANTISSE",
+    "binaryFull": "Vollständig Binär",
+    "hex": "Hexadezimal",
+    "fixedTitle": "Festkomma",
+    "fractionalBits": "Bruchbits",
+    "integerScaled": "Skalierter Ganzzahlwert",
+    "positive": "Positiv",
+    "negative": "Negativ",
+    "useCases": [
+      "3D-Grafik: Koordinaten und Transformationen",
+      "Wissenschaftliches Rechnen: variable Präzision",
+      "Spieleentwicklung: Physik und Positionierung",
+      "Finanzen: Festkomma vermeidet Rundungsfehler",
+      "Audio/Video: Signalverarbeitung"
+    ]
+  },
+  "json": {
+    "title": "JSON Formatierer & Validator",
+    "description": "Formatieren, validieren, minifizieren und reparieren Sie Ihre JSON-Daten.",
+    "inputLabel": "JSON Eingabe",
+    "outputLabel": "Ausgabe",
+    "format": "Formatieren",
+    "minify": "Minifizieren",
+    "sort": "Schlüssel sortieren",
+    "escape": "Maskieren",
+    "unescape": "Demaskieren",
+    "indentation": "Einrückung",
+    "valid": "Gültiges JSON",
+    "invalid": "Ungültiges JSON",
+    "compact": "Kompakt",
+    "formatted": "Formatiert",
+    "simpleObject": "Einfaches Objekt",
+    "arrayObjects": "Array mit Objekten",
+    "size": "Größe",
+    "lines": "Zeilen",
+    "useCases": [
+      "API-Entwicklung: JSON-Antworten debuggen",
+      "Konfiguration: .json Dateien",
+      "Validierung: Syntaxprüfung",
+      "Komprimierung: Minifizieren für Produktion",
+      "Logs: Lesen von JSON-Logs"
+    ]
   }
 }

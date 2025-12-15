@@ -1,12 +1,12 @@
 import React, { useState, useRef } from 'react';
-import { FileUp, Download, FileCode } from 'lucide-react';
+import { FileUp, FileCode } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import Button from '../ui/Button';
 import Textarea from '../ui/Textarea';
 import Card from '../ui/Card';
 import CopyButton from '../shared/CopyButton';
 import InfoBox from '../ui/InfoBox';
-import { encodeBase64, decodeBase64, encodeFileToBase64, isValidBase64 } from '../../utils/conversions/base64';
+import { encodeBase64, decodeBase64, encodeFileToBase64 } from '../../utils/conversions/base64';
 import { useDebounce } from '../../hooks/useDebounce';
 
 const Base64Converter: React.FC = () => {
