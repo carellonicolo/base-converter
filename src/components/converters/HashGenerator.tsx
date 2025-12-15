@@ -7,7 +7,6 @@ import Card from '../ui/Card';
 import CopyButton from '../shared/CopyButton';
 import InfoBox from '../ui/InfoBox';
 import { generateHash, generateFileHash, HashAlgorithm } from '../../utils/conversions/hash';
-import { useHistory } from '../../hooks/useHistory';
 import { useDebounce } from '../../hooks/useDebounce';
 
 const HashGenerator: React.FC = () => {
@@ -15,7 +14,6 @@ const HashGenerator: React.FC = () => {
   const [algorithm, setAlgorithm] = useState<HashAlgorithm>('SHA256');
   const [hash, setHash] = useState('');
   const [loading, setLoading] = useState(false);
-  const { add } = useHistory();
 
   const debouncedInput = useDebounce(input, 300);
 

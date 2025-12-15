@@ -13,7 +13,6 @@ import {
   escapeJSON,
   unescapeJSON,
 } from '../../utils/conversions/json';
-import { useHistory } from '../../hooks/useHistory';
 import { useDebounce } from '../../hooks/useDebounce';
 
 const JSONFormatter: React.FC = () => {
@@ -21,7 +20,6 @@ const JSONFormatter: React.FC = () => {
   const [indentSize, setIndentSize] = useState(2);
   const [output, setOutput] = useState('');
   const [error, setError] = useState<string | null>(null);
-  const { add } = useHistory();
 
   const debouncedJSON = useDebounce(jsonInput, 300);
 

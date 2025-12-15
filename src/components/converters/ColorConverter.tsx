@@ -16,14 +16,12 @@ import {
   isValidHex,
   formatHex,
 } from '../../utils/conversions/color';
-import { useHistory } from '../../hooks/useHistory';
 
 const ColorConverter: React.FC = () => {
   const [hexInput, setHexInput] = useState('#38bdf8');
   const [rgbR, setRgbR] = useState(56);
   const [rgbG, setRgbG] = useState(189);
   const [rgbB, setRgbB] = useState(248);
-  const { add } = useHistory();
 
   const [currentColor, setCurrentColor] = useState({ r: 56, g: 189, b: 248 });
 

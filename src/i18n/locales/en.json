@@ -7,7 +7,6 @@
   "nav": {
     "home": "Home",
     "base": "Bases",
-    "history": "History",
     "settings": "Settings"
   },
   "settings": {
@@ -39,18 +38,11 @@
       "fontSizeMedium": "Medium",
       "fontSizeLarge": "Large"
     },
-    "data": {
-      "title": "Data",
-      "exportFormat": "Export Format",
-      "historyLimit": "History Limit"
-    },
     "danger": {
       "title": "Danger Zone",
       "subtitle": "Irreversible actions",
       "reset": "Reset",
       "resetConfirm": "Reset to default settings?",
-      "clearHistory": "Clear History",
-      "clearHistoryConfirm": "Delete all history?",
       "clearAll": "Delete All Data",
       "clearAllConfirm": "Delete all data? This action is irreversible."
     }

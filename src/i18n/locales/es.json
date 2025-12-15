@@ -7,7 +7,6 @@
   "nav": {
     "home": "Inicio",
     "base": "Bases",
-    "history": "Historial",
     "settings": "Configuración"
   },
   "settings": {
@@ -39,18 +38,11 @@
       "fontSizeMedium": "Medio",
       "fontSizeLarge": "Grande"
     },
-    "data": {
-      "title": "Datos",
-      "exportFormat": "Formato de Exportación",
-      "historyLimit": "Límite de Historial"
-    },
     "danger": {
       "title": "Zona de Peligro",
       "subtitle": "Acciones irreversibles",
       "reset": "Restablecer",
       "resetConfirm": "¿Restablecer la configuración predeterminada?",
-      "clearHistory": "Borrar Historial",
-      "clearHistoryConfirm": "¿Eliminar todo el historial?",
       "clearAll": "Eliminar Todos los Datos",
       "clearAllConfirm": "¿Eliminar todos los datos? Esta acción es irreversible."
     }

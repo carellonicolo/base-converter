@@ -12,7 +12,6 @@ import {
   parseURL,
   slugify,
 } from '../../utils/conversions/url';
-import { useHistory } from '../../hooks/useHistory';
 import { useDebounce } from '../../hooks/useDebounce';
 
 const URLConverter: React.FC = () => {
@@ -20,7 +19,6 @@ const URLConverter: React.FC = () => {
   const [urlInput, setURLInput] = useState('');
   const [queryInput, setQueryInput] = useState('');
   const [error, setError] = useState('');
-  const { add } = useHistory();
 
   const debouncedText = useDebounce(textInput, 300);
   const debouncedURL = useDebounce(urlInput, 300);

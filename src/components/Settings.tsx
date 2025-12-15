@@ -3,15 +3,6 @@ import { useTranslation } from 'react-i18next';
 import {
   Settings as SettingsIcon,
   Palette,
-  Globe,
-  Bell,
-  Volume2,
-  Save,
-  Download,
-  Eye,
-  Moon,
-  Sun,
-  Monitor,
   Accessibility,
 } from 'lucide-react';
 import Card from './ui/Card';
@@ -60,12 +51,6 @@ const Settings: React.FC = () => {
     { value: 'small', label: t('settings.accessibility.fontSizeSmall') },
     { value: 'medium', label: t('settings.accessibility.fontSizeMedium') },
     { value: 'large', label: t('settings.accessibility.fontSizeLarge') },
-  ];
-
-  const exportFormatOptions = [
-    { value: 'json', label: 'JSON' },
-    { value: 'csv', label: 'CSV' },
-    { value: 'txt', label: 'TXT' },
   ];
 
   const ToggleSwitch: React.FC<{
@@ -207,47 +192,6 @@ const Settings: React.FC = () => {
         </div>
       </Card>
 
-      {/* Data & Storage */}
-      <Card>
-        <div className="flex items-center gap-2 mb-3">
-          <Save className="w-4 h-4 text-liquid-300" />
-          <h3 className="text-base font-bold text-white">{t('settings.data.title')}</h3>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-          <div>
-            <label className="block text-xs font-medium text-slate-300 mb-1.5">
-              {t('settings.data.exportFormat')}
-            </label>
-            <Select
-              options={exportFormatOptions}
-              value={settings.defaultExportFormat}
-              onChange={(value) =>
-                updateSettings({
-                  defaultExportFormat: value as 'json' | 'csv' | 'txt',
-                })
-              }
-            />
-          </div>
-
-          <div>
-            <label className="block text-xs font-medium text-slate-300 mb-1.5">
-              {t('settings.data.historyLimit')}
-            </label>
-            <input
-              type="number"
-              min="10"
-              max="500"
-              value={settings.historyLimit}
-              onChange={(e) =>
-                updateSettings({ historyLimit: parseInt(e.target.value) })
-              }
-              className="w-full px-3 py-2 text-sm bg-black/20 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-liquid-400"
-            />
-          </div>
-        </div>
-      </Card>
-
       {/* Danger Zone */}
       <Card>
         <div className="border-l-4 border-red-500 pl-3 mb-3">
@@ -255,7 +199,7 @@ const Settings: React.FC = () => {
           <p className="text-slate-400 text-xs">{t('settings.danger.subtitle')}</p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
           <Button
             variant="danger"
             onClick={() => {
@@ -268,21 +212,6 @@ const Settings: React.FC = () => {
             fullWidth
           >
             {t('settings.danger.reset')}
-          </Button>
-
-          <Button
-            variant="ghost"
-            onClick={() => {
-              if (
-                window.confirm(t('settings.danger.clearHistoryConfirm'))
-              ) {
-                localStorage.removeItem('history-storage');
-                window.location.reload();
-              }
-            }}
-            fullWidth
-          >
-            {t('settings.danger.clearHistory')}
           </Button>
 
           <Button

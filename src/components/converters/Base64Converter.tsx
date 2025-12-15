@@ -6,14 +6,12 @@ import Card from '../ui/Card';
 import CopyButton from '../shared/CopyButton';
 import InfoBox from '../ui/InfoBox';
 import { encodeBase64, decodeBase64, encodeFileToBase64, isValidBase64 } from '../../utils/conversions/base64';
-import { useHistory } from '../../hooks/useHistory';
 import { useDebounce } from '../../hooks/useDebounce';
 
 const Base64Converter: React.FC = () => {
   const [textInput, setTextInput] = useState('');
   const [base64Input, setBase64Input] = useState('');
   const [error, setError] = useState('');
-  const { add } = useHistory();
 
   const debouncedText = useDebounce(textInput, 300);
   const debouncedBase64 = useDebounce(base64Input, 300);

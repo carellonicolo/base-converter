@@ -2,14 +2,12 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Hash, Type, Binary, Gauge, FileText, Shield,
-  Palette, Clock, Link2, Key, FileJson, History, Settings
+  Palette, Clock, Link2, Key, FileJson
 } from 'lucide-react';
 import Card from './ui/Card';
-import { useHistory } from '../hooks/useHistory';
 
 const Dashboard: React.FC = () => {
   const navigate = useNavigate();
-  const { stats } = useHistory();
 
   const converters = [
     { name: 'Basi Numeriche', path: '/base', icon: Hash, color: 'text-blue-400', description: 'Converti tra basi 2-36' },
@@ -40,30 +38,6 @@ const Dashboard: React.FC = () => {
         </p>
       </div>
 
-      {/* Stats */}
-      {stats.totalConversions > 0 && (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <Card className="text-center">
-            <div className="text-3xl font-bold text-liquid-300 mb-1">
-              {stats.totalConversions}
-            </div>
-            <div className="text-sm text-slate-400">Conversioni Totali</div>
-          </Card>
-          <Card className="text-center">
-            <div className="text-3xl font-bold text-liquid-300 mb-1">
-              {stats.favoriteCount}
-            </div>
-            <div className="text-sm text-slate-400">Preferiti</div>
-          </Card>
-          <Card className="text-center">
-            <div className="text-3xl font-bold text-liquid-300 mb-1">
-              {stats.mostUsedType?.toUpperCase() || 'N/A'}
-            </div>
-            <div className="text-sm text-slate-400">Più Usato</div>
-          </Card>
-        </div>
-      )}
-
       {/* Converters grid */}
       <div>
         <h2 className="text-2xl font-bold text-white mb-6">Scegli uno Strumento</h2>
@@ -93,29 +67,6 @@ const Dashboard: React.FC = () => {
         </div>
       </div>
 
-      {/* Quick links */}
-      <div className="grid md:grid-cols-2 gap-6">
-        <Card hover onClick={() => navigate('/history')} className="cursor-pointer">
-          <div className="flex items-center gap-3">
-            <History className="w-8 h-8 text-liquid-300" />
-            <div>
-              <h3 className="text-lg font-bold text-white">Cronologia</h3>
-              <p className="text-sm text-slate-400">Visualizza tutte le conversioni passate</p>
-            </div>
-          </div>
-        </Card>
-
-        <Card hover onClick={() => navigate('/settings')} className="cursor-pointer">
-          <div className="flex items-center gap-3">
-            <Settings className="w-8 h-8 text-liquid-300" />
-            <div>
-              <h3 className="text-lg font-bold text-white">Impostazioni</h3>
-              <p className="text-sm text-slate-400">Personalizza tema e preferenze</p>
-            </div>
-          </div>
-        </Card>
-      </div>
-
       {/* Features */}
       <div className="glass-morphism rounded-2xl p-6">
         <h3 className="text-lg font-bold text-white mb-4">Caratteristiche</h3>
@@ -123,10 +74,6 @@ const Dashboard: React.FC = () => {
           <div className="flex items-center gap-2">
             <span className="text-green-400">✓</span>
             <span>Conversioni in tempo reale</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <span className="text-green-400">✓</span>
-            <span>Cronologia persistente</span>
           </div>
           <div className="flex items-center gap-2">
             <span className="text-green-400">✓</span>
@@ -143,6 +90,10 @@ const Dashboard: React.FC = () => {
           <div className="flex items-center gap-2">
             <span className="text-green-400">✓</span>
             <span>100% Privacy - Locale</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="text-green-400">✓</span>
+            <span>Interfaccia multilingua</span>
           </div>
         </div>
       </div>

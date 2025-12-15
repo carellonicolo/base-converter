@@ -7,7 +7,6 @@
   "nav": {
     "home": "Home",
     "base": "Basi",
-    "history": "Cronologia",
     "settings": "Impostazioni"
   },
   "settings": {
@@ -39,18 +38,11 @@
       "fontSizeMedium": "Medio",
       "fontSizeLarge": "Grande"
     },
-    "data": {
-      "title": "Dati",
-      "exportFormat": "Formato Export",
-      "historyLimit": "Limite Cronologia"
-    },
     "danger": {
       "title": "Zona Pericolosa",
       "subtitle": "Azioni irreversibili",
       "reset": "Ripristina",
       "resetConfirm": "Ripristinare le impostazioni predefinite?",
-      "clearHistory": "Cancella Cronologia",
-      "clearHistoryConfirm": "Eliminare tutta la cronologia?",
       "clearAll": "Elimina Tutti i Dati",
       "clearAllConfirm": "Eliminare tutti i dati? Questa azione è irreversibile."
     }

@@ -19,8 +19,6 @@ export interface Settings {
   notifications: boolean;
   soundEffects: boolean;
   autoSave: boolean;
-  defaultExportFormat: 'json' | 'csv' | 'txt';
-  historyLimit: number;
   shortcuts: Record<string, string>;
   accessibility: {
     highContrast: boolean;
@@ -38,13 +36,10 @@ export const defaultSettings: Settings = {
   notifications: true,
   soundEffects: false,
   autoSave: true,
-  defaultExportFormat: 'json',
-  historyLimit: 100,
   shortcuts: {
     'command-palette': 'ctrl+k',
     'new-conversion': 'ctrl+n',
     'save-favorite': 'ctrl+d',
-    'export': 'ctrl+e',
   },
   accessibility: {
     highContrast: false,

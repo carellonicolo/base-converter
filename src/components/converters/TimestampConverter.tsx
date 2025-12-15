@@ -16,12 +16,10 @@ import {
   getRelativeTime,
   getTimezoneString,
 } from '../../utils/conversions/timestamp';
-import { useHistory } from '../../hooks/useHistory';
 
 const TimestampConverter: React.FC = () => {
   const [unixTimestamp, setUnixTimestamp] = useState(now());
   const [dateString, setDateString] = useState(new Date().toISOString().slice(0, 16));
-  const { add } = useHistory();
 
   const currentDate = unixToDate(unixTimestamp);
 

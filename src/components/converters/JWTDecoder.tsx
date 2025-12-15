@@ -5,13 +5,11 @@ import Card from '../ui/Card';
 import CopyButton from '../shared/CopyButton';
 import InfoBox from '../ui/InfoBox';
 import { decodeJWT, validateJWT, formatJWT } from '../../utils/conversions/jwt';
-import { useHistory } from '../../hooks/useHistory';
 import { useDebounce } from '../../hooks/useDebounce';
 
 const JWTDecoder: React.FC = () => {
   const [jwtInput, setJwtInput] = useState('');
   const [error, setError] = useState('');
-  const { add } = useHistory();
 
   const debouncedJWT = useDebounce(jwtInput, 300);
 

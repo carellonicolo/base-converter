@@ -1,6 +1,6 @@
 import React, { Suspense, lazy } from 'react';
 import { BrowserRouter, Routes, Route, Link, useLocation } from 'react-router-dom';
-import { Calculator, Home, History, Settings, Menu, X } from 'lucide-react';
+import { Calculator, Home, Settings, Menu, X } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useTheme } from './hooks/useTheme';
 import { useLanguage } from './hooks/useLanguage';
@@ -41,7 +41,6 @@ function Navigation() {
   const navItems = [
     { path: '/', label: t('nav.home'), icon: Home },
     { path: '/base', label: t('nav.base'), icon: Calculator },
-    { path: '/history', label: t('nav.history'), icon: History },
     { path: '/settings', label: t('nav.settings'), icon: Settings },
   ];
 
@@ -144,7 +143,6 @@ function AppContent() {
                   <Route path="/url" element={<URLConverter />} />
                   <Route path="/jwt" element={<JWTDecoder />} />
                   <Route path="/json" element={<JSONFormatter />} />
-                  <Route path="/history" element={<div className="text-white text-center py-12">Cronologia - Coming Soon</div>} />
                   <Route path="/settings" element={<SettingsPage />} />
                   <Route path="*" element={<div className="text-white text-center py-12">Pagina non trovata</div>} />
                 </Routes>
