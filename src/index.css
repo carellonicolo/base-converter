@@ -26,10 +26,10 @@
 
 @layer components {
   .glass-morphism {
-    background: rgba(255, 255, 255, 0.05);
+    background: var(--color-glass);
     backdrop-filter: blur(var(--glass-blur)) saturate(180%);
     -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(180%);
-    border: 1px solid rgba(255, 255, 255, var(--glass-border));
+    border: 1px solid var(--color-glass-border);
     position: relative;
     overflow: hidden;
   }
@@ -49,10 +49,11 @@
   }
 
   .glass-card:hover {
-    background: rgba(255, 255, 255, 0.08);
-    border-color: rgba(255, 255, 255, 0.25);
+    background: var(--color-glass);
+    border-color: var(--color-glass-border);
     transform: translateY(-2px);
     box-shadow: 0 24px 48px 0 rgba(31, 38, 135, 0.5);
+    filter: brightness(1.1);
   }
 
   .liquid-button {
@@ -82,9 +83,10 @@
   }
 
   .liquid-input:focus {
-    background: rgba(255, 255, 255, 0.08);
-    border-color: rgba(56, 189, 248, 0.5);
+    background: var(--color-glass);
+    border-color: var(--color-accent-primary);
     box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.1), 0 8px 32px rgba(14, 165, 233, 0.25);
+    filter: brightness(1.05);
   }
 
   select.liquid-input {
@@ -92,22 +94,23 @@
     background-repeat: no-repeat;
     background-position: right 12px center;
     padding-right: 40px;
-    background-color: rgba(255, 255, 255, 0.05);
+    background-color: var(--color-glass);
+    color: var(--color-text-primary);
   }
 
   select.liquid-input option {
-    background: #1e293b;
-    color: #e2e8f0;
+    background: var(--color-background);
+    color: var(--color-text-primary);
     padding: 8px;
   }
 
   select.liquid-input option:checked {
-    background: linear-gradient(rgba(56, 189, 248, 0.3), rgba(56, 189, 248, 0.3)), #1e293b;
-    color: #38bdf8;
+    background: var(--color-accent-primary);
+    color: var(--color-text-primary);
   }
 
   select.liquid-input option:hover {
-    background: rgba(56, 189, 248, 0.2);
+    background: var(--color-accent-secondary);
   }
 
   .specular-highlight {
@@ -132,13 +135,13 @@
   }
 
   .liquid-gradient-bg {
-    background: linear-gradient(135deg,
-      rgba(30, 41, 59, 0.95) 0%,
-      rgba(15, 23, 42, 0.98) 25%,
-      rgba(14, 165, 233, 0.03) 50%,
-      rgba(15, 23, 42, 0.98) 75%,
-      rgba(30, 41, 59, 0.95) 100%
-    );
+    /* Background is set dynamically via useTheme hook */
+    background-attachment: fixed;
+    min-height: 100vh;
+  }
+
+  /* Only animate background in dark themes, not in light theme */
+  body:not(.light-theme) .liquid-gradient-bg {
     background-size: 200% 200%;
     animation: gradientShift 15s ease infinite;
   }
@@ -185,6 +188,42 @@
 }
 
 @layer utilities {
+  /* Theme-aware text colors */
+  .theme-text-primary {
+    color: var(--color-text-primary);
+  }
+
+  .theme-text-secondary {
+    color: var(--color-text-secondary);
+  }
+
+  .theme-text-tertiary {
+    color: var(--color-text-tertiary);
+  }
+
+  .theme-accent {
+    color: var(--color-accent-primary);
+  }
+
+  /* Override hardcoded text colors in light theme */
+  body.light-theme .text-white {
+    color: var(--color-text-primary) !important;
+  }
+
+  body.light-theme .text-slate-300,
+  body.light-theme .text-slate-400 {
+    color: var(--color-text-secondary) !important;
+  }
+
+  body.light-theme .text-liquid-300 {
+    color: var(--color-accent-primary) !important;
+  }
+
+  /* Fix select arrow in light theme */
+  body.light-theme select.liquid-input {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%23475569' d='M1 1l5 5 5-5'/%3E%3C/svg%3E");
+  }
+
   @keyframes slideDown {
     from {
       opacity: 0;

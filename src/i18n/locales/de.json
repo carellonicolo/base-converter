@@ -1,0 +1,62 @@
+{
+  "app": {
+    "title": "Base Converter Pro",
+    "subtitle": "by Prof. Carello Nicolò",
+    "footer": "© 2025 Base Converter Pro - Powered by Prof. Carello Nicolò"
+  },
+  "nav": {
+    "home": "Startseite",
+    "base": "Basen",
+    "history": "Verlauf",
+    "settings": "Einstellungen"
+  },
+  "settings": {
+    "title": "Einstellungen",
+    "subtitle": "Passen Sie das Aussehen und Verhalten der Anwendung an",
+    "appearance": {
+      "title": "Aussehen und Sprache",
+      "themeMode": "Themenmodus",
+      "themeModeDark": "Dunkel",
+      "themeModeLight": "Hell",
+      "themeModeAuto": "Auto",
+      "themeColor": "Farbthema",
+      "themeDefault": "Standard (Cyan)",
+      "themeMidnight": "Mitternacht (Lila)",
+      "themeSunset": "Sonnenuntergang (Orange)",
+      "themeForest": "Wald (Grün)",
+      "themeOcean": "Ozean (Blau)",
+      "language": "Sprache"
+    },
+    "accessibility": {
+      "title": "Barrierefreiheit und Einstellungen",
+      "highContrast": "Hoher Kontrast",
+      "reducedMotion": "Reduzierte Bewegung",
+      "notifications": "Benachrichtigungen",
+      "soundEffects": "Soundeffekte",
+      "autoSave": "Automatisches Speichern",
+      "fontSize": "Schriftgröße",
+      "fontSizeSmall": "Klein",
+      "fontSizeMedium": "Mittel",
+      "fontSizeLarge": "Groß"
+    },
+    "data": {
+      "title": "Daten",
+      "exportFormat": "Exportformat",
+      "historyLimit": "Verlaufslimit"
+    },
+    "danger": {
+      "title": "Gefahrenzone",
+      "subtitle": "Irreversible Aktionen",
+      "reset": "Zurücksetzen",
+      "resetConfirm": "Auf Standardeinstellungen zurücksetzen?",
+      "clearHistory": "Verlauf Löschen",
+      "clearHistoryConfirm": "Gesamten Verlauf löschen?",
+      "clearAll": "Alle Daten Löschen",
+      "clearAllConfirm": "Alle Daten löschen? Diese Aktion ist irreversibel."
+    }
+  },
+  "dashboard": {
+    "welcome": "Willkommen bei Base Converter Pro",
+    "description": "Professionelles Tool zum Konvertieren von Zahlensystemen, Codierungen und Formaten"
+  }
+}

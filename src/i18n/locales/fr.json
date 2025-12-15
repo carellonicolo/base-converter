@@ -1,0 +1,62 @@
+{
+  "app": {
+    "title": "Base Converter Pro",
+    "subtitle": "by Prof. Carello Nicolò",
+    "footer": "© 2025 Base Converter Pro - Powered by Prof. Carello Nicolò"
+  },
+  "nav": {
+    "home": "Accueil",
+    "base": "Bases",
+    "history": "Historique",
+    "settings": "Paramètres"
+  },
+  "settings": {
+    "title": "Paramètres",
+    "subtitle": "Personnalisez l'apparence et le comportement de l'application",
+    "appearance": {
+      "title": "Apparence et Langue",
+      "themeMode": "Mode de Thème",
+      "themeModeDark": "Sombre",
+      "themeModeLight": "Clair",
+      "themeModeAuto": "Auto",
+      "themeColor": "Thème de Couleur",
+      "themeDefault": "Défaut (Cyan)",
+      "themeMidnight": "Minuit (Violet)",
+      "themeSunset": "Coucher de Soleil (Orange)",
+      "themeForest": "Forêt (Vert)",
+      "themeOcean": "Océan (Bleu)",
+      "language": "Langue"
+    },
+    "accessibility": {
+      "title": "Accessibilité et Préférences",
+      "highContrast": "Contraste Élevé",
+      "reducedMotion": "Mouvement Réduit",
+      "notifications": "Notifications",
+      "soundEffects": "Effets Sonores",
+      "autoSave": "Sauvegarde Automatique",
+      "fontSize": "Taille de Police",
+      "fontSizeSmall": "Petit",
+      "fontSizeMedium": "Moyen",
+      "fontSizeLarge": "Grand"
+    },
+    "data": {
+      "title": "Données",
+      "exportFormat": "Format d'Exportation",
+      "historyLimit": "Limite d'Historique"
+    },
+    "danger": {
+      "title": "Zone Dangereuse",
+      "subtitle": "Actions irréversibles",
+      "reset": "Réinitialiser",
+      "resetConfirm": "Réinitialiser les paramètres par défaut?",
+      "clearHistory": "Effacer l'Historique",
+      "clearHistoryConfirm": "Supprimer tout l'historique?",
+      "clearAll": "Supprimer Toutes les Données",
+      "clearAllConfirm": "Supprimer toutes les données? Cette action est irréversible."
+    }
+  },
+  "dashboard": {
+    "welcome": "Bienvenue sur Base Converter Pro",
+    "description": "Outil professionnel pour convertir les bases numériques, les encodages et les formats"
+  }
+}

@@ -1,7 +1,9 @@
 import React, { Suspense, lazy } from 'react';
 import { BrowserRouter, Routes, Route, Link, useLocation } from 'react-router-dom';
 import { Calculator, Home, History, Settings, Menu, X } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { useTheme } from './hooks/useTheme';
+import { useLanguage } from './hooks/useLanguage';
 import ErrorBoundary from './components/shared/ErrorBoundary';
 
 // Lazy load components
@@ -30,16 +32,17 @@ function LoadingSpinner() {
 }
 
 function Navigation() {
+  const { t } = useTranslation();
   const location = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false);
 
   const isActive = (path: string) => location.pathname === path;
 
   const navItems = [
-    { path: '/', label: 'Home', icon: Home },
-    { path: '/base', label: 'Basi', icon: Calculator },
-    { path: '/history', label: 'Cronologia', icon: History },
-    { path: '/settings', label: 'Impostazioni', icon: Settings },
+    { path: '/', label: t('nav.home'), icon: Home },
+    { path: '/base', label: t('nav.base'), icon: Calculator },
+    { path: '/history', label: t('nav.history'), icon: History },
+    { path: '/settings', label: t('nav.settings'), icon: Settings },
   ];
 
   return (
@@ -101,6 +104,7 @@ function Navigation() {
 
 function AppContent() {
   useTheme(); // Initialize theme
+  useLanguage(); // Initialize language
 
   return (
     <div className="min-h-screen liquid-gradient-bg">

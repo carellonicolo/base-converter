@@ -1,0 +1,62 @@
+{
+  "app": {
+    "title": "Base Converter Pro",
+    "subtitle": "by Prof. Carello Nicolò",
+    "footer": "© 2025 Base Converter Pro - Powered by Prof. Carello Nicolò"
+  },
+  "nav": {
+    "home": "Home",
+    "base": "Bases",
+    "history": "History",
+    "settings": "Settings"
+  },
+  "settings": {
+    "title": "Settings",
+    "subtitle": "Customize the appearance and behavior of the application",
+    "appearance": {
+      "title": "Appearance & Language",
+      "themeMode": "Theme Mode",
+      "themeModeDark": "Dark",
+      "themeModeLight": "Light",
+      "themeModeAuto": "Auto",
+      "themeColor": "Color Theme",
+      "themeDefault": "Default (Cyan)",
+      "themeMidnight": "Midnight (Purple)",
+      "themeSunset": "Sunset (Orange)",
+      "themeForest": "Forest (Green)",
+      "themeOcean": "Ocean (Blue)",
+      "language": "Language"
+    },
+    "accessibility": {
+      "title": "Accessibility & Preferences",
+      "highContrast": "High Contrast",
+      "reducedMotion": "Reduced Motion",
+      "notifications": "Notifications",
+      "soundEffects": "Sound Effects",
+      "autoSave": "Auto Save",
+      "fontSize": "Font Size",
+      "fontSizeSmall": "Small",
+      "fontSizeMedium": "Medium",
+      "fontSizeLarge": "Large"
+    },
+    "data": {
+      "title": "Data",
+      "exportFormat": "Export Format",
+      "historyLimit": "History Limit"
+    },
+    "danger": {
+      "title": "Danger Zone",
+      "subtitle": "Irreversible actions",
+      "reset": "Reset",
+      "resetConfirm": "Reset to default settings?",
+      "clearHistory": "Clear History",
+      "clearHistoryConfirm": "Delete all history?",
+      "clearAll": "Delete All Data",
+      "clearAllConfirm": "Delete all data? This action is irreversible."
+    }
+  },
+  "dashboard": {
+    "welcome": "Welcome to Base Converter Pro",
+    "description": "Professional tool for converting numeric bases, encodings, and formats"
+  }
+}

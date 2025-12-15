@@ -28,6 +28,7 @@ export function useTheme() {
   // Apply theme to CSS variables
   useEffect(() => {
     const root = document.documentElement;
+    const body = document.body;
 
     // Apply colors
     root.style.setProperty('--color-background', theme.colors.background);
@@ -51,7 +52,15 @@ export function useTheme() {
     root.style.setProperty('--glass-border-opacity', theme.effects.borderOpacity.toString());
 
     // Apply background gradient
-    document.body.style.background = theme.colors.backgroundGradient;
+    body.style.background = theme.colors.backgroundGradient;
+    body.style.backgroundAttachment = 'fixed';
+
+    // Add/remove light-theme class to disable animations in light mode
+    if (actualTheme === 'light') {
+      body.classList.add('light-theme');
+    } else {
+      body.classList.remove('light-theme');
+    }
 
     // Apply accessibility settings
     const fontSize = {
@@ -77,7 +86,7 @@ export function useTheme() {
     } else {
       root.classList.remove('reduced-motion');
     }
-  }, [theme, settings.accessibility]);
+  }, [theme, settings.accessibility, actualTheme]);
 
   // Listen for system theme changes when in auto mode
   useEffect(() => {

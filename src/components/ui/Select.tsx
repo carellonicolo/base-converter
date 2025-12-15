@@ -5,12 +5,13 @@ export interface SelectOption {
   label: string;
 }
 
-export interface SelectProps extends React.SelectHTMLAttributes<HTMLSelectElement> {
+export interface SelectProps extends Omit<React.SelectHTMLAttributes<HTMLSelectElement>, 'onChange'> {
   label?: string;
   options: SelectOption[];
   error?: string;
   helperText?: string;
   fullWidth?: boolean;
+  onChange?: (value: string) => void;
 }
 
 const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
@@ -22,6 +23,8 @@ const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
       helperText,
       fullWidth = false,
       className = '',
+      onChange,
+      value,
       ...props
     },
     ref
@@ -32,6 +35,12 @@ const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
 
     const selectClasses = `${baseStyles} ${widthStyles} ${errorStyles} ${className}`;
 
+    const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+      if (onChange) {
+        onChange(e.target.value);
+      }
+    };
+
     return (
       <div className={fullWidth ? 'w-full' : ''}>
         {label && (
@@ -40,7 +49,13 @@ const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
           </label>
         )}
 
-        <select ref={ref} className={selectClasses} {...props}>
+        <select
+          ref={ref}
+          className={selectClasses}
+          onChange={handleChange}
+          value={value}
+          {...props}
+        >
           {options.map((option) => (
             <option key={option.value} value={option.value}>
               {option.label}

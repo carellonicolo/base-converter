@@ -1,0 +1,62 @@
+{
+  "app": {
+    "title": "Base Converter Pro",
+    "subtitle": "by Prof. Carello Nicolò",
+    "footer": "© 2025 Base Converter Pro - Powered by Prof. Carello Nicolò"
+  },
+  "nav": {
+    "home": "Inicio",
+    "base": "Bases",
+    "history": "Historial",
+    "settings": "Configuración"
+  },
+  "settings": {
+    "title": "Configuración",
+    "subtitle": "Personaliza la apariencia y el comportamiento de la aplicación",
+    "appearance": {
+      "title": "Apariencia e Idioma",
+      "themeMode": "Modo de Tema",
+      "themeModeDark": "Oscuro",
+      "themeModeLight": "Claro",
+      "themeModeAuto": "Auto",
+      "themeColor": "Tema de Color",
+      "themeDefault": "Predeterminado (Cian)",
+      "themeMidnight": "Medianoche (Púrpura)",
+      "themeSunset": "Atardecer (Naranja)",
+      "themeForest": "Bosque (Verde)",
+      "themeOcean": "Océano (Azul)",
+      "language": "Idioma"
+    },
+    "accessibility": {
+      "title": "Accesibilidad y Preferencias",
+      "highContrast": "Alto Contraste",
+      "reducedMotion": "Movimiento Reducido",
+      "notifications": "Notificaciones",
+      "soundEffects": "Efectos de Sonido",
+      "autoSave": "Guardado Automático",
+      "fontSize": "Tamaño de Fuente",
+      "fontSizeSmall": "Pequeño",
+      "fontSizeMedium": "Medio",
+      "fontSizeLarge": "Grande"
+    },
+    "data": {
+      "title": "Datos",
+      "exportFormat": "Formato de Exportación",
+      "historyLimit": "Límite de Historial"
+    },
+    "danger": {
+      "title": "Zona de Peligro",
+      "subtitle": "Acciones irreversibles",
+      "reset": "Restablecer",
+      "resetConfirm": "¿Restablecer la configuración predeterminada?",
+      "clearHistory": "Borrar Historial",
+      "clearHistoryConfirm": "¿Eliminar todo el historial?",
+      "clearAll": "Eliminar Todos los Datos",
+      "clearAllConfirm": "¿Eliminar todos los datos? Esta acción es irreversible."
+    }
+  },
+  "dashboard": {
+    "welcome": "Bienvenido a Base Converter Pro",
+    "description": "Herramienta profesional para convertir bases numéricas, codificaciones y formatos"
+  }
+}

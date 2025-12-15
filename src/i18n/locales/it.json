@@ -1,0 +1,62 @@
+{
+  "app": {
+    "title": "Base Converter Pro",
+    "subtitle": "by Prof. Carello Nicolò",
+    "footer": "© 2025 Base Converter Pro - Powered by Prof. Carello Nicolò"
+  },
+  "nav": {
+    "home": "Home",
+    "base": "Basi",
+    "history": "Cronologia",
+    "settings": "Impostazioni"
+  },
+  "settings": {
+    "title": "Impostazioni",
+    "subtitle": "Personalizza l'aspetto e il comportamento dell'applicazione",
+    "appearance": {
+      "title": "Aspetto e Lingua",
+      "themeMode": "Modalità Tema",
+      "themeModeDark": "Dark",
+      "themeModeLight": "Light",
+      "themeModeAuto": "Auto",
+      "themeColor": "Tema Colore",
+      "themeDefault": "Default (Cyan)",
+      "themeMidnight": "Midnight (Purple)",
+      "themeSunset": "Sunset (Orange)",
+      "themeForest": "Forest (Green)",
+      "themeOcean": "Ocean (Blue)",
+      "language": "Lingua"
+    },
+    "accessibility": {
+      "title": "Accessibilità e Preferenze",
+      "highContrast": "Alto Contrasto",
+      "reducedMotion": "Riduzione Movimento",
+      "notifications": "Notifiche",
+      "soundEffects": "Effetti Sonori",
+      "autoSave": "Salvataggio Auto",
+      "fontSize": "Dimensione Testo",
+      "fontSizeSmall": "Piccolo",
+      "fontSizeMedium": "Medio",
+      "fontSizeLarge": "Grande"
+    },
+    "data": {
+      "title": "Dati",
+      "exportFormat": "Formato Export",
+      "historyLimit": "Limite Cronologia"
+    },
+    "danger": {
+      "title": "Zona Pericolosa",
+      "subtitle": "Azioni irreversibili",
+      "reset": "Ripristina",
+      "resetConfirm": "Ripristinare le impostazioni predefinite?",
+      "clearHistory": "Cancella Cronologia",
+      "clearHistoryConfirm": "Eliminare tutta la cronologia?",
+      "clearAll": "Elimina Tutti i Dati",
+      "clearAllConfirm": "Eliminare tutti i dati? Questa azione è irreversibile."
+    }
+  },
+  "dashboard": {
+    "welcome": "Benvenuto in Base Converter Pro",
+    "description": "Strumento professionale per la conversione di basi numeriche, codifiche e formati"
+  }
+}

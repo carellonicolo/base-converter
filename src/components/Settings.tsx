@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   Settings as SettingsIcon,
   Palette,
@@ -20,6 +21,7 @@ import { useSettingsStore } from '../store/useSettingsStore';
 import { ThemeMode, Language } from '../types/settings';
 
 const Settings: React.FC = () => {
+  const { t } = useTranslation();
   const {
     settings,
     setThemeMode,
@@ -33,17 +35,17 @@ const Settings: React.FC = () => {
   } = useSettingsStore();
 
   const themeModeOptions = [
-    { value: 'dark', label: '🌙 Dark' },
-    { value: 'light', label: '☀️ Light' },
-    { value: 'auto', label: '🖥️ Auto' },
+    { value: 'dark', label: `🌙 ${t('settings.appearance.themeModeDark')}` },
+    { value: 'light', label: `☀️ ${t('settings.appearance.themeModeLight')}` },
+    { value: 'auto', label: `🖥️ ${t('settings.appearance.themeModeAuto')}` },
   ];
 
   const themePresetOptions = [
-    { value: 'default', label: 'Default (Cyan)' },
-    { value: 'midnight', label: 'Midnight (Purple)' },
-    { value: 'sunset', label: 'Sunset (Orange)' },
-    { value: 'forest', label: 'Forest (Green)' },
-    { value: 'ocean', label: 'Ocean (Blue)' },
+    { value: 'default', label: t('settings.appearance.themeDefault') },
+    { value: 'midnight', label: t('settings.appearance.themeMidnight') },
+    { value: 'sunset', label: t('settings.appearance.themeSunset') },
+    { value: 'forest', label: t('settings.appearance.themeForest') },
+    { value: 'ocean', label: t('settings.appearance.themeOcean') },
   ];
 
   const languageOptions = [
@@ -55,9 +57,9 @@ const Settings: React.FC = () => {
   ];
 
   const fontSizeOptions = [
-    { value: 'small', label: 'Piccolo' },
-    { value: 'medium', label: 'Medio' },
-    { value: 'large', label: 'Grande' },
+    { value: 'small', label: t('settings.accessibility.fontSizeSmall') },
+    { value: 'medium', label: t('settings.accessibility.fontSizeMedium') },
+    { value: 'large', label: t('settings.accessibility.fontSizeLarge') },
   ];
 
   const exportFormatOptions = [
@@ -99,9 +101,9 @@ const Settings: React.FC = () => {
         <div className="flex items-center gap-3">
           <SettingsIcon className="w-5 h-5 text-liquid-300" />
           <div>
-            <h2 className="text-xl font-bold text-white">Impostazioni</h2>
+            <h2 className="text-xl font-bold text-white">{t('settings.title')}</h2>
             <p className="text-slate-400 text-xs">
-              Personalizza l'aspetto e il comportamento dell'applicazione
+              {t('settings.subtitle')}
             </p>
           </div>
         </div>
@@ -111,13 +113,13 @@ const Settings: React.FC = () => {
       <Card>
         <div className="flex items-center gap-2 mb-3">
           <Palette className="w-4 h-4 text-liquid-300" />
-          <h3 className="text-base font-bold text-white">Aspetto e Lingua</h3>
+          <h3 className="text-base font-bold text-white">{t('settings.appearance.title')}</h3>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
           <div>
             <label className="block text-xs font-medium text-slate-300 mb-1.5">
-              Modalità Tema
+              {t('settings.appearance.themeMode')}
             </label>
             <Select
               options={themeModeOptions}
@@ -128,7 +130,7 @@ const Settings: React.FC = () => {
 
           <div>
             <label className="block text-xs font-medium text-slate-300 mb-1.5">
-              Tema Colore
+              {t('settings.appearance.themeColor')}
             </label>
             <Select
               options={themePresetOptions}
@@ -139,7 +141,7 @@ const Settings: React.FC = () => {
 
           <div>
             <label className="block text-xs font-medium text-slate-300 mb-1.5">
-              Lingua
+              {t('settings.appearance.language')}
             </label>
             <Select
               options={languageOptions}
@@ -154,20 +156,20 @@ const Settings: React.FC = () => {
       <Card>
         <div className="flex items-center gap-2 mb-3">
           <Accessibility className="w-4 h-4 text-liquid-300" />
-          <h3 className="text-base font-bold text-white">Accessibilità e Preferenze</h3>
+          <h3 className="text-base font-bold text-white">{t('settings.accessibility.title')}</h3>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
           <ToggleSwitch
             enabled={settings.accessibility.highContrast}
             onChange={toggleHighContrast}
-            label="Alto Contrasto"
+            label={t('settings.accessibility.highContrast')}
           />
 
           <ToggleSwitch
             enabled={settings.accessibility.reducedMotion}
             onChange={toggleReducedMotion}
-            label="Riduzione Movimento"
+            label={t('settings.accessibility.reducedMotion')}
           />
 
           <ToggleSwitch
@@ -175,7 +177,7 @@ const Settings: React.FC = () => {
             onChange={() =>
               updateSettings({ notifications: !settings.notifications })
             }
-            label="Notifiche"
+            label={t('settings.accessibility.notifications')}
           />
 
           <ToggleSwitch
@@ -183,18 +185,18 @@ const Settings: React.FC = () => {
             onChange={() =>
               updateSettings({ soundEffects: !settings.soundEffects })
             }
-            label="Effetti Sonori"
+            label={t('settings.accessibility.soundEffects')}
           />
 
           <ToggleSwitch
             enabled={settings.autoSave}
             onChange={() => updateSettings({ autoSave: !settings.autoSave })}
-            label="Salvataggio Auto"
+            label={t('settings.accessibility.autoSave')}
           />
 
           <div className="p-3 glass-morphism rounded-lg">
             <label className="block text-xs font-medium text-white mb-1.5">
-              Dimensione Testo
+              {t('settings.accessibility.fontSize')}
             </label>
             <Select
               options={fontSizeOptions}
@@ -209,13 +211,13 @@ const Settings: React.FC = () => {
       <Card>
         <div className="flex items-center gap-2 mb-3">
           <Save className="w-4 h-4 text-liquid-300" />
-          <h3 className="text-base font-bold text-white">Dati</h3>
+          <h3 className="text-base font-bold text-white">{t('settings.data.title')}</h3>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
           <div>
             <label className="block text-xs font-medium text-slate-300 mb-1.5">
-              Formato Export
+              {t('settings.data.exportFormat')}
             </label>
             <Select
               options={exportFormatOptions}
@@ -230,7 +232,7 @@ const Settings: React.FC = () => {
 
           <div>
             <label className="block text-xs font-medium text-slate-300 mb-1.5">
-              Limite Cronologia
+              {t('settings.data.historyLimit')}
             </label>
             <input
               type="number"
@@ -249,8 +251,8 @@ const Settings: React.FC = () => {
       {/* Danger Zone */}
       <Card>
         <div className="border-l-4 border-red-500 pl-3 mb-3">
-          <h3 className="text-base font-bold text-red-400">Zona Pericolosa</h3>
-          <p className="text-slate-400 text-xs">Azioni irreversibili</p>
+          <h3 className="text-base font-bold text-red-400">{t('settings.danger.title')}</h3>
+          <p className="text-slate-400 text-xs">{t('settings.danger.subtitle')}</p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
@@ -258,25 +260,21 @@ const Settings: React.FC = () => {
             variant="danger"
             onClick={() => {
               if (
-                window.confirm(
-                  'Ripristinare le impostazioni predefinite?'
-                )
+                window.confirm(t('settings.danger.resetConfirm'))
               ) {
                 resetSettings();
               }
             }}
             fullWidth
           >
-            Ripristina
+            {t('settings.danger.reset')}
           </Button>
 
           <Button
             variant="ghost"
             onClick={() => {
               if (
-                window.confirm(
-                  'Eliminare tutta la cronologia?'
-                )
+                window.confirm(t('settings.danger.clearHistoryConfirm'))
               ) {
                 localStorage.removeItem('history-storage');
                 window.location.reload();
@@ -284,16 +282,14 @@ const Settings: React.FC = () => {
             }}
             fullWidth
           >
-            Cancella Cronologia
+            {t('settings.danger.clearHistory')}
           </Button>
 
           <Button
             variant="ghost"
             onClick={() => {
               if (
-                window.confirm(
-                  'Eliminare tutti i dati? Questa azione è irreversibile.'
-                )
+                window.confirm(t('settings.danger.clearAllConfirm'))
               ) {
                 localStorage.clear();
                 window.location.reload();
@@ -301,7 +297,7 @@ const Settings: React.FC = () => {
             }}
             fullWidth
           >
-            Elimina Tutti i Dati
+            {t('settings.danger.clearAll')}
           </Button>
         </div>
       </Card>
