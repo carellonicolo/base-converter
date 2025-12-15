@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { ChevronDown, ChevronUp, Copy, Check, Search, Info } from 'lucide-react';
 import CharacterDetailModal from './CharacterDetailModal';
 import { unicodeCharacterDetails } from '../data/unicodeCharacterDetails';
+import { getEmojiName } from '../utils/emojiNames';
 
 interface UnicodeChar {
   dec: number;
@@ -97,7 +98,21 @@ const generateUnicodeData = (): UnicodeChar[] => {
     });
   }
 
-  // Add Emojis (U+1F600 - U+1F64F)
+  // Misc Symbols (U+1F300 - U+1F5FF)
+  for (let i = 0x1F300; i <= 0x1F5FF; i++) {
+    const char = String.fromCodePoint(i);
+    data.push({
+      dec: i,
+      hex: i.toString(16).toUpperCase().padStart(4, '0'),
+      bin: i.toString(2).padStart(16, '0'),
+      char: char,
+      description: getEmojiName(i),
+      category: 'misc',
+      unicode: `U+${i.toString(16).toUpperCase().padStart(4, '0')}`
+    });
+  }
+
+  // Emoticons (U+1F600 - U+1F64F)
   for (let i = 0x1F600; i <= 0x1F64F; i++) {
     const char = String.fromCodePoint(i);
     data.push({
@@ -105,8 +120,36 @@ const generateUnicodeData = (): UnicodeChar[] => {
       hex: i.toString(16).toUpperCase().padStart(4, '0'),
       bin: i.toString(2).padStart(16, '0'),
       char: char,
-      description: 'Emoji / Emoticon',
-      category: 'emoji',
+      description: getEmojiName(i),
+      category: 'emoticon',
+      unicode: `U+${i.toString(16).toUpperCase().padStart(4, '0')}`
+    });
+  }
+
+  // Transport (U+1F680 - U+1F6FF)
+  for (let i = 0x1F680; i <= 0x1F6FF; i++) {
+    const char = String.fromCodePoint(i);
+    data.push({
+      dec: i,
+      hex: i.toString(16).toUpperCase().padStart(4, '0'),
+      bin: i.toString(2).padStart(16, '0'),
+      char: char,
+      description: getEmojiName(i),
+      category: 'transport',
+      unicode: `U+${i.toString(16).toUpperCase().padStart(4, '0')}`
+    });
+  }
+
+  // Supplemental (U+1F900 - U+1F9FF)
+  for (let i = 0x1F900; i <= 0x1F9FF; i++) {
+    const char = String.fromCodePoint(i);
+    data.push({
+      dec: i,
+      hex: i.toString(16).toUpperCase().padStart(4, '0'),
+      bin: i.toString(2).padStart(16, '0'),
+      char: char,
+      description: getEmojiName(i),
+      category: 'supplemental',
       unicode: `U+${i.toString(16).toUpperCase().padStart(4, '0')}`
     });
   }
@@ -180,7 +223,10 @@ const categoryColors = {
   'latin1-lowercase': 'bg-teal-500/10 border-teal-500/20',
   'latin-extended-a': 'bg-orange-500/10 border-orange-500/20',
   'latin-extended-b': 'bg-pink-500/10 border-pink-500/20',
-  'emoji': 'bg-yellow-400/10 border-yellow-400/20',
+  'misc': 'bg-purple-400/10 border-purple-400/20',
+  'emoticon': 'bg-yellow-400/10 border-yellow-400/20',
+  'transport': 'bg-blue-400/10 border-blue-400/20',
+  'supplemental': 'bg-green-400/10 border-green-400/20',
 };
 
 const categoryLabels = {
@@ -194,7 +240,10 @@ const categoryLabels = {
   'latin1-lowercase': 'Minuscole Latin-1 Supplement',
   'latin-extended-a': 'Latin Extended-A',
   'latin-extended-b': 'Latin Extended-B',
-  'emoji': 'Emoticon & Emoji (U+1F600 - U+1F64F)',
+  'misc': 'Simboli Vari & Pittogrammi',
+  'emoticon': 'Faccine & Emoticon',
+  'transport': 'Trasporti & Mappe',
+  'supplemental': 'Simboli Supplementari',
 };
 
 function UnicodeTable() {
