@@ -1,9 +1,11 @@
 import { useState } from 'react';
 import { Sparkles, Copy, Check, Globe } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import UnicodeTable from './UnicodeTable';
 import InfoBox from './ui/InfoBox';
 
 function UnicodeConverter() {
+  const { t } = useTranslation();
   const [textInput, setTextInput] = useState('');
   const [unicodeInput, setUnicodeInput] = useState('');
   const [copiedField, setCopiedField] = useState<string | null>(null);
@@ -87,12 +89,13 @@ function UnicodeConverter() {
   const unicodeHexResult = textInput ? textToUnicodeHex(textInput) : '';
   const textResult = unicodeInput ? unicodeToText(unicodeInput) : '';
 
+  /* Existing code */
   return (
     <div className="space-y-6">
       {/* Educational Info Box */}
       <InfoBox
-        title="Convertitore Unicode"
-        description="Unicode è lo standard universale per rappresentare testi in tutte le lingue del mondo, compresi emoji e simboli speciali. Mentre ASCII supporta solo 128 caratteri (inglese), Unicode ne supporta oltre 140.000 coprendo praticamente tutti i sistemi di scrittura esistenti."
+        title={t('unicode.title')}
+        description={t('unicode.description')}
         icon={<Globe className="w-5 h-5" />}
         useCases={[
           "Internazionalizzazione: creare app che supportano tutte le lingue",
@@ -116,12 +119,12 @@ function UnicodeConverter() {
         <div className="space-y-4">
           <div>
             <label className="block text-sm font-semibold text-slate-200 mb-3 tracking-wide">
-              Testo da Convertire in Unicode
+              {t('unicode.textToUnicode')}
             </label>
             <textarea
               value={textInput}
               onChange={(e) => setTextInput(e.target.value)}
-              placeholder="Inserisci testo o emoji... 👋 🌟 ❤️"
+              placeholder={t('common.input')}
               rows={4}
               className="liquid-input w-full text-white placeholder-slate-400 resize-none"
             />
@@ -135,7 +138,7 @@ function UnicodeConverter() {
                   <button
                     onClick={() => copyToClipboard(unicodeResult, 'unicode')}
                     className="glass-morphism p-2.5 rounded-xl transition-all duration-300 hover:scale-110 hover:bg-white/10"
-                    title="Copia"
+                    title={t('common.copy')}
                   >
                     {copiedField === 'unicode' ? (
                       <Check className="w-4 h-4 text-green-400" />
@@ -153,7 +156,7 @@ function UnicodeConverter() {
                   <button
                     onClick={() => copyToClipboard(unicodeDecimalResult, 'decimal')}
                     className="glass-morphism p-2.5 rounded-xl transition-all duration-300 hover:scale-110 hover:bg-white/10"
-                    title="Copia"
+                    title={t('common.copy')}
                   >
                     {copiedField === 'decimal' ? (
                       <Check className="w-4 h-4 text-green-400" />
@@ -171,7 +174,7 @@ function UnicodeConverter() {
                   <button
                     onClick={() => copyToClipboard(unicodeHexResult, 'hex')}
                     className="glass-morphism p-2.5 rounded-xl transition-all duration-300 hover:scale-110 hover:bg-white/10"
-                    title="Copia"
+                    title={t('common.copy')}
                   >
                     {copiedField === 'hex' ? (
                       <Check className="w-4 h-4 text-green-400" />
@@ -189,12 +192,12 @@ function UnicodeConverter() {
         <div className="space-y-4">
           <div>
             <label className="block text-sm font-semibold text-slate-200 mb-3 tracking-wide">
-              Unicode da Convertire in Testo
+              {t('unicode.unicodeToText')}
             </label>
             <textarea
               value={unicodeInput}
               onChange={(e) => setUnicodeInput(e.target.value)}
-              placeholder="Inserisci codici Unicode... (es. U+0048 U+0065 U+006C U+006C U+006F)"
+              placeholder="U+0048 U+0065..."
               rows={4}
               className="liquid-input w-full text-white placeholder-slate-400 resize-none"
             />
@@ -206,11 +209,11 @@ function UnicodeConverter() {
           {unicodeInput && (
             <div className="glass-card specular-highlight p-5">
               <div className="flex items-center justify-between mb-3">
-                <h4 className="text-sm font-bold text-liquid-300 uppercase tracking-wider">Testo Risultante</h4>
+                <h4 className="text-sm font-bold text-liquid-300 uppercase tracking-wider">{t('common.result')}</h4>
                 <button
                   onClick={() => copyToClipboard(textResult, 'text')}
                   className="p-2 hover:bg-slate-700 rounded-lg transition-all"
-                  title="Copia"
+                  title={t('common.copy')}
                 >
                   {copiedField === 'text' ? (
                     <Check className="w-4 h-4 text-green-400" />
@@ -232,7 +235,7 @@ function UnicodeConverter() {
               <div className="absolute inset-0 bg-liquid-400 blur-lg opacity-40"></div>
               <Sparkles className="w-6 h-6 text-liquid-300 relative z-10" />
             </div>
-            <h3 className="text-2xl font-bold text-white">Dettagli Caratteri</h3>
+            <h3 className="text-2xl font-bold text-white">{t('unicode.charDetails')}</h3>
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">

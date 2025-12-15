@@ -8,7 +8,8 @@ import {
   Languages,
   Palette,
   Accessibility,
-  Check
+  Check,
+  Settings
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useTheme } from './hooks/useTheme';
@@ -69,12 +70,12 @@ function Header() {
     { value: 'ocean', label: 'Ocean', color: 'bg-cyan-500' },
   ];
 
-  const languageOptions: { value: Language; label: string; flag: string }[] = [
-    { value: 'it', label: 'Italiano', flag: '🇮🇹' },
-    { value: 'en', label: 'English', flag: '🇬🇧' },
-    { value: 'es', label: 'Español', flag: '🇪🇸' },
-    { value: 'fr', label: 'Français', flag: '🇫🇷' },
-    { value: 'de', label: 'Deutsch', flag: '🇩🇪' },
+  const languageOptions: { value: Language; label: string; initials: string }[] = [
+    { value: 'it', label: 'Italiano', initials: 'IT' },
+    { value: 'en', label: 'English', initials: 'EN' },
+    { value: 'es', label: 'Español', initials: 'ES' },
+    { value: 'fr', label: 'Français', initials: 'FR' },
+    { value: 'de', label: 'Deutsch', initials: 'DE' },
   ];
 
   return (
@@ -93,7 +94,7 @@ function Header() {
 
         <div className="flex items-center gap-2 glass-morphism p-1 rounded-2xl !overflow-visible relative z-50">
           {/* Language Dropdown */}
-          <HeaderDropdown icon={Languages} label={languageOptions.find(l => l.value === settings.language)?.flag}>
+          <HeaderDropdown icon={Languages} label={languageOptions.find(l => l.value === settings.language)?.initials}>
             <div className="space-y-1">
               {languageOptions.map((option) => (
                 <button
@@ -105,7 +106,7 @@ function Header() {
                     }`}
                 >
                   <span className="flex items-center gap-2">
-                    <span>{option.flag}</span>
+                    <span className="font-mono font-bold">{option.initials}</span>
                     <span>{option.label}</span>
                   </span>
                   {settings.language === option.value && <Check className="w-3 h-3" />}
@@ -168,7 +169,7 @@ function Header() {
           <div className="w-px h-6 bg-white/10 mx-1"></div>
 
           {/* Accessibility Dropdown */}
-          <HeaderDropdown icon={Accessibility}>
+          <HeaderDropdown icon={Settings}>
             <div className="space-y-2 p-1">
               <div className="px-2 py-1 text-xs font-semibold text-slate-400 uppercase tracking-wider">
                 {t('settings.accessibility.title')}

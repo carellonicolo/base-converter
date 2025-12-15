@@ -100,7 +100,7 @@ const generateUnicodeData = (): UnicodeChar[] => {
 
   // Misc Symbols (U+1F300 - U+1F5FF)
   for (let i = 0x1F300; i <= 0x1F5FF; i++) {
-    const char = String.fromCodePoint(i);
+    const char = String.fromCodePoint(i) + '\uFE0F';
     data.push({
       dec: i,
       hex: i.toString(16).toUpperCase().padStart(4, '0'),
@@ -114,7 +114,7 @@ const generateUnicodeData = (): UnicodeChar[] => {
 
   // Emoticons (U+1F600 - U+1F64F)
   for (let i = 0x1F600; i <= 0x1F64F; i++) {
-    const char = String.fromCodePoint(i);
+    const char = String.fromCodePoint(i) + '\uFE0F';
     data.push({
       dec: i,
       hex: i.toString(16).toUpperCase().padStart(4, '0'),
@@ -128,7 +128,7 @@ const generateUnicodeData = (): UnicodeChar[] => {
 
   // Transport (U+1F680 - U+1F6FF)
   for (let i = 0x1F680; i <= 0x1F6FF; i++) {
-    const char = String.fromCodePoint(i);
+    const char = String.fromCodePoint(i) + '\uFE0F';
     data.push({
       dec: i,
       hex: i.toString(16).toUpperCase().padStart(4, '0'),
@@ -142,7 +142,7 @@ const generateUnicodeData = (): UnicodeChar[] => {
 
   // Supplemental (U+1F900 - U+1F9FF)
   for (let i = 0x1F900; i <= 0x1F9FF; i++) {
-    const char = String.fromCodePoint(i);
+    const char = String.fromCodePoint(i) + '\uFE0F';
     data.push({
       dec: i,
       hex: i.toString(16).toUpperCase().padStart(4, '0'),

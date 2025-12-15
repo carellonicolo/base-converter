@@ -48,7 +48,69 @@
     }
   },
   "dashboard": {
-    "welcome": "Welcome to Base Converter Pro",
+    "welcome": "Welcome to Base Converter",
     "description": "Professional tool for converting numeric bases, encodings, and formats"
+  },
+  "common": {
+    "copy": "Copy",
+    "copied": "Copied!",
+    "error": "Error",
+    "loading": "Loading...",
+    "examples": "Examples",
+    "realWorldUse": "Real World Use",
+    "input": "Input",
+    "output": "Output",
+    "result": "Result"
+  },
+  "unicode": {
+    "title": "Unicode Converter",
+    "description": "Unicode is the universal standard for representing text in all languages, including emojis and special symbols.",
+    "textToUnicode": "Text to Unicode",
+    "unicodeToText": "Unicode to Text",
+    "charDetails": "Character Details",
+    "tableTitle": "Extended Unicode Table (including Emojis)",
+    "categories": {
+      "emoji": "Emoji & Emoticons (U+1F600+)",
+      "misc": "Misc Symbols",
+      "transport": "Transport & Maps",
+      "supplemental": "Supplemental"
+    }
+  },
+  "base64": {
+    "title": "Base64 Encoder",
+    "description": "Base64 converts binary data into pure ASCII text using 64 safe characters. Essential for emails and APIs.",
+    "encodeTitle": "Encode (Text → Base64)",
+    "decodeTitle": "Decode (Base64 → Text)",
+    "uploadButton": "Upload File and Convert to Base64",
+    "encodedResult": "Base64 Result",
+    "decodedText": "Decoded Text"
+  },
+  "hash": {
+    "title": "Hash Generator",
+    "description": "Cryptographic hashes transform data into a unique fingerprint. MD5, SHA-256, etc.",
+    "inputText": "Text to Hash",
+    "algorithm": "Algorithm",
+    "uploadButton": "Hash File"
+  },
+  "color": {
+    "title": "Color Converter",
+    "description": "Convert between HEX, RGB, HSL, HSV, and CMYK formats. Essential tool for web design and graphics.",
+    "preview": "Color Preview",
+    "palette": "Suggested Palette"
+  },
+  "url": {
+    "title": "URL Encoder/Decoder",
+    "description": "Percent-encoding makes URLs safe and valid. Handles special characters and query strings.",
+    "encodeTitle": "URL Encode",
+    "decodeTitle": "URL Decode",
+    "analyzeQuery": "Analyze Query Parameters",
+    "extractedParams": "Extracted Parameters"
+  },
+  "timestamp": {
+    "title": "Timestamp Converter",
+    "description": "Convert Unix Timestamps to readable dates and vice versa. Supports ISO 8601 and RFC 2822.",
+    "current": "Current Timestamp",
+    "unixLabel": "Unix Timestamp (seconds)",
+    "dateLabel": "Date and Time"
   }
 }

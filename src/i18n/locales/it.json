@@ -48,7 +48,69 @@
     }
   },
   "dashboard": {
-    "welcome": "Benvenuto in Base Converter Pro",
+    "welcome": "Benvenuto in Base Converter",
     "description": "Strumento professionale per la conversione di basi numeriche, codifiche e formati"
+  },
+  "common": {
+    "copy": "Copia",
+    "copied": "Copiato!",
+    "error": "Errore",
+    "loading": "Caricamento...",
+    "examples": "Esempi",
+    "realWorldUse": "Uso nel Mondo Reale",
+    "input": "Input",
+    "output": "Output",
+    "result": "Risultato"
+  },
+  "unicode": {
+    "title": "Convertitore Unicode",
+    "description": "Unicode è lo standard universale per rappresentare testi in tutte le lingue del mondo, compresi emoji e simboli speciali.",
+    "textToUnicode": "Testo da Convertire in Unicode",
+    "unicodeToText": "Unicode da Convertire in Testo",
+    "charDetails": "Dettagli Caratteri",
+    "tableTitle": "Tabella Unicode Estesa (inclusi Emoji)",
+    "categories": {
+      "emoji": "Emoji & Emoticon (U+1F600+)",
+      "misc": "Simboli Vari",
+      "transport": "Trasporti & Mappe",
+      "supplemental": "Supplementari"
+    }
+  },
+  "base64": {
+    "title": "Codifica Base64",
+    "description": "Base64 converte dati binari in testo ASCII puro usando 64 caratteri sicuri. Essenziale per email e API.",
+    "encodeTitle": "Codifica (Testo → Base64)",
+    "decodeTitle": "Decodifica (Base64 → Testo)",
+    "uploadButton": "Carica File e Converti in Base64",
+    "encodedResult": "Risultato Base64",
+    "decodedText": "Testo Decodificato"
+  },
+  "hash": {
+    "title": "Generatore Hash",
+    "description": "Gli hash crittografici trasformano dati in un'impronta digitale univoca. MD5, SHA-256, etc.",
+    "inputText": "Testo da hashare",
+    "algorithm": "Algoritmo",
+    "uploadButton": "Hash File"
+  },
+  "color": {
+    "title": "Convertitore Colori",
+    "description": "Converti tra formati HEX, RGB, HSL, HSV e CMYK. Strumento essenziale per web design e grafica.",
+    "preview": "Anteprima Colore",
+    "palette": "Palette Suggerita"
+  },
+  "url": {
+    "title": "Encoder/Decoder URL",
+    "description": "Percent-encoding per rendere gli URL sicuri e validi. Gestisce caratteri speciali e query string.",
+    "encodeTitle": "Codifica URL",
+    "decodeTitle": "Decodifica URL",
+    "analyzeQuery": "Analizza Query Parameters",
+    "extractedParams": "Parametri Estratti"
+  },
+  "timestamp": {
+    "title": "Convertitore Timestamp",
+    "description": "Converti Unix Timestamp in date leggibili e viceversa. Supporta ISO 8601 e RFC 2822.",
+    "current": "Timestamp Corrente",
+    "unixLabel": "Unix Timestamp (secondi)",
+    "dateLabel": "Data e Ora"
   }
 }

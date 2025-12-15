@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { FileUp, Download, FileCode } from 'lucide-react';
 import Button from '../ui/Button';
 import Textarea from '../ui/Textarea';
@@ -12,6 +12,7 @@ const Base64Converter: React.FC = () => {
   const [textInput, setTextInput] = useState('');
   const [base64Input, setBase64Input] = useState('');
   const [error, setError] = useState('');
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const debouncedText = useDebounce(textInput, 300);
   const debouncedBase64 = useDebounce(base64Input, 300);
@@ -135,9 +136,10 @@ const Base64Converter: React.FC = () => {
 
           {/* File upload */}
           <div>
-            <label className="block">
+            <div>
               <input
                 type="file"
+                ref={fileInputRef}
                 onChange={handleFileUpload}
                 className="hidden"
                 accept="*/*"
@@ -146,11 +148,11 @@ const Base64Converter: React.FC = () => {
                 variant="secondary"
                 icon={FileUp}
                 fullWidth
-                as="span"
+                onClick={() => fileInputRef.current?.click()}
               >
                 Carica File e Converti in Base64
               </Button>
-            </label>
+            </div>
           </div>
 
           {decodedResult && (

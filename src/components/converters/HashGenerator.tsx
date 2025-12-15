@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Shield, FileUp } from 'lucide-react';
 import Button from '../ui/Button';
 import Textarea from '../ui/Textarea';
@@ -14,6 +14,7 @@ const HashGenerator: React.FC = () => {
   const [algorithm, setAlgorithm] = useState<HashAlgorithm>('SHA256');
   const [hash, setHash] = useState('');
   const [loading, setLoading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const debouncedInput = useDebounce(input, 300);
 
@@ -105,9 +106,10 @@ const HashGenerator: React.FC = () => {
           />
 
           <div>
-            <label className="block">
+            <div>
               <input
                 type="file"
+                ref={fileInputRef}
                 onChange={handleFileUpload}
                 className="hidden"
                 accept="*/*"
@@ -117,11 +119,11 @@ const HashGenerator: React.FC = () => {
                 icon={FileUp}
                 fullWidth
                 loading={loading}
-                as="span"
+                onClick={() => fileInputRef.current?.click()}
               >
                 Hash File
               </Button>
-            </label>
+            </div>
             <p className="text-xs text-slate-400 mt-2">
               Carica un file per calcolarne l'hash
             </p>
