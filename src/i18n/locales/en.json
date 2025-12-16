@@ -97,6 +97,10 @@
         "name": "JWT",
         "desc": "JWT Token Decoder"
       },
+      "regex": {
+        "name": "Regex Tester",
+        "desc": "Test and build RegEx"
+      },
       "json": {
         "name": "JSON",
         "desc": "Format and Validate JSON"
@@ -389,5 +393,41 @@
       "Compression: minify for production",
       "Logs: reading JSON logs"
     ]
+  },
+  "regex": {
+    "title": "Regex Tester",
+    "description": "Test and validate your regular expressions in real-time.",
+    "patternLabel": "Pattern",
+    "testStringLabel": "Test String",
+    "matches": "matches",
+    "noMatches": "No matches found",
+    "useCase1": "Email/Phone format validation",
+    "useCase2": "Extracting data from text",
+    "useCase3": "Scraping and parsing",
+    "flags": {
+      "g": "Global",
+      "i": "Case Insensitive",
+      "m": "Multiline",
+      "s": "Dot All"
+    },
+    "cheatsheet": {
+      "title": "Regex Cheatsheet",
+      "anyChar": "Any character (except newline)",
+      "wordChar": "Alphanumeric character",
+      "digit": "Digit",
+      "whitespace": "Whitespace",
+      "set": "One of the characters",
+      "negSet": "None of the characters",
+      "range": "Range",
+      "start": "Start of string",
+      "end": "End of string",
+      "zeroMore": "Zero or more",
+      "oneMore": "One or more",
+      "zeroOne": "Zero or one",
+      "exactlyN": "Exactly n times",
+      "group": "Capture group",
+      "nonCapture": "Non-capturing group",
+      "boundary": "Word boundary"
+    }
   }
 }

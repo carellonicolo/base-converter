@@ -97,6 +97,10 @@
         "name": "JWT",
         "desc": "Décodeur de Token JWT"
       },
+      "regex": {
+        "name": "Testeur Regex",
+        "desc": "Tester et créer RegEx"
+      },
       "json": {
         "name": "JSON",
         "desc": "Formater et Valider JSON"
@@ -389,5 +393,41 @@
       "Compression : minifier pour production",
       "Logs : lire logs au format JSON"
     ]
+  },
+  "regex": {
+    "title": "Testeur Regex",
+    "description": "Testez et validez vos expressions régulières en temps réel.",
+    "patternLabel": "Motif (Pattern)",
+    "testStringLabel": "Chaîne de test",
+    "matches": "correspondances",
+    "noMatches": "Aucune correspondance trouvée",
+    "useCase1": "Validation de format email/téléphone",
+    "useCase2": "Extraction de données de texte",
+    "useCase3": "Scraping et analyse",
+    "flags": {
+      "g": "Global",
+      "i": "Insensible à la casse",
+      "m": "Multiligne",
+      "s": "Dot All"
+    },
+    "cheatsheet": {
+      "title": "Aide-mémoire Regex",
+      "anyChar": "N'importe quel caractère (sauf saut de ligne)",
+      "wordChar": "Caractère alphanumérique",
+      "digit": "Chiffre",
+      "whitespace": "Espace blanc",
+      "set": "Un des caractères",
+      "negSet": "Aucun des caractères",
+      "range": "Plage",
+      "start": "Début de chaîne",
+      "end": "Fin de chaîne",
+      "zeroMore": "Zéro ou plus",
+      "oneMore": "Un ou plus",
+      "zeroOne": "Zéro ou un",
+      "exactlyN": "Exactement n fois",
+      "group": "Groupe de capture",
+      "nonCapture": "Groupe non capturant",
+      "boundary": "Limite de mot"
+    }
   }
 }

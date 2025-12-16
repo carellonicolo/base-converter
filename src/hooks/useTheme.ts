@@ -25,10 +25,17 @@ export function useTheme() {
     if (actualTheme === 'light') {
       const baseLight = themes.light;
       const presetTheme = themes[preset] || themes.default;
+
+      // Create a subtle gradient based on the preset's accent color
+      // Append '15' for ~8% opacity
+      const accentColor = presetTheme.colors.accent.primary;
+      const lightGradient = `linear-gradient(135deg, #f8fafc 0%, ${accentColor}15 100%)`;
+
       return {
         ...baseLight,
         colors: {
           ...baseLight.colors,
+          backgroundGradient: lightGradient,
           accent: presetTheme.colors.accent,
         },
       };
@@ -56,6 +63,7 @@ export function useTheme() {
     root.style.setProperty('--color-error', theme.colors.status.error);
     root.style.setProperty('--color-warning', theme.colors.status.warning);
     root.style.setProperty('--color-info', theme.colors.status.info);
+    root.style.setProperty('--color-shadow', theme.colors.accent.primary);
 
     // Apply effects
     root.style.setProperty('--glass-blur', theme.effects.blur);

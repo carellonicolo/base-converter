@@ -95,7 +95,11 @@
       },
       "jwt": {
         "name": "JWT",
-        "desc": "Decoder JWT Token"
+        "desc": "Decoder Token JWT"
+      },
+      "regex": {
+        "name": "Tester Regex",
+        "desc": "Testa e crea RegEx"
       },
       "json": {
         "name": "JSON",
@@ -389,5 +393,41 @@
       "Compressione: minify per produzione",
       "Log: leggere log in formato JSON"
     ]
+  },
+  "regex": {
+    "title": "Tester Regex",
+    "description": "Testa e valida le tue espressioni regolari in tempo reale.",
+    "patternLabel": "Pattern",
+    "testStringLabel": "Testo di Prova",
+    "matches": "corrispondenze",
+    "noMatches": "Nessuna corrispondenza trovata",
+    "useCase1": "Convalida formato email/telefono",
+    "useCase2": "Estrazione dati da testo",
+    "useCase3": "Scraping e parsing",
+    "flags": {
+      "g": "Globale",
+      "i": "Case Insensitive",
+      "m": "Multilinea",
+      "s": "Dot All"
+    },
+    "cheatsheet": {
+      "title": "Regex Cheatsheet",
+      "anyChar": "Qualsiasi carattere (eccetto a capo)",
+      "wordChar": "Carattere alfanumerico",
+      "digit": "Cifra",
+      "whitespace": "Spazio bianco",
+      "set": "Uno dei caratteri",
+      "negSet": "Nessuno dei caratteri",
+      "range": "Intervallo",
+      "start": "Inizio stringa",
+      "end": "Fine stringa",
+      "zeroMore": "Zero o più",
+      "oneMore": "Uno o più",
+      "zeroOne": "Zero o uno",
+      "exactlyN": "Esattamente n volte",
+      "group": "Gruppo di cattura",
+      "nonCapture": "Gruppo non di cattura",
+      "boundary": "Confine di parola"
+    }
   }
 }

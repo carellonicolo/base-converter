@@ -2,7 +2,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Hash, Type, Binary, Gauge, FileText, Shield,
-  Palette, Clock, Link2, Key, FileJson
+  Palette, Clock, Link2, Key, FileJson, ScanText
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import Card from './ui/Card';
@@ -22,6 +22,7 @@ const Dashboard: React.FC = () => {
     { name: t('dashboard.tools.timestamp.name'), path: '/timestamp', icon: Clock, color: 'text-orange-400', description: t('dashboard.tools.timestamp.desc') },
     { name: t('dashboard.tools.url.name'), path: '/url', icon: Link2, color: 'text-indigo-400', description: t('dashboard.tools.url.desc') },
     { name: t('dashboard.tools.jwt.name'), path: '/jwt', icon: Key, color: 'text-emerald-400', description: t('dashboard.tools.jwt.desc') },
+    { name: t('dashboard.tools.regex.name'), path: '/regex', icon: ScanText, color: 'text-indigo-500', description: t('dashboard.tools.regex.desc') },
     { name: t('dashboard.tools.json.name'), path: '/json', icon: FileJson, color: 'text-teal-400', description: t('dashboard.tools.json.desc') },
   ];
 
