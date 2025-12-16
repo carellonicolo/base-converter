@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { X } from 'lucide-react';
-import Button from './Button';
+
 
 export interface ModalProps {
   isOpen: boolean;
@@ -67,20 +67,20 @@ const Modal: React.FC<ModalProps> = ({
       className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fadeIn"
       onClick={handleBackdropClick}
     >
-      <div className={`glass-morphism rounded-3xl shadow-glass-lg w-full ${sizeStyles[size]} animate-scaleIn`}>
+      <div className={`bg-slate-900 [.light-theme_&]:bg-white border border-theme-soft rounded-3xl shadow-2xl shadow-theme-lg w-full ${sizeStyles[size]} animate-scaleIn`}>
         {/* Header */}
         {(title || showCloseButton) && (
-          <div className="flex items-center justify-between p-6 border-b border-white/10">
+          <div className="flex items-center justify-between p-6 border-b border-theme-soft">
             {title && (
-              <h2 className="text-2xl font-bold text-white">{title}</h2>
+              <h2 className="text-2xl font-bold text-white [.light-theme_&]:text-slate-900">{title}</h2>
             )}
             {showCloseButton && (
               <button
                 onClick={onClose}
-                className="glass-morphism p-2 rounded-xl transition-all duration-300 hover:bg-white/10 ml-auto"
+                className="p-2 rounded-xl transition-all duration-300 hover:bg-slate-800 [.light-theme_&]:hover:bg-slate-100 ml-auto"
                 aria-label="Close modal"
               >
-                <X className="w-5 h-5 text-slate-300" />
+                <X className="w-5 h-5 text-slate-400" />
               </button>
             )}
           </div>
@@ -93,7 +93,7 @@ const Modal: React.FC<ModalProps> = ({
 
         {/* Footer */}
         {footer && (
-          <div className="flex items-center justify-end gap-3 p-6 border-t border-white/10">
+          <div className="flex items-center justify-end gap-3 p-6 border-t border-theme-soft">
             {footer}
           </div>
         )}

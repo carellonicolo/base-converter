@@ -17,7 +17,7 @@ import { useTranslation } from 'react-i18next';
 import { useSettingsStore } from '../../store/useSettingsStore';
 import { ThemeMode, ThemePreset, Language } from '../../types/settings';
 import Modal from '../ui/Modal';
-import { themes } from '../../types/theme';
+
 
 const Header: React.FC = () => {
     const { t } = useTranslation();
@@ -42,11 +42,11 @@ const Header: React.FC = () => {
     ];
 
     const themePresetOptions: { value: ThemePreset; label: string; color: string }[] = [
-        { value: 'default', label: 'Default', color: 'bg-blue-500' },
-        { value: 'midnight', label: 'Midnight', color: 'bg-indigo-500' },
-        { value: 'sunset', label: 'Sunset', color: 'bg-orange-500' },
-        { value: 'forest', label: 'Forest', color: 'bg-green-500' },
-        { value: 'ocean', label: 'Ocean', color: 'bg-cyan-500' },
+        { value: 'default', label: t('settings.appearance.themeDefault'), color: 'bg-blue-500' },
+        { value: 'midnight', label: t('settings.appearance.themeMidnight'), color: 'bg-indigo-500' },
+        { value: 'sunset', label: t('settings.appearance.themeSunset'), color: 'bg-orange-500' },
+        { value: 'forest', label: t('settings.appearance.themeForest'), color: 'bg-green-500' },
+        { value: 'ocean', label: t('settings.appearance.themeOcean'), color: 'bg-cyan-500' },
     ];
 
     const languageOptions: { value: Language; label: string; initials: string }[] = [
@@ -68,8 +68,8 @@ const Header: React.FC = () => {
         <button
             onClick={onClick}
             className={`flex items-center gap-2 px-4 py-2 rounded-xl transition-all duration-300 font-medium ${active
-                    ? 'bg-liquid-500/20 text-liquid-300 shadow-[0_0_15px_rgba(var(--color-shadow),0.3)]'
-                    : 'text-slate-400 hover:text-white hover:bg-white/5'
+                ? 'bg-theme-soft theme-accent shadow-theme'
+                : 'text-slate-400 hover:text-white hover:bg-white/5'
                 }`}
         >
             <Icon className="w-5 h-5" />
@@ -79,15 +79,15 @@ const Header: React.FC = () => {
 
     return (
         <>
-            <header className="fixed top-0 left-0 right-0 z-40 bg-slate-900/80 [.light-theme_&]:bg-white/80 backdrop-blur-xl border-b border-white/10 shadow-lg h-20">
+            <header className="fixed top-0 left-0 right-0 z-40 bg-slate-900/80 [.light-theme_&]:bg-white/80 backdrop-blur-xl border-b border-theme-soft shadow-lg shadow-theme h-20">
                 <div className="container mx-auto px-4 h-full flex items-center justify-between max-w-7xl">
                     {/* Logo */}
                     <Link to="/" className="flex items-center gap-3 group relative">
-                        <div className="absolute -inset-2 bg-liquid-500/20 blur-xl opacity-0 group-hover:opacity-100 transition-opacity rounded-full"></div>
-                        <Calculator className="w-8 h-8 text-liquid-500 relative z-10 transition-transform group-hover:rotate-12" />
+                        <div className="absolute -inset-2 bg-theme-soft blur-xl opacity-0 group-hover:opacity-100 transition-opacity rounded-full"></div>
+                        <Calculator className="w-8 h-8 theme-accent relative z-10 transition-transform group-hover:rotate-12" />
                         <div className="flex flex-col">
                             <span className="text-xl font-bold text-white [.light-theme_&]:text-slate-900 tracking-tight">Base Converter</span>
-                            <span className="text-[10px] text-slate-500 uppercase tracking-widest font-semibold">Pro Edition</span>
+                            <span className="text-[10px] text-slate-500 uppercase tracking-widest font-semibold">Powered by Prof. Carello</span>
                         </div>
                     </Link>
 
@@ -102,11 +102,9 @@ const Header: React.FC = () => {
                         <div className="w-px h-6 bg-white/10 mx-1"></div>
                         <ToolbarButton
                             icon={Palette}
-                            label={t('settings.appearance.theme')}
                             onClick={() => setActiveModal('theme')}
                             active={activeModal === 'theme'}
                         />
-                        <div className="w-px h-6 bg-white/10 mx-1"></div>
                         <ToolbarButton
                             icon={Settings}
                             onClick={() => setActiveModal('settings')}
@@ -151,8 +149,8 @@ const Header: React.FC = () => {
                                 closeModal();
                             }}
                             className={`flex items-center justify-between p-4 rounded-xl transition-all border ${settings.language === option.value
-                                    ? 'bg-liquid-500/10 border-liquid-500 text-liquid-500 shadow-[0_0_20px_rgba(var(--color-shadow),0.2)]'
-                                    : 'bg-white/5 border-transparent text-slate-400 hover:bg-white/10'
+                                ? 'bg-liquid-500/10 border-liquid-500 text-liquid-500 shadow-[0_0_20px_rgba(var(--color-shadow),0.2)]'
+                                : 'bg-white/5 border-transparent text-slate-400 hover:bg-white/10'
                                 }`}
                         >
                             <div className="flex items-center gap-4">
@@ -181,8 +179,8 @@ const Header: React.FC = () => {
                                 key={option.value}
                                 onClick={() => setThemeMode(option.value)}
                                 className={`flex flex-col items-center gap-3 p-4 rounded-xl border transition-all ${settings.theme.mode === option.value
-                                        ? 'bg-liquid-500/10 border-liquid-500 text-liquid-500'
-                                        : 'bg-white/5 border-transparent text-slate-400 hover:bg-white/10'
+                                    ? 'bg-liquid-500/10 border-liquid-500 text-liquid-500'
+                                    : 'bg-white/5 border-transparent text-slate-400 hover:bg-white/10'
                                     }`}
                             >
                                 <option.icon className="w-6 h-6" />
@@ -204,8 +202,8 @@ const Header: React.FC = () => {
                                     key={option.value}
                                     onClick={() => setThemePreset(option.value)}
                                     className={`flex items-center gap-3 p-3 rounded-xl border transition-all ${settings.theme.preset === option.value
-                                            ? 'bg-white/10 border-white/20 shadow-lg'
-                                            : 'bg-transparent border-transparent hover:bg-white/5'
+                                        ? 'bg-white/10 border-white/20 shadow-lg'
+                                        : 'bg-transparent border-transparent hover:bg-white/5'
                                         }`}
                                 >
                                     <div className={`w-6 h-6 rounded-full ${option.color} shadow-lg ring-2 ring-white/10`}></div>

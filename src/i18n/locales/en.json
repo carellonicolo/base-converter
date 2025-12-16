@@ -14,6 +14,7 @@
     "subtitle": "Customize the appearance and behavior of the application",
     "appearance": {
       "title": "Appearance & Language",
+      "theme": "Theme",
       "themeMode": "Theme Mode",
       "themeModeDark": "Dark",
       "themeModeLight": "Light",
@@ -45,6 +46,9 @@
       "resetConfirm": "Reset to default settings?",
       "clearAll": "Delete All Data",
       "clearAllConfirm": "Delete all data? This action is irreversible."
+    },
+    "language": {
+      "title": "Select Language"
     }
   },
   "dashboard": {
@@ -118,7 +122,9 @@
     "realWorldUse": "Real World Use",
     "input": "Input",
     "output": "Output",
-    "result": "Result"
+    "result": "Result",
+    "whenToUse": "When to use it?",
+    "learnMore": "Learn More"
   },
   "unicode": {
     "title": "Unicode Converter",

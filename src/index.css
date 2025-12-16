@@ -218,6 +218,26 @@
     color: var(--color-accent-primary);
   }
 
+  .border-theme {
+    border-color: var(--color-accent-primary);
+  }
+
+  .border-theme-soft {
+    border-color: color-mix(in srgb, var(--color-accent-primary) 20%, transparent);
+  }
+
+  .bg-theme-soft {
+    background-color: color-mix(in srgb, var(--color-accent-primary) 10%, transparent);
+  }
+
+  .shadow-theme {
+    box-shadow: 0 4px 20px -5px color-mix(in srgb, var(--color-shadow) 30%, transparent);
+  }
+
+  .shadow-theme-lg {
+    box-shadow: 0 10px 40px -10px color-mix(in srgb, var(--color-shadow) 40%, transparent);
+  }
+
   /* Override hardcoded text colors in light theme */
   body.light-theme .text-white {
     color: var(--color-text-primary) !important;

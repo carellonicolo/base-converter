@@ -14,6 +14,7 @@
     "subtitle": "Personaliza la apariencia y el comportamiento de la aplicación",
     "appearance": {
       "title": "Apariencia e Idioma",
+      "theme": "Tema",
       "themeMode": "Modo de Tema",
       "themeModeDark": "Oscuro",
       "themeModeLight": "Claro",
@@ -45,6 +46,9 @@
       "resetConfirm": "¿Restablecer a la configuración predeterminada?",
       "clearAll": "Borrar Todos los Datos",
       "clearAllConfirm": "¿Borrar todos los datos? Esta acción es irreversible."
+    },
+    "language": {
+      "title": "Seleccionar Idioma"
     }
   },
   "dashboard": {
@@ -118,7 +122,9 @@
     "realWorldUse": "Uso en el Mundo Real",
     "input": "Entrada",
     "output": "Salida",
-    "result": "Resultado"
+    "result": "Resultado",
+    "whenToUse": "¿Cuándo usarlo?",
+    "learnMore": "Saber más"
   },
   "unicode": {
     "title": "Convertidor Unicode",

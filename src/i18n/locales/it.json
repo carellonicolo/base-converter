@@ -14,6 +14,7 @@
     "subtitle": "Personalizza l'aspetto e il comportamento dell'applicazione",
     "appearance": {
       "title": "Aspetto e Lingua",
+      "theme": "Tema",
       "themeMode": "Modalità Tema",
       "themeModeDark": "Dark",
       "themeModeLight": "Light",
@@ -45,6 +46,9 @@
       "resetConfirm": "Ripristinare le impostazioni predefinite?",
       "clearAll": "Elimina Tutti i Dati",
       "clearAllConfirm": "Eliminare tutti i dati? Questa azione è irreversibile."
+    },
+    "language": {
+      "title": "Seleziona Lingua"
     }
   },
   "dashboard": {
@@ -118,7 +122,9 @@
     "realWorldUse": "Uso nel Mondo Reale",
     "input": "Input",
     "output": "Output",
-    "result": "Risultato"
+    "result": "Risultato",
+    "whenToUse": "Quando usarlo?",
+    "learnMore": "Approfondisci"
   },
   "jwt": {
     "title": "Decoder JWT",

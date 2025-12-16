@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
-import { Info, Lightbulb, BookOpen, ChevronDown, ChevronUp } from 'lucide-react';
+import { Info, Lightbulb, BookOpen, ChevronRight } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
+import Modal from './Modal';
 
 export type InfoBoxType = 'info' | 'educational' | 'warning' | 'tip';
 
@@ -26,7 +28,8 @@ const InfoBox: React.FC<InfoBoxProps> = ({
   expandable = true,
   defaultExpanded = false,
 }) => {
-  const [isExpanded, setIsExpanded] = useState(defaultExpanded);
+  const { t } = useTranslation();
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const typeStyles = {
     info: {
@@ -70,96 +73,108 @@ const InfoBox: React.FC<InfoBoxProps> = ({
     realWorldUse;
 
   return (
-    <div className={`glass-morphism rounded-2xl border ${styles.border} ${styles.bg} overflow-hidden`}>
-      <div className="p-5">
-        {/* Header */}
-        <div className="flex items-start gap-4">
-          <div className={`${styles.iconBg} p-3 rounded-xl flex-shrink-0`}>
-            <div className={styles.text}>
-              {icon || defaultIcon}
-            </div>
-          </div>
-          <div className="flex-1 min-w-0">
-            <div className="flex items-start justify-between gap-3">
-              <div className="flex-1">
-                <h3 className="text-lg font-bold text-white mb-2">{title}</h3>
-                <p className="text-slate-300 text-sm leading-relaxed">
-                  {description}
-                </p>
+    <>
+      <div className={`glass-morphism rounded-2xl border ${styles.border} ${styles.bg} overflow-hidden`}>
+        <div className="p-5">
+          {/* Header */}
+          <div className="flex items-start gap-4">
+            <div className={`${styles.iconBg} p-3 rounded-xl flex-shrink-0`}>
+              <div className={styles.text}>
+                {icon || defaultIcon}
               </div>
-              {expandable && hasExpandableContent && (
-                <button
-                  onClick={() => setIsExpanded(!isExpanded)}
-                  className="glass-morphism p-2 rounded-lg hover:bg-white/10 transition-all flex-shrink-0"
-                  aria-label={isExpanded ? 'Riduci' : 'Espandi'}
-                >
-                  {isExpanded ? (
-                    <ChevronUp className="w-4 h-4 text-slate-400" />
-                  ) : (
-                    <ChevronDown className="w-4 h-4 text-slate-400" />
-                  )}
-                </button>
-              )}
+            </div>
+            <div className="flex-1 min-w-0">
+              <div className="flex items-start justify-between gap-3">
+                <div className="flex-1">
+                  <h3 className="text-lg font-bold text-white mb-2">{title}</h3>
+                  <p className="text-slate-300 text-sm leading-relaxed line-clamp-2">
+                    {description}
+                  </p>
+                </div>
+                {expandable && hasExpandableContent && (
+                  <button
+                    onClick={() => setIsModalOpen(true)}
+                    className="glass-morphism px-4 py-2 rounded-lg hover:bg-white/10 transition-all flex items-center gap-2 flex-shrink-0 group"
+                    aria-label={t('common.learnMore')}
+                  >
+                    <span className="text-xs font-semibold text-slate-300 group-hover:text-white transition-colors">
+                      {t('common.learnMore')}
+                    </span>
+                    <ChevronRight className="w-4 h-4 text-slate-400 group-hover:text-white transition-colors group-hover:translate-x-0.5 transform" />
+                  </button>
+                )}
+              </div>
             </div>
           </div>
         </div>
-
-        {/* Expandable Content */}
-        {isExpanded && hasExpandableContent && (
-          <div className="mt-4 pt-4 border-t border-white/10 space-y-4 animate-slideDown">
-            {/* Use Cases */}
-            {useCases && useCases.length > 0 && (
-              <div>
-                <h4 className="text-sm font-bold text-liquid-300 mb-2 flex items-center gap-2">
-                  <Lightbulb className="w-4 h-4" />
-                  Quando usarlo?
-                </h4>
-                <ul className="space-y-1.5">
-                  {useCases.map((useCase, index) => (
-                    <li key={index} className="text-sm text-slate-300 flex items-start gap-2">
-                      <span className="text-liquid-400 mt-0.5">•</span>
-                      <span>{useCase}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )}
-
-            {/* Examples */}
-            {examples && examples.length > 0 && (
-              <div>
-                <h4 className="text-sm font-bold text-liquid-300 mb-2">
-                  Esempi pratici:
-                </h4>
-                <div className="space-y-2">
-                  {examples.map((example, index) => (
-                    <div key={index} className="glass-morphism rounded-lg p-3 bg-black/20">
-                      <div className="flex items-center justify-between gap-2 text-xs">
-                        <code className="text-slate-400 font-mono">{example.label}</code>
-                        <span className="text-slate-500">→</span>
-                        <code className="text-liquid-300 font-mono flex-1 text-right truncate">
-                          {example.value}
-                        </code>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* Real World Use */}
-            {realWorldUse && (
-              <div className="glass-morphism rounded-lg p-3 bg-liquid-500/5">
-                <p className="text-xs text-slate-300 leading-relaxed">
-                  <span className="font-bold text-liquid-300">💡 Nel mondo reale: </span>
-                  {realWorldUse}
-                </p>
-              </div>
-            )}
-          </div>
-        )}
       </div>
-    </div>
+
+      {/* Detail Modal */}
+      <Modal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        title={title}
+        size="lg"
+      >
+        <div className="space-y-6">
+          <div className={`p-4 rounded-xl ${styles.bg} border ${styles.border}`}>
+            <p className="text-slate-300 leading-relaxed">
+              {description}
+            </p>
+          </div>
+
+          {/* Use Cases */}
+          {useCases && useCases.length > 0 && (
+            <div>
+              <h4 className="text-lg font-bold text-liquid-300 mb-3 flex items-center gap-2">
+                <Lightbulb className="w-5 h-5" />
+                {t('common.whenToUse')}
+              </h4>
+              <ul className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                {useCases.map((useCase, index) => (
+                  <li key={index} className="bg-slate-800/50 p-3 rounded-lg border border-white/5 flex items-start gap-3">
+                    <span className="text-liquid-400 mt-0.5">•</span>
+                    <span className="text-slate-300 text-sm">{useCase}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+
+          {/* Examples */}
+          {examples && examples.length > 0 && (
+            <div>
+              <h4 className="text-lg font-bold text-liquid-300 mb-3">
+                {t('common.examples')}:
+              </h4>
+              <div className="space-y-2">
+                {examples.map((example, index) => (
+                  <div key={index} className="bg-slate-900 rounded-xl p-4 border border-white/10 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                    <code className="text-slate-400 font-mono text-sm bg-black/30 px-2 py-1 rounded">{example.label}</code>
+                    <span className="hidden sm:block text-slate-600">→</span>
+                    <code className="text-liquid-300 font-mono text-right truncate bg-liquid-500/10 px-2 py-1 rounded border border-liquid-500/20">
+                      {example.value}
+                    </code>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Real World Use */}
+          {realWorldUse && (
+            <div className="bg-gradient-to-br from-liquid-900/20 to-purple-900/20 rounded-xl p-5 border border-white/10">
+              <h4 className="text-sm font-bold text-liquid-300 mb-2 uppercase tracking-wider">
+                💡 {t('common.realWorldUse')}
+              </h4>
+              <p className="text-slate-300 leading-relaxed">
+                {realWorldUse}
+              </p>
+            </div>
+          )}
+        </div>
+      </Modal>
+    </>
   );
 };
 
