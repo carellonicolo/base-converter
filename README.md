@@ -1,377 +1,135 @@
-# 🚀 BASE CONVERTER PRO v2.0
+# Base Converter Pro
 
-> La suite completa e professionale per conversioni multi-funzionali: basi numeriche, encoding, hash, colori, timestamp e molto altro!
+> Suite completa di conversione: basi numeriche, encoding, hash, colori, timestamp e molto altro
 
-[![React](https://img.shields.io/badge/React-18.3.1-61dafb?logo=react&logoColor=white)](https://reactjs.org/)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.5.3-3178c6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
-[![Vite](https://img.shields.io/badge/Vite-5.4.2-646cff?logo=vite&logoColor=white)](https://vitejs.dev/)
-[![PWA](https://img.shields.io/badge/PWA-Enabled-5a0fc8?logo=pwa&logoColor=white)](https://web.dev/progressive-web-apps/)
+[![Licenza MIT](https://img.shields.io/badge/Licenza-MIT-blue.svg)](LICENSE)
+[![React](https://img.shields.io/badge/React-18-61dafb?logo=react&logoColor=white)](https://reactjs.org/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5-3178c6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![Vite](https://img.shields.io/badge/Vite-5-646cff?logo=vite&logoColor=white)](https://vitejs.dev/)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-3-06b6d4?logo=tailwindcss&logoColor=white)](https://tailwindcss.com/)
+[![PWA](https://img.shields.io/badge/PWA-Installabile-5a0fc8?logo=pwa&logoColor=white)](https://web.dev/progressive-web-apps/)
+[![i18n](https://img.shields.io/badge/i18n-IT%20%7C%20EN-yellow)](https://www.i18next.com/)
+[![GitHub stars](https://img.shields.io/github/stars/carellonicolo/base-converter?style=social)](https://github.com/carellonicolo/base-converter)
+[![GitHub issues](https://img.shields.io/github/issues/carellonicolo/base-converter)](https://github.com/carellonicolo/base-converter/issues)
 
-## ✨ Novità Versione 2.0
+## Panoramica
 
-### 🎯 Nuove Funzionalità Principali
+Base Converter Pro e una suite di conversione multi-funzionale che riunisce oltre 11 strumenti in un'unica applicazione web. Dalla conversione tra basi numeriche (da base 2 a base 36) all'encoding Base64, dalla generazione di hash alla manipolazione di colori, timestamp, URL e JWT — tutto accessibile da un'interfaccia moderna, veloce e installabile come PWA.
 
-#### **7 Nuovi Converter**
-1. **Base64 Encoder/Decoder** - Codifica e decodifica Base64, supporto file
-2. **Hash Generator** - MD5, SHA-1, SHA-256, SHA-512 + File hashing
-3. **Color Converter** - HEX ↔ RGB ↔ HSL ↔ HSV ↔ CMYK + Color picker
-4. **Timestamp Converter** - Unix ↔ ISO 8601 ↔ RFC 2822 + Relative time
-5. **URL Encoder/Decoder** - URL encoding + Query parser + Slugify
-6. **JWT Decoder** - Analisi e validazione JSON Web Tokens
-7. **JSON Formatter** - Formatta, minifica, valida e ordina JSON
+L'applicazione e disponibile in italiano e inglese, funziona completamente offline dopo la prima installazione ed e pensata per sviluppatori, studenti di informatica e chiunque lavori quotidianamente con conversioni di dati.
 
-#### **Architettura Completamente Rinnovata**
-- ✅ **React Router** - Navigazione moderna con routing dinamico
-- ✅ **Zustand** - State management globale con persistenza
-- ✅ **Design System** - Componenti UI riutilizzabili e consistenti
-- ✅ **PWA Support** - Installabile e funzionamento offline
-- ✅ **i18n Ready** - Supporto multilingua (IT/EN)
-- ✅ **TypeScript Strict** - Type-safety completo
+## Funzionalita Principali
 
-#### **UX/UI Improvements**
-- ✅ **Dashboard Interattiva** - Quick access a tutti gli strumenti
-- ✅ **Cronologia Conversioni** - Persistente con local storage
-- ✅ **Favoriti** - Salva e organizza conversioni frequenti
-- ✅ **Temi Multipli** - Dark, Light, Midnight, Sunset, Forest, Ocean
-- ✅ **Accessibilità** - WCAG 2.1 AA compliant
-- ✅ **Responsive** - Ottimizzato per mobile, tablet e desktop
-- ✅ **Performance** - Code splitting e lazy loading
-- ✅ **Keyboard Navigation** - Supporto completo da tastiera
+- **Conversione basi numeriche** — Supporto completo da base 2 a base 36 con visualizzazione binaria, ottale, decimale, esadecimale
+- **Base64 Encoder/Decoder** — Codifica e decodifica di testo e file
+- **ASCII/Unicode** — Tabella completa con ricerca e conversione
+- **Generatore Hash** — MD5, SHA-1, SHA-256, SHA-512 e altri algoritmi
+- **Color Converter** — Conversione tra HEX, RGB, HSL, CMYK con color picker visuale
+- **Timestamp Converter** — Conversione Unix timestamp, ISO 8601 e formati personalizzati
+- **URL Encoder/Decoder** — Encoding e decoding di URL
+- **JWT Decoder** — Decodifica e ispezione di JSON Web Token
+- **JSON Formatter** — Formattazione e validazione JSON
+- **QR Code Generator** — Generazione di codici QR da testo
+- **Multilingua** — Interfaccia disponibile in italiano e inglese
+- **PWA** — Installabile e funzionante offline
+- **Dark mode** — Tema chiaro e scuro
 
-## 📋 Indice
+## Tech Stack
 
-- [Caratteristiche](#-caratteristiche)
-- [Strumenti Disponibili](#-strumenti-disponibili)
-- [Tecnologie](#-tecnologie)
-- [Installazione](#-installazione)
-- [Utilizzo](#-utilizzo)
-- [Struttura Progetto](#-struttura-progetto)
-- [Build e Deploy](#-build-e-deploy)
-- [Contribuire](#-contribuire)
-- [Roadmap](#-roadmap)
+| Tecnologia | Utilizzo |
+|:--|:--|
+| ![React](https://img.shields.io/badge/React_18-61dafb?logo=react&logoColor=white) | Framework UI |
+| ![TypeScript](https://img.shields.io/badge/TypeScript_5-3178c6?logo=typescript&logoColor=white) | Linguaggio tipizzato |
+| ![Vite](https://img.shields.io/badge/Vite_5-646cff?logo=vite&logoColor=white) | Build tool |
+| ![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-06b6d4?logo=tailwindcss&logoColor=white) | Styling |
+| ![Zustand](https://img.shields.io/badge/Zustand-433e38) | State management |
+| ![i18next](https://img.shields.io/badge/i18next-26a69a) | Internazionalizzazione |
+| ![PWA](https://img.shields.io/badge/PWA-5a0fc8) | Offline e installabilita |
 
-## 🎯 Caratteristiche
+## Requisiti
 
-### Core Features
-- 🔄 **11 Strumenti di Conversione** - Tutto quello che serve in un'unica app
-- ⚡ **Conversioni Real-Time** - Risultati istantanei mentre digiti
-- 💾 **Cronologia Persistente** - Tutte le conversioni salvate localmente
-- 📋 **Copy-to-Clipboard** - Copia rapida con feedback visivo
-- 🎨 **6 Temi Predefiniti** - Personalizza l'aspetto dell'app
-- 🌐 **Multilingua** - Italiano e Inglese
-- 📱 **PWA** - Installabile come app nativa
-- 🔒 **100% Privacy** - Tutto funziona localmente, zero tracking
+- **Node.js** >= 18
+- **npm** >= 9 (oppure bun)
 
-### Performance & Quality
-- ⚡ **Lighthouse Score > 95**
-- 🎯 **Type-Safe** - TypeScript strict mode
-- ♿ **Accessible** - WCAG 2.1 AA compliant
-- 🧪 **Tested** - Unit tests con Vitest
-- 📦 **Optimized** - Code splitting e lazy loading
-- 🎨 **Modern Design** - Glassmorphism UI
-
-## 🛠 Strumenti Disponibili
-
-### Conversioni Numeriche
-| Strumento | Descrizione | Features |
-|-----------|-------------|----------|
-| **Basi Numeriche** | Converti tra basi 2-36 | Supporto prefissi (0b, 0x, 0o), base personalizzata |
-| **Virgola Mobile** | IEEE 754 Float32/64 | Visualizzazione bit, Fixed-point Q notation |
-
-### Encoding & Decoding
-| Strumento | Descrizione | Features |
-|-----------|-------------|----------|
-| **ASCII** | Testo ↔ ASCII | Tabella completa, filtri categoria, dettagli caratteri |
-| **Unicode** | Testo ↔ Unicode | Supporto emoji, dettagli code point, tabella Unicode |
-| **Base64** | Base64 encoding | File upload, image preview |
-| **URL** | URL encoding | Query parser, slug generator |
-
-### Sicurezza & Crypto
-| Strumento | Descrizione | Features |
-|-----------|-------------|----------|
-| **Hash Generator** | Hashing crittografico | MD5, SHA-1, SHA-256, SHA-512, file hashing |
-| **JWT Decoder** | Analisi JWT | Validazione timestamp, claims details |
-
-### Utility
-| Strumento | Descrizione | Features |
-|-----------|-------------|----------|
-| **Color Converter** | Conversione colori | HEX, RGB, HSL, HSV, CMYK, color picker |
-| **Timestamp** | Conversione date | Unix, ISO 8601, RFC 2822, relative time |
-| **JSON Formatter** | JSON tools | Format, minify, validate, sort keys |
-
-## 🏗 Tecnologie
-
-### Frontend Core
-```json
-{
-  "react": "^18.3.1",
-  "typescript": "^5.5.3",
-  "vite": "^5.4.2",
-  "tailwindcss": "^3.4.1"
-}
-```
-
-### Routing & State
-```json
-{
-  "react-router-dom": "^6.20.0",
-  "zustand": "^4.4.7"
-}
-```
-
-### Features
-```json
-{
-  "lucide-react": "^0.344.0",    // Icons
-  "qrcode": "^1.5.3",            // QR generation
-  "i18next": "^23.7.6",          // Internationalization
-  "react-window": "^1.8.10"      // Virtual scrolling
-}
-```
-
-### PWA & Build
-```json
-{
-  "vite-plugin-pwa": "^0.17.4",
-  "workbox-window": "^7.0.0"
-}
-```
-
-## 🚀 Installazione
-
-### Prerequisiti
-- Node.js >= 18.x
-- npm >= 9.x (o yarn >= 1.22.x)
-
-### Setup
+## Installazione
 
 ```bash
-# Clone repository
 git clone https://github.com/carellonicolo/base-converter.git
 cd base-converter
-
-# Install dependencies
 npm install
-
-# Start dev server
 npm run dev
 ```
 
-L'app sarà disponibile su `http://localhost:5173/`
+L'applicazione sara disponibile su `http://localhost:8080`.
 
-## 💻 Utilizzo
+## Utilizzo
 
-### Comandi Disponibili
+1. Seleziona lo strumento desiderato dal menu laterale
+2. Inserisci i dati nel campo di input
+3. I risultati vengono calcolati in tempo reale
+4. Utilizza i pulsanti di copia per trasferire i risultati negli appunti
 
-```bash
-npm run dev        # Dev server con HMR
-npm run build      # Build produzione
-npm run preview    # Preview build locale
-npm run lint       # Linter ESLint
-npm run typecheck  # TypeScript check
-npm run test       # Run tests
-```
-
-### Quick Start
-
-1. **Apri Dashboard** - Visualizza tutti gli strumenti disponibili
-2. **Scegli Strumento** - Click su un converter
-3. **Inserisci Input** - Conversione automatica real-time
-4. **Copia Risultato** - Click sul bottone copia
-
-### Keyboard Shortcuts (Coming Soon)
-- `Ctrl+K` - Command Palette
-- `Ctrl+H` - Cronologia
-- `Ctrl+N` - Nuova conversione
-- `Ctrl+D` - Aggiungi a preferiti
-
-## 📂 Struttura Progetto
+## Struttura del Progetto
 
 ```
 base-converter/
-├── public/
-│   ├── manifest.json          # PWA manifest
-│   ├── sw.js                  # Service Worker
-│   └── calculator.svg         # App icon
 ├── src/
-│   ├── components/
-│   │   ├── ui/                # Design System
-│   │   │   ├── Button.tsx
-│   │   │   ├── Input.tsx
-│   │   │   ├── Card.tsx
-│   │   │   ├── Modal.tsx
-│   │   │   ├── Select.tsx
-│   │   │   └── Textarea.tsx
-│   │   ├── converters/        # Converter components
-│   │   │   ├── Base64Converter.tsx
-│   │   │   ├── HashGenerator.tsx
-│   │   │   ├── ColorConverter.tsx
-│   │   │   ├── TimestampConverter.tsx
-│   │   │   ├── URLConverter.tsx
-│   │   │   ├── JWTDecoder.tsx
-│   │   │   └── JSONFormatter.tsx
-│   │   ├── shared/            # Shared components
-│   │   │   ├── CopyButton.tsx
-│   │   │   └── ErrorBoundary.tsx
-│   │   ├── Dashboard.tsx      # Main dashboard
-│   │   ├── BaseConverter.tsx
-│   │   ├── AsciiConverter.tsx
-│   │   ├── UnicodeConverter.tsx
-│   │   └── FloatingPointConverter.tsx
-│   ├── hooks/                 # Custom hooks
-│   │   ├── useCopyToClipboard.ts
-│   │   ├── useDebounce.ts
-│   │   ├── useLocalStorage.ts
-│   │   ├── useTheme.ts
-│   │   ├── useHistory.ts
-│   │   └── useKeyboardShortcut.ts
-│   ├── store/                 # Zustand stores
-│   │   ├── useConversionStore.ts
-│   │   ├── useHistoryStore.ts
-│   │   └── useSettingsStore.ts
-│   ├── utils/
-│   │   ├── conversions/       # Conversion logic
-│   │   │   ├── base.ts
-│   │   │   ├── base64.ts
-│   │   │   ├── hash.ts
-│   │   │   ├── color.ts
-│   │   │   ├── timestamp.ts
-│   │   │   ├── url.ts
-│   │   │   ├── jwt.ts
-│   │   │   └── json.ts
-│   │   └── validation.ts
-│   ├── types/                 # TypeScript types
-│   │   ├── conversion.ts
-│   │   ├── history.ts
-│   │   ├── settings.ts
-│   │   └── theme.ts
-│   ├── i18n/                  # Internationalization
-│   │   └── config.ts
-│   ├── App.tsx                # Main app with routing
-│   ├── index.css              # Global styles
-│   └── main.tsx               # Entry point
-├── package.json
-├── tsconfig.json
-├── vite.config.ts
-├── tailwind.config.js
-└── README.md
+│   ├── components/     # Componenti React per ogni convertitore
+│   ├── store/          # Store Zustand
+│   ├── lib/            # Logica di conversione
+│   ├── i18n/           # File di traduzione IT/EN
+│   ├── pages/          # Pagine dell'applicazione
+│   └── hooks/          # Custom hooks
+├── public/             # Asset statici e manifest PWA
+├── index.html          # Entry point HTML
+└── vite.config.ts      # Configurazione Vite + PWA
 ```
 
-## 🏗 Build e Deploy
-
-### Build di Produzione
+## Deploy
 
 ```bash
 npm run build
 ```
 
-Genera build ottimizzata in `dist/`:
-- ✅ Code splitting
-- ✅ Tree shaking
-- ✅ Asset optimization
-- ✅ Service Worker generation
+La cartella `dist/` e deployabile su Cloudflare Pages, Netlify, Vercel o qualsiasi hosting statico.
 
-### Deploy
+## Contribuire
 
-#### Netlify
-```bash
-npm run build
-# Drag & drop dist/ folder su netlify.com
-```
+I contributi sono benvenuti! Consulta le [linee guida per contribuire](CONTRIBUTING.md) per maggiori dettagli.
 
-#### Vercel
-```bash
-npm run build
-npx vercel --prod
-```
+## Licenza
 
-#### GitHub Pages
-```bash
-npm run build
-# Configure repo settings per GitHub Pages
-```
+Distribuito con licenza MIT. Vedi il file [LICENSE](LICENSE) per i dettagli completi.
 
-## 🤝 Contribuire
+## Autore
 
-I contributi sono benvenuti! Segui questi step:
-
-1. Fork del progetto
-2. Crea feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit changes (`git commit -m 'Add AmazingFeature'`)
-4. Push to branch (`git push origin feature/AmazingFeature`)
-5. Apri Pull Request
-
-### Linee Guida
-- Usa TypeScript strict mode
-- Segui convenzioni ESLint
-- Aggiungi test per nuove features
-- Aggiorna documentazione
-- Mantieni design system consistente
-
-## 🗺 Roadmap
-
-### v2.1 (Q1 2025)
-- [ ] QR Code Generator completo
-- [ ] Regex Tester con highlights
-- [ ] IP Address Converter
-- [ ] Command Palette (Ctrl+K)
-- [ ] Advanced History con tags
-- [ ] Export/Import settings
-
-### v2.2 (Q2 2025)
-- [ ] Password Generator
-- [ ] Markdown Preview
-- [ ] Diff Tool
-- [ ] CSV to JSON converter
-- [ ] API integrations
-- [ ] Cloud sync (optional)
-
-### v3.0 (Future)
-- [ ] AI-Powered suggestions
-- [ ] Browser extension
-- [ ] Desktop app (Electron)
-- [ ] Mobile app (React Native)
-- [ ] Collaboration features
-- [ ] Plugin system
-
-## 📊 Statistiche Progetto
-
-- 📝 **~8,000 righe** di codice TypeScript/TSX
-- 🧩 **30+ componenti** React
-- 🎨 **6 temi** personalizzati
-- 🔧 **11 strumenti** di conversione
-- 🌐 **2 lingue** supportate
-- ⚡ **100%** TypeScript strict mode
-- 📱 **100%** responsive design
-- ♿ **WCAG 2.1 AA** compliant
-
-## 📄 Licenza
-
-Questo progetto è stato creato per scopi educativi e professionali.
-
-## 👤 Autore
-
-**Prof. Carello Nicolò**
-
-📧 Email: [info@nicolocarello.it](mailto:info@nicolocarello.it)
-🌐 Web: [nicolocarello.it](https://app.nicolocarello.it)
+**Nicolo Carello**
+- GitHub: [@carellonicolo](https://github.com/carellonicolo)
+- Website: [nicolocarello.it](https://nicolocarello.it)
 
 ---
 
-## 🙏 Credits
+<sub>Sviluppato con l'ausilio dell'intelligenza artificiale.</sub>
 
-- [React](https://reactjs.org/) - UI Library
-- [Vite](https://vitejs.dev/) - Build tool
-- [Tailwind CSS](https://tailwindcss.com/) - CSS framework
-- [Lucide](https://lucide.dev/) - Icons
-- [Zustand](https://zustand-demo.pmnd.rs/) - State management
+## Progetti Correlati
 
----
+Questo progetto fa parte di una collezione di strumenti didattici e applicazioni open-source:
 
-<div align="center">
-
-**Sviluppato con ❤️ da Prof. Carello Nicolò**
-
-[⬆ Torna su](#-base-converter-pro-v20)
-
-</div>
+| Progetto | Descrizione |
+|:--|:--|
+| [DFA Visual Editor](https://github.com/carellonicolo/AFS) | Editor visuale per automi DFA |
+| [Turing Machine](https://github.com/carellonicolo/Turing-Machine) | Simulatore di Macchina di Turing |
+| [Scheduler](https://github.com/carellonicolo/Scheduler) | Simulatore di scheduling CPU |
+| [Subnet Calculator](https://github.com/carellonicolo/Subnet) | Calcolatore subnet IPv4/IPv6 |
+| [Gioco del Lotto](https://github.com/carellonicolo/giocodellotto) | Simulatore Lotto e SuperEnalotto |
+| [MicroASM](https://github.com/carellonicolo/microasm) | Simulatore assembly |
+| [Flow Charts](https://github.com/carellonicolo/flow-charts) | Editor di diagrammi di flusso |
+| [Cypher](https://github.com/carellonicolo/cypher) | Toolkit di crittografia |
+| [Snake](https://github.com/carellonicolo/snake) | Snake game retro |
+| [Pong](https://github.com/carellonicolo/pongcarello) | Pong game |
+| [Calculator](https://github.com/carellonicolo/calculator-carello) | Calcolatrice scientifica |
+| [IPSC Score](https://github.com/carellonicolo/IPSC) | Calcolatore punteggi IPSC |
+| [Quiz](https://github.com/carellonicolo/quiz) | Piattaforma quiz scolastici |
+| [Carello Hub](https://github.com/carellonicolo/carello-hub) | Dashboard educativa |
+| [Prof Carello](https://github.com/carellonicolo/prof-carello) | Gestionale lezioni private |
+| [DOCSITE](https://github.com/carellonicolo/DOCSITE) | Piattaforma documentale |
