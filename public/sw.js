@@ -7,7 +7,7 @@
  *    (i nomi file cambiano ad ogni deploy → nessun rischio di servire JS vecchio).
  *  - Bump di CACHE_VERSION ⇒ le cache vecchie vengono eliminate all'activate.
  */
-const CACHE_VERSION = 'bc-cache-v1';
+const CACHE_VERSION = 'bc-cache-v2';
 const APP_SHELL = ['/', '/favicon.svg', '/icon.svg', '/manifest.webmanifest'];
 
 self.addEventListener('install', (event) => {
@@ -46,7 +46,7 @@ self.addEventListener('fetch', (event) => {
     caches.match(req).then((cached) => {
       const network = fetch(req)
         .then((res) => {
-          if (res && res.status === 200 && res.type === 'basic') {
+          if (res && res.status === 200 && res.type === 'basic' && isCacheable(url, res)) {
             const copy = res.clone();
             caches.open(CACHE_VERSION).then((cache) => cache.put(req, copy));
           }
@@ -57,3 +57,15 @@ self.addEventListener('fetch', (event) => {
     })
   );
 });
+
+/**
+ * Un asset sotto /assets/ non deve MAI essere memorizzato se la risposta è
+ * HTML: significa che il file non esiste più e il fallback SPA di Cloudflare
+ * Pages ha restituito index.html con status 200. Metterlo in cache
+ * congelerebbe l'errore (pagina senza CSS) anche dopo un nuovo deploy.
+ */
+function isCacheable(url, res) {
+  if (!url.pathname.startsWith('/assets/')) return true;
+  const type = res.headers.get('content-type') || '';
+  return !type.includes('text/html');
+}

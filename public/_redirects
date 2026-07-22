@@ -1,1 +1,11 @@
+# Fallback SPA per le rotte dell'app (/convertitore, /palestra, …).
+#
+# NOTA: un asset inesistente sotto /assets/ ricade qui e riceve "200 +
+# index.html" invece di 404 (Cloudflare Pages non supporta lo status 404 nei
+# _redirects: verificato). È innocuo a regime — l'HTML referenzia sempre gli
+# hash correnti — ma diventa un problema se un SERVICE WORKER VECCHIO richiede
+# asset non più esistenti: con nosniff il browser rifiuta l'HTML servito come
+# .css e la pagina appare senza stile. Per questo il nuovo service worker
+# prende il controllo subito (skipWaiting + claim) e src/main.tsx ricarica una
+# volta al cambio di controller. Vedi public/sw.js.
 /*    /index.html    200
