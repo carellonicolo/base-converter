@@ -1,0 +1,20 @@
+# Configurazione del progetto Cloudflare Pages "base-converter".
+#
+# Questo file è la FONTE DI VERITÀ dei binding: al deploy sostituisce le
+# variabili/binding impostati a mano nel dashboard.
+#
+# D1: si riusa il database esistente `ccna1` (limite piano free quasi
+# raggiunto); tutte le tabelle di questa app sono prefissate `bc_`,
+# quindi non interferiscono con le tabelle di CCNA1/Calcolatrice.
+#
+# Migrazioni: applicare a mano con
+#   npx wrangler d1 execute ccna1 --remote --file=migrations/0001_bc_init.sql
+
+name = "base-converter"
+pages_build_output_dir = "dist"
+compatibility_date = "2026-07-01"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "ccna1"
+database_id = "c3b75339-db87-44b4-8ca8-45998b4a4253"

@@ -1,67 +1,59 @@
-// Service Worker for Base Converter Pro
-const CACHE_NAME = 'base-converter-v2.0.0';
-const urlsToCache = [
-  '/',
-  '/index.html',
-  '/manifest.json',
-  '/calculator.svg',
-];
+/* Service worker Base Converter — conservativo (stesso schema di VLSM).
+ *
+ * Regole:
+ *  - /api/* NON viene MAI messo in cache (integrità di verifiche, sessioni, SSO).
+ *  - Navigazioni (SPA): network-first, con fallback alla home in cache se offline.
+ *  - Asset statici hashati (/assets/*) e altri GET same-origin: stale-while-revalidate
+ *    (i nomi file cambiano ad ogni deploy → nessun rischio di servire JS vecchio).
+ *  - Bump di CACHE_VERSION ⇒ le cache vecchie vengono eliminate all'activate.
+ */
+const CACHE_VERSION = 'bc-cache-v1';
+const APP_SHELL = ['/', '/favicon.svg', '/icon.svg', '/manifest.webmanifest'];
 
-// Install event
 self.addEventListener('install', (event) => {
   event.waitUntil(
-    caches.open(CACHE_NAME)
-      .then((cache) => {
-        console.log('Cache opened');
-        return cache.addAll(urlsToCache);
-      })
+    caches.open(CACHE_VERSION)
+      .then((cache) => cache.addAll(APP_SHELL))
+      .then(() => self.skipWaiting())
+      .catch(() => self.skipWaiting())
   );
-  self.skipWaiting();
 });
 
-// Activate event
 self.addEventListener('activate', (event) => {
   event.waitUntil(
-    caches.keys().then((cacheNames) => {
-      return Promise.all(
-        cacheNames.map((cacheName) => {
-          if (cacheName !== CACHE_NAME) {
-            console.log('Deleting old cache:', cacheName);
-            return caches.delete(cacheName);
-          }
-        })
-      );
-    })
+    caches.keys()
+      .then((keys) => Promise.all(keys.filter((k) => k !== CACHE_VERSION).map((k) => caches.delete(k))))
+      .then(() => self.clients.claim())
   );
-  self.clients.claim();
 });
 
-// Fetch event
 self.addEventListener('fetch', (event) => {
+  const req = event.request;
+  if (req.method !== 'GET') return;
+
+  const url = new URL(req.url);
+  if (url.origin !== self.location.origin) return;   // solo same-origin
+  if (url.pathname.startsWith('/api/')) return;       // mai cache delle API
+
+  // Navigazioni SPA: prova la rete, altrimenti la home in cache (offline).
+  if (req.mode === 'navigate') {
+    event.respondWith(fetch(req).catch(() => caches.match('/')));
+    return;
+  }
+
+  // Altri GET same-origin (asset hashati, icone…): stale-while-revalidate.
   event.respondWith(
-    caches.match(event.request)
-      .then((response) => {
-        // Cache hit - return response
-        if (response) {
-          return response;
-        }
-
-        return fetch(event.request).then((response) => {
-          // Check if valid response
-          if (!response || response.status !== 200 || response.type !== 'basic') {
-            return response;
+    caches.match(req).then((cached) => {
+      const network = fetch(req)
+        .then((res) => {
+          if (res && res.status === 200 && res.type === 'basic') {
+            const copy = res.clone();
+            caches.open(CACHE_VERSION).then((cache) => cache.put(req, copy));
           }
-
-          // Clone the response
-          const responseToCache = response.clone();
-
-          caches.open(CACHE_NAME)
-            .then((cache) => {
-              cache.put(event.request, responseToCache);
-            });
-
-          return response;
-        });
-      })
+          return res;
+        })
+        .catch(() => cached);
+      return cached || network;
+    })
   );
 });

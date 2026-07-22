@@ -2,9 +2,36 @@
 <html lang="it">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/calculator.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Base Converter</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <title>Base Converter — Prof. Carello</title>
+    <meta
+      name="description"
+      content="Basi numeriche e codifiche: convertitore con passaggi svolti, aritmetica in base, complemento a due, IEEE 754, ASCII/Unicode, palestra di esercizi e verifiche."
+    />
+
+    <!-- Carello shell (top bar + launcher). Rimuovi questo script per rollback. -->
+    <script src="/carello-shell.js" defer></script>
+
+    <!-- PWA -->
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <meta name="theme-color" content="#e0662b" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="Base Converter" />
+    <script>
+      (function () {
+        try {
+          var stored = localStorage.getItem('bc_theme');
+          var theme = stored || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+          document.documentElement.setAttribute('data-theme', theme);
+          if (theme === 'dark') document.documentElement.classList.add('dark');
+        } catch (e) {
+          document.documentElement.setAttribute('data-theme', 'light');
+        }
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>

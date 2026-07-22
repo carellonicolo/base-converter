@@ -1,3 +1,4 @@
+# Logs
 logs
 *.log
 npm-debug.log*
@@ -10,7 +11,11 @@ node_modules
 dist
 dist-ssr
 *.local
+.env
+.dev.vars
+.wrangler
 
+# Editor directories and files
 .vscode/*
 !.vscode/extensions.json
 .idea
@@ -20,4 +25,5 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
-.env
+
+tsconfig.tsbuildinfo

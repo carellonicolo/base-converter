@@ -1,0 +1,20 @@
+{
+  "name": "Base Converter — Prof. Carello",
+  "short_name": "Base Converter",
+  "description": "Basi numeriche e codifiche: convertitore con passaggi svolti, aritmetica in base, IEEE 754, ASCII/Unicode, palestra di esercizi e verifiche.",
+  "lang": "it",
+  "id": "/",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#1a1714",
+  "theme_color": "#e0662b",
+  "categories": ["education"],
+  "icons": [
+    { "src": "/icon.svg", "type": "image/svg+xml", "sizes": "any", "purpose": "any" },
+    { "src": "/icon-192.png", "type": "image/png", "sizes": "192x192", "purpose": "any" },
+    { "src": "/icon-512.png", "type": "image/png", "sizes": "512x512", "purpose": "any" },
+    { "src": "/icon-512.png", "type": "image/png", "sizes": "512x512", "purpose": "maskable" }
+  ]
+}

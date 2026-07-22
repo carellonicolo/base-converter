@@ -1,0 +1,22 @@
+/*
+  X-Frame-Options: DENY
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=(), usb=(), interest-cohort=()
+  Strict-Transport-Security: max-age=31536000
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: https://auth.nicolocarello.it; connect-src 'self' https://nicolocarello.it https://unpkg.com https://auth.nicolocarello.it; font-src 'self' data: https://fonts.gstatic.com; worker-src 'self'; object-src 'none'; base-uri 'self'; frame-ancestors 'none'; manifest-src 'self'; form-action 'self'
+
+# NOTE CSP:
+#  - style-src/font-src consentono Google Fonts (Lexend + JetBrains Mono del tema Carello).
+#  - connect-src consente unpkg.com e nicolocarello.it perché la carello-shell
+#    (header unificato condiviso con le altre app) scarica le icone Lucide e la
+#    lista app dell'Hub. NON modificare la shell: allarga qui semmai gli origin.
+#  - img-src consente auth.nicolocarello.it per la foto profilo nell'avatar della shell.
+
+# Il service worker non deve essere messo in cache dal browser/CDN,
+# così gli aggiornamenti (e i bump di versione) arrivano subito.
+/sw.js
+  Cache-Control: no-cache
+
+/manifest.webmanifest
+  Content-Type: application/manifest+json; charset=utf-8

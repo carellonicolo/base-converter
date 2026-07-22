@@ -1,135 +1,108 @@
-# Base Converter Pro
+# Base Converter
 
-> Suite completa di conversione: basi numeriche, encoding, hash, colori, timestamp e molto altro
+> Basi numeriche e codifiche — toolkit didattico del Prof. Nicolò Carello
 
-[![Licenza MIT](https://img.shields.io/badge/Licenza-MIT-blue.svg)](LICENSE)
-[![React](https://img.shields.io/badge/React-18-61dafb?logo=react&logoColor=white)](https://reactjs.org/)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5-3178c6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
-[![Vite](https://img.shields.io/badge/Vite-5-646cff?logo=vite&logoColor=white)](https://vitejs.dev/)
-[![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-3-06b6d4?logo=tailwindcss&logoColor=white)](https://tailwindcss.com/)
-[![PWA](https://img.shields.io/badge/PWA-Installabile-5a0fc8?logo=pwa&logoColor=white)](https://web.dev/progressive-web-apps/)
-[![i18n](https://img.shields.io/badge/i18n-IT%20%7C%20EN-yellow)](https://www.i18next.com/)
-[![GitHub stars](https://img.shields.io/github/stars/carellonicolo/base-converter?style=social)](https://github.com/carellonicolo/base-converter)
-[![GitHub issues](https://img.shields.io/github/issues/carellonicolo/base-converter)](https://github.com/carellonicolo/base-converter/issues)
+Strumento per capire (non solo calcolare) come i numeri e il testo vivono dentro
+il computer: conversioni di base con i **passaggi svolti come sul quaderno**,
+aritmetica in colonna, complemento a due, IEEE 754, ASCII/Unicode, una palestra
+di esercizi con traguardi e le **verifiche ufficiali** con correzione automatica.
 
-## Panoramica
+Fa parte dell'infrastruttura di app didattiche su `nicolocarello.it` e ne
+condivide grafica, header unificato e login SSO.
 
-Base Converter Pro e una suite di conversione multi-funzionale che riunisce oltre 11 strumenti in un'unica applicazione web. Dalla conversione tra basi numeriche (da base 2 a base 36) all'encoding Base64, dalla generazione di hash alla manipolazione di colori, timestamp, URL e JWT — tutto accessibile da un'interfaccia moderna, veloce e installabile come PWA.
+- **Produzione**: [converter.nicolocarello.it](https://converter.nicolocarello.it)
+  (alias: `baseconverter.nicolocarello.it`)
+- **Deploy**: automatico su Cloudflare Pages a ogni push su `main`
 
-L'applicazione e disponibile in italiano e inglese, funziona completamente offline dopo la prima installazione ed e pensata per sviluppatori, studenti di informatica e chiunque lavori quotidianamente con conversioni di dati.
+## Moduli
 
-## Funzionalita Principali
-
-- **Conversione basi numeriche** — Supporto completo da base 2 a base 36 con visualizzazione binaria, ottale, decimale, esadecimale
-- **Base64 Encoder/Decoder** — Codifica e decodifica di testo e file
-- **ASCII/Unicode** — Tabella completa con ricerca e conversione
-- **Generatore Hash** — MD5, SHA-1, SHA-256, SHA-512 e altri algoritmi
-- **Color Converter** — Conversione tra HEX, RGB, HSL, CMYK con color picker visuale
-- **Timestamp Converter** — Conversione Unix timestamp, ISO 8601 e formati personalizzati
-- **URL Encoder/Decoder** — Encoding e decoding di URL
-- **JWT Decoder** — Decodifica e ispezione di JSON Web Token
-- **JSON Formatter** — Formattazione e validazione JSON
-- **QR Code Generator** — Generazione di codici QR da testo
-- **Multilingua** — Interfaccia disponibile in italiano e inglese
-- **PWA** — Installabile e funzionante offline
-- **Dark mode** — Tema chiaro e scuro
-
-## Tech Stack
-
-| Tecnologia | Utilizzo |
+| Modulo | Cosa fa |
 |:--|:--|
-| ![React](https://img.shields.io/badge/React_18-61dafb?logo=react&logoColor=white) | Framework UI |
-| ![TypeScript](https://img.shields.io/badge/TypeScript_5-3178c6?logo=typescript&logoColor=white) | Linguaggio tipizzato |
-| ![Vite](https://img.shields.io/badge/Vite_5-646cff?logo=vite&logoColor=white) | Build tool |
-| ![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-06b6d4?logo=tailwindcss&logoColor=white) | Styling |
-| ![Zustand](https://img.shields.io/badge/Zustand-433e38) | State management |
-| ![i18next](https://img.shields.io/badge/i18next-26a69a) | Internazionalizzazione |
-| ![PWA](https://img.shields.io/badge/PWA-5a0fc8) | Offline e installabilita |
+| **Convertitore di basi** | Basi 2–36, interi e frazionari, negativi, precisione arbitraria (BigInt), raggruppamento a nibble/byte, rilevamento delle frazioni periodiche. Passaggi: divisioni successive, moltiplicazioni successive, pesi posizionali. |
+| **Aritmetica in base** | Addizione, sottrazione e moltiplicazione in colonna in base 2/8/10/16, con riporti, prestiti e prodotti parziali espliciti, più controprova in base 10. |
+| **Numeri con segno** | Complemento a due e a uno, modulo e segno, eccesso-K su 4/8/16/32 bit. Bit cliccabili, intervallo rappresentabile, overflow, e i passaggi «inverti + aggiungi 1». |
+| **IEEE 754** | Half/single/double: campi segno, esponente e mantissa colorati e modificabili bit a bit, casi speciali (zero, denormali, ±∞, NaN) ed errore di rappresentazione reale. |
+| **Testo e codifiche** | Tabella ASCII completa, esploratore Unicode per blocchi, codifica UTF-8/16/32 byte per byte, Base64 con la scomposizione 3 byte → 24 bit → 4 sestetti, URL-encoding. |
+| **Palestra** | Esercizi generati automaticamente su tutti i moduli, tre livelli, XP e livelli, serie (streak), statistiche per argomento, 16 traguardi da sbloccare e **modalità tutor** che corregge un passaggio alla volta. |
+| **Verifiche** | Prova ufficiale con timer, correzione automatica lato server, voto in decimi e revisione domanda per domanda. |
+| **Console docente** | Configurazione per classe (moduli, difficoltà, durata, numero domande, soglia di sufficienza), risultati con export CSV e vista «in diretta» delle prove in corso. |
 
-## Requisiti
+## Accesso
 
-- **Node.js** >= 18
-- **npm** >= 9 (oppure bun)
+L'app è a **uso libero**: strumenti, teoria e palestra funzionano senza login e
+anche offline. Il login SSO (`auth.nicolocarello.it`) serve solo per:
 
-## Installazione
+- salvare i progressi della palestra su tutti i dispositivi;
+- svolgere le **verifiche ufficiali**, riservate agli account attivi con
+  **classe approvata** dal docente;
+- la console docente (`isTeacher` / `isSuperAdmin`).
+
+## Tecnologie
+
+Vite 6 · React 18 · TypeScript 5.7 (strict) · React Router 6 · Cloudflare Pages
+Functions · D1 · PWA installabile e offline. Nessun framework CSS: il tema
+Carello è scritto a mano in `src/index.css`.
+
+## Struttura
+
+```
+shared/            logica condivisa frontend + backend (la stessa che corregge le verifiche)
+  engine/          bases, arithmetic, signed, ieee754, text  (+ test)
+  exercises/       generatore deterministico di esercizi     (+ test)
+  exam/            configurazione e correzione delle prove    (+ test)
+src/
+  components/      screens/ (pagine) e ui/ (guscio e componenti condivisi)
+  hooks/           useAuth, useFocusMonitor, useCopy
+  lib/             auth SSO, progressi e badge, sync, formattazioni
+  i18n/            dizionari IT/EN
+functions/         Pages Functions: /api/profile, /api/exam/*, /api/teacher/*
+migrations/        0001_bc_init.sql (tabelle bc_* nel D1 condiviso `ccna1`)
+```
+
+Il codice in `shared/` è il **cuore didattico**: la stessa identica logica che
+lo studente usa nella palestra è quella che lo corregge in verifica, così non
+può esserci divergenza tra ciò che si impara e ciò che viene valutato.
+
+## Sviluppo
 
 ```bash
-git clone https://github.com/carellonicolo/base-converter.git
-cd base-converter
 npm install
 npm run dev
 ```
 
-L'applicazione sara disponibile su `http://localhost:8080`.
+Per lavorare anche sulle API (Pages Functions + D1), in un secondo terminale:
 
-## Utilizzo
-
-1. Seleziona lo strumento desiderato dal menu laterale
-2. Inserisci i dati nel campo di input
-3. I risultati vengono calcolati in tempo reale
-4. Utilizza i pulsanti di copia per trasferire i risultati negli appunti
-
-## Struttura del Progetto
-
+```bash
+npm run pages:dev
 ```
-base-converter/
-├── src/
-│   ├── components/     # Componenti React per ogni convertitore
-│   ├── store/          # Store Zustand
-│   ├── lib/            # Logica di conversione
-│   ├── i18n/           # File di traduzione IT/EN
-│   ├── pages/          # Pagine dell'applicazione
-│   └── hooks/          # Custom hooks
-├── public/             # Asset statici e manifest PWA
-├── index.html          # Entry point HTML
-└── vite.config.ts      # Configurazione Vite + PWA
+
+Vite inoltra `/api` a `localhost:8788`.
+
+### Verifiche di qualità
+
+```bash
+npm run build && npm test && npm run typecheck:functions
 ```
+
+`npm test` copre il motore di conversione, l'aritmetica, le rappresentazioni con
+segno, IEEE 754, le codifiche di testo, il generatore di esercizi, la correzione
+delle verifiche e il rendering di tutte le schermate pubbliche.
 
 ## Deploy
 
+Il push su `main` avvia la build su Cloudflare Pages (`dist/`). I binding sono
+dichiarati in `wrangler.toml` (D1 `ccna1`, tabelle prefissate `bc_`).
+
+Alla **prima messa in produzione** va applicata una volta la migrazione:
+
 ```bash
-npm run build
+npx wrangler d1 execute ccna1 --remote --file=migrations/0001_bc_init.sql
 ```
-
-La cartella `dist/` e deployabile su Cloudflare Pages, Netlify, Vercel o qualsiasi hosting statico.
-
-## Contribuire
-
-I contributi sono benvenuti! Consulta le [linee guida per contribuire](CONTRIBUTING.md) per maggiori dettagli.
 
 ## Licenza
 
-Distribuito con licenza MIT. Vedi il file [LICENSE](LICENSE) per i dettagli completi.
-
-## Autore
-
-**Nicolo Carello**
-- GitHub: [@carellonicolo](https://github.com/carellonicolo)
-- Website: [nicolocarello.it](https://nicolocarello.it)
+MIT — vedi [LICENSE](LICENSE).
 
 ---
 
 <sub>Sviluppato con l'ausilio dell'intelligenza artificiale.</sub>
-
-## Progetti Correlati
-
-Questo progetto fa parte di una collezione di strumenti didattici e applicazioni open-source:
-
-| Progetto | Descrizione |
-|:--|:--|
-| [DFA Visual Editor](https://github.com/carellonicolo/AFS) | Editor visuale per automi DFA |
-| [Turing Machine](https://github.com/carellonicolo/Turing-Machine) | Simulatore di Macchina di Turing |
-| [Scheduler](https://github.com/carellonicolo/Scheduler) | Simulatore di scheduling CPU |
-| [Subnet Calculator](https://github.com/carellonicolo/Subnet) | Calcolatore subnet IPv4/IPv6 |
-| [Gioco del Lotto](https://github.com/carellonicolo/giocodellotto) | Simulatore Lotto e SuperEnalotto |
-| [MicroASM](https://github.com/carellonicolo/microasm) | Simulatore assembly |
-| [Flow Charts](https://github.com/carellonicolo/flow-charts) | Editor di diagrammi di flusso |
-| [Cypher](https://github.com/carellonicolo/cypher) | Toolkit di crittografia |
-| [Snake](https://github.com/carellonicolo/snake) | Snake game retro |
-| [Pong](https://github.com/carellonicolo/pongcarello) | Pong game |
-| [Calculator](https://github.com/carellonicolo/calculator-carello) | Calcolatrice scientifica |
-| [IPSC Score](https://github.com/carellonicolo/IPSC) | Calcolatore punteggi IPSC |
-| [Quiz](https://github.com/carellonicolo/quiz) | Piattaforma quiz scolastici |
-| [Carello Hub](https://github.com/carellonicolo/carello-hub) | Dashboard educativa |
-| [Prof Carello](https://github.com/carellonicolo/prof-carello) | Gestionale lezioni private |
-| [DOCSITE](https://github.com/carellonicolo/DOCSITE) | Piattaforma documentale |
