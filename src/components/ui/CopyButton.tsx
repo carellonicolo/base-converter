@@ -15,8 +15,7 @@ export function CopyButton({ value, size = 16, label = 'Copia', className }: Pro
   return (
     <button
       type="button"
-      className={`base-copy icon-btn btn-sm${className ? ` ${className}` : ''}`}
-      style={{ width: 32, height: 32, border: 'none', background: 'transparent' }}
+      className={`copy-btn${className ? ` ${className}` : ''}`}
       onClick={() => copy(value)}
       aria-label={label}
       title={label}

@@ -295,7 +295,9 @@ export function GymPage() {
           <BadgeGrid earned={progress.badges} t={t} />
         </div>
 
-        <InfoBox title={t('gym.tutorMode')} tone="tip" collapsedByDefault>
+        {/* Tono informativo come gli altri riquadri didattici: il verde
+            "tip" stonava con la palette calda e suggeriva un esito positivo. */}
+        <InfoBox title={t('gym.tutorMode')} collapsedByDefault>
           <p>{t('gym.tutorHint')}</p>
         </InfoBox>
       </div>

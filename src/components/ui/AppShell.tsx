@@ -29,10 +29,12 @@ export function AppShell({ children, back }: Props) {
         data-theme-key="bc_theme"
         data-console-url="/admin"
       />
-      <div style={{ display: 'flex', justifyContent: 'flex-end', margin: '0 0 0.75rem' }}>
+      {/* Una sola riga sotto la shell: percorso a sinistra, lingua a destra.
+          Prima la lingua stava su una banda separata e sembrava staccata. */}
+      <div className="topbar-row">
+        <div>{back}</div>
         <LangToggle />
       </div>
-      {back}
       {children}
       <Footer />
     </div>

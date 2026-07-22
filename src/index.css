@@ -129,9 +129,11 @@ code, kbd, pre, samp, .mono { font-family: var(--font-mono); }
 .bg-blob-1 { top: -180px; left: -120px; width: 520px; height: 520px; background: rgba(224, 102, 43, 0.30); animation: bg-blob-1-anim 14s ease-in-out infinite; }
 .bg-blob-2 { top: 35%; right: -180px; width: 600px; height: 600px; background: rgba(255, 138, 76, 0.26); animation: bg-blob-2-anim 11s ease-in-out infinite; }
 .bg-blob-3 { bottom: -250px; left: 30%; width: 680px; height: 680px; background: rgba(237, 138, 62, 0.22); animation: bg-blob-3-anim 17s ease-in-out infinite; }
-[data-theme='dark'] .bg-blob-1 { background: rgba(238, 123, 67, 0.34); }
-[data-theme='dark'] .bg-blob-2 { background: rgba(255, 154, 82, 0.28); }
-[data-theme='dark'] .bg-blob-3 { background: rgba(224, 102, 43, 0.24); }
+/* In dark le bolle erano troppo cariche e impastavano lo sfondo di marrone:
+   tenute più basse restano un accento caldo senza sporcare la lettura. */
+[data-theme='dark'] .bg-blob-1 { background: rgba(238, 123, 67, 0.18); }
+[data-theme='dark'] .bg-blob-2 { background: rgba(255, 154, 82, 0.14); }
+[data-theme='dark'] .bg-blob-3 { background: rgba(224, 102, 43, 0.12); }
 
 @keyframes bg-blob-1-anim { 0%{transform:translate(0,0) scale(1)} 25%{transform:translate(220px,140px) scale(1.25)} 50%{transform:translate(60px,280px) scale(.85)} 75%{transform:translate(-90px,160px) scale(1.1)} 100%{transform:translate(0,0) scale(1)} }
 @keyframes bg-blob-2-anim { 0%{transform:translate(0,0) scale(1)} 33%{transform:translate(-260px,150px) scale(1.3)} 66%{transform:translate(180px,-110px) scale(.78)} 100%{transform:translate(0,0) scale(1)} }
@@ -216,6 +218,11 @@ a { color: var(--primary); }
 .icon-btn:hover { background: var(--readonly-bg); border-color: var(--primary); }
 
 /* ---------------- Form ---------------- */
+/* ⚠️ `input:not([type])` è ESSENZIALE: un <input> senza attributo type si
+   comporta come "text" ma NON viene intercettato da input[type='text'].
+   Senza questa riga tutti i campi dell'app resterebbero con lo stile nativo
+   del browser (fondo bianco anche in dark, spigoli vivi, larghezza fissa). */
+input:not([type]),
 input[type='text'], input[type='email'], input[type='password'], input[type='number'],
 input[type='search'], input[type='tel'], input[type='url'], input[type='date'],
 textarea, select {
@@ -324,6 +331,16 @@ label { display: block; font-weight: 600; margin-bottom: 0.35rem; font-size: 0.9
    ============================================================ */
 .module { max-width: 1080px; margin: 0 auto; }
 .module-wide { max-width: 1280px; }
+/* Riga sotto la shell: breadcrumb a sinistra, selettore lingua a destra. */
+.topbar-row {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 1rem; flex-wrap: wrap; margin: 0 0 1rem;
+  min-height: 32px;
+}
+.topbar-row .breadcrumb { margin-bottom: 0; }
+.topbar-row .segmented { padding: 2px; border-radius: 999px; }
+.topbar-row .segmented button { padding: 0.25rem 0.7rem; font-size: 0.78rem; }
+
 .breadcrumb { display: flex; align-items: center; gap: 0.4rem; font-size: 0.88rem; margin-bottom: 0.75rem; color: var(--muted); flex-wrap: wrap; }
 .breadcrumb a { color: var(--primary); text-decoration: none; font-weight: 500; }
 .breadcrumb a:hover { text-decoration: underline; }
@@ -341,13 +358,16 @@ label { display: block; font-weight: 600; margin-bottom: 0.35rem; font-size: 0.9
 /* ============================================================
    SEGMENTED / TABS
    ============================================================ */
+/* Contenitore a spigoli morbidi (non a pillola): con 4+ voci il controllo va
+   a capo e una pillola gigante su due righe risultava sgraziata. I pulsanti
+   interni restano a pillola. */
 .segmented {
   display: inline-flex;
   background: var(--readonly-bg);
-  border: 1px solid var(--border);
-  border-radius: 999px;
+  border: 1px solid var(--border-strong);
+  border-radius: 14px;
   padding: 3px;
-  gap: 2px;
+  gap: 3px;
   flex-wrap: wrap;
 }
 .segmented button {
@@ -422,7 +442,17 @@ label { display: block; font-weight: 600; margin-bottom: 0.35rem; font-size: 0.9
   letter-spacing: 0.04em;
 }
 .base-value:focus { outline: none; background: transparent; }
-.base-copy { color: var(--muted); }
+/* Pulsante "copia": era quasi invisibile (solo --muted su fondo card).
+   Ora ha un'area cliccabile chiara e reagisce al passaggio del mouse. */
+.copy-btn {
+  width: 32px; height: 32px; flex-shrink: 0;
+  display: inline-flex; align-items: center; justify-content: center;
+  border: 1px solid transparent; border-radius: 8px;
+  background: transparent; color: var(--muted);
+  cursor: pointer; transition: color 0.15s, background 0.15s, border-color 0.15s;
+}
+.copy-btn:hover { color: var(--primary); background: var(--readonly-bg); border-color: var(--border-strong); }
+.copy-btn:focus-visible { outline: 2px solid var(--primary); outline-offset: 1px; }
 
 .num-display {
   font-family: var(--font-mono);
@@ -470,7 +500,10 @@ label { display: block; font-weight: 600; margin-bottom: 0.35rem; font-size: 0.9
 .bit.sign.on { background: #b5323c; border-color: #b5323c; }
 .bit.exp.on { background: #185fa5; border-color: #185fa5; }
 .bit.mant.on { background: #1f7a3c; border-color: #1f7a3c; }
-.bit-index { position: absolute; top: -1.05rem; font-size: 0.62rem; color: var(--muted); font-family: var(--font-sans); }
+.bit-index { position: absolute; top: -1.3rem; font-size: 0.68rem; color: var(--muted); font-family: var(--font-sans); }
+/* Separazione visiva tra i campi IEEE 754 (segno | esponente | mantissa):
+   didatticamente serve capire dove finisce un campo e inizia il successivo. */
+.bit-sep { margin-right: 14px; }
 .bit-legend { display: flex; gap: 1rem; flex-wrap: wrap; font-size: 0.82rem; margin-top: 0.6rem; }
 .bit-legend span { display: inline-flex; align-items: center; gap: 0.35rem; }
 .bit-legend .sw { width: 12px; height: 12px; border-radius: 3px; }
@@ -497,7 +530,9 @@ label { display: block; font-weight: 600; margin-bottom: 0.35rem; font-size: 0.9
 /* ============================================================
    PALESTRA — esercizi, statistiche, streak, badge
    ============================================================ */
-.exercise-card { max-width: 720px; margin: 0 auto; }
+/* Larghezza piena come le altre card della pagina: da centrata e più stretta
+   sembrava disallineata rispetto ai riquadri soprastanti. */
+.exercise-card { width: 100%; }
 .exercise-prompt {
   font-size: 1.15rem; line-height: 1.6; margin: 0 0 1rem;
   background: var(--readonly-bg); border-left: 4px solid var(--primary);
@@ -525,7 +560,14 @@ label { display: block; font-weight: 600; margin-bottom: 0.35rem; font-size: 0.9
 }
 
 .level-bar { display: flex; align-items: center; gap: 0.7rem; margin: 0.5rem 0 1rem; }
-.level-track { flex: 1; height: 9px; border-radius: 999px; background: var(--readonly-bg); overflow: hidden; }
+/* La traccia deve restare visibile anche a 0%: su fondo card scuro il solo
+   --readonly-bg spariva, quindi aggiungiamo un bordo di contrasto. */
+.level-track {
+  flex: 1; height: 9px; border-radius: 999px;
+  background: var(--readonly-bg);
+  border: 1px solid var(--border-strong);
+  overflow: hidden;
+}
 .level-fill { height: 100%; border-radius: 999px; background: linear-gradient(90deg, #ff8a4c, #e0662b); transition: width 0.35s ease; }
 .level-label { font-size: 0.82rem; color: var(--muted); font-variant-numeric: tabular-nums; white-space: nowrap; }
 
@@ -536,7 +578,10 @@ label { display: block; font-weight: 600; margin-bottom: 0.35rem; font-size: 0.9
   transition: transform 0.15s;
 }
 .badge-item.earned { border-color: var(--primary); }
-.badge-item.locked { opacity: 0.5; filter: grayscale(0.7); }
+/* I traguardi non ancora presi restano leggibili (devono invogliare): solo la
+   medaglia è spenta, il testo mantiene contrasto sufficiente. */
+.badge-item.locked { opacity: 0.75; }
+.badge-item.locked .badge-name { color: var(--muted); }
 .badge-item:hover { transform: translateY(-2px); }
 .badge-medal {
   width: 54px; height: 54px; margin: 0 auto 0.5rem; border-radius: 50%;
@@ -667,10 +712,25 @@ label { display: block; font-weight: 600; margin-bottom: 0.35rem; font-size: 0.9
 .chip {
   display: inline-flex; align-items: center; gap: 0.35rem;
   padding: 0.25rem 0.65rem; border-radius: 999px;
-  background: var(--readonly-bg); border: 1px solid var(--border);
+  background: var(--readonly-bg); border: 1px solid var(--border-strong);
+  color: var(--fg);
   font-size: 0.8rem; font-weight: 600;
+  white-space: nowrap; /* es. "8 bit" non deve spezzarsi su due righe */
 }
 .chip.primary { background: var(--primary-soft); color: var(--primary); border-color: transparent; }
+
+/* In dark il testo arancione su fondo bruno risultava poco leggibile:
+   schiariamo il testo e diamo un bordo che stacca dal fondo della card. */
+[data-theme='dark'] .chip.primary {
+  color: #ffb083;
+  border-color: rgba(238, 123, 67, 0.35);
+}
+[data-theme='dark'] .chip { border-color: var(--border-strong); }
+
+/* I chip usati come pulsanti (argomenti palestra, valori notevoli IEEE)
+   devono sembrare cliccabili. */
+button.chip { cursor: pointer; font-family: inherit; transition: border-color 0.15s, background 0.15s; }
+button.chip:hover { border-color: var(--primary); }
 
 /* ---------------- Responsive ---------------- */
 @media (max-width: 640px) {

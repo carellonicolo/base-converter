@@ -106,14 +106,18 @@ export function IeeePage() {
             ))}
           </div>
 
-          <div className="bit-grid" style={{ marginTop: '1.35rem' }}>
+          {/* Spazio sopra sufficiente alle etichette S/E/M, che sono in
+              posizione assoluta e altrimenti toccano la riga soprastante. */}
+          <div className="bit-grid" style={{ marginTop: '2.1rem' }}>
             {padded.split('').map((b, i) => {
               const zone = i === 0 ? 'sign' : i < mantStart ? 'exp' : 'mant';
+              // Stacco visivo dopo il bit di segno e dopo l'ultimo bit di esponente.
+              const sep = i === 0 || i === mantStart - 1 ? ' bit-sep' : '';
               return (
                 <button
                   key={i}
                   type="button"
-                  className={`bit ${zone}${b === '1' ? ' on' : ''}`}
+                  className={`bit ${zone}${b === '1' ? ' on' : ''}${sep}`}
                   onClick={() => toggleBit(i)}
                   aria-label={`bit ${spec.total - 1 - i} (${zone}) = ${b}`}
                 >
@@ -144,7 +148,17 @@ export function IeeePage() {
           <div className="card">
             <div className="stat-grid">
               <div className="stat-tile stat-good">
-                <div className="stat-value" style={{ fontSize: '1.15rem', wordBreak: 'break-all' }}>
+                {/* Il valore memorizzato può essere lunghissimo (0,1 in single ha
+                    17 cifre): rimpicciolisco il carattere invece di troncarlo,
+                    perché vederlo per intero È la lezione. */}
+                <div
+                  className="stat-value"
+                  style={{
+                    fontSize: formatValue(info.value).length > 12 ? '0.82rem' : '1.15rem',
+                    lineHeight: 1.35,
+                    wordBreak: 'break-all',
+                  }}
+                >
                   {formatValue(info.value)}
                 </div>
                 <div className="stat-label">{t('ieee.decimalValue')}</div>
