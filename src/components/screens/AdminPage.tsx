@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowLeft, Users, LogIn, Download, Save, Radio, Eye } from 'lucide-react';
+import { ArrowLeft, Users, LogIn, Download, Save, Radio, Eye, RefreshCw } from 'lucide-react';
 import { AppShell } from '../ui/AppShell';
 import { useI18n } from '../../i18n';
 import { useAuth } from '../../hooks/useAuth';
@@ -9,7 +9,7 @@ import { authFetch } from '../../lib/auth';
 import { fmtGrade, fmtDateTime, fmtClock } from '../../lib/format';
 import { moduleLabel } from '../../lib/exerciseText';
 import { MODULES, type ModuleKey, type Difficulty } from '../../../shared/exercises/generator';
-import { DEFAULT_CLASS, type ExamConfig } from '../../../shared/exam/config';
+import { DEFAULT_CLASS, DEFAULT_CONFIG, type ExamConfig } from '../../../shared/exam/config';
 
 type Tab = 'config' | 'results' | 'live';
 
@@ -54,7 +54,17 @@ export function AdminPage() {
     </div>
   );
 
-  if (!loading && !user) {
+  // Finché l'identità non è risolta non si può decidere nulla: senza questo
+  // gate la console si montava (e chiamava le API docente) anche a chi non lo è.
+  if (loading) {
+    return (
+      <AppShell back={back}>
+        <div className="card" style={{ maxWidth: 520, margin: '2rem auto' }}>{t('common.loading')}</div>
+      </AppShell>
+    );
+  }
+
+  if (!user) {
     return (
       <AppShell back={back}>
         <div className="gate">
@@ -70,7 +80,7 @@ export function AdminPage() {
     );
   }
 
-  if (!loading && user && !isTeacher) {
+  if (!isTeacher) {
     return (
       <AppShell back={back}>
         <div className="card" style={{ maxWidth: 520, margin: '2rem auto' }}>
@@ -114,23 +124,52 @@ export function AdminPage() {
 
 type Tfn = (k: string, v?: Record<string, string | number>) => string;
 
+/**
+ * Stato di attesa di una scheda della console.
+ *
+ * ⚠️ Un errore del server DEVE restare visibile: prima un 500 (per esempio
+ * tabelle `bc_*` non ancora migrate) lasciava "Caricamento…" per sempre e la
+ * console sembrava semplicemente morta, senza alcun indizio sulla causa.
+ */
+function LoadState({ t, error, onRetry }: { t: Tfn; error: string | null; onRetry: () => void }) {
+  if (!error) return <p>{t('common.loading')}</p>;
+  return (
+    <div className="feedback ko" style={{ display: 'block' }}>
+      <strong>{t('errors.loadFailed')}</strong>
+      <p className="mono" style={{ margin: '0.5rem 0 0.75rem', fontSize: '0.85rem', wordBreak: 'break-word' }}>{error}</p>
+      <button className="btn btn-sm btn-secondary" type="button" onClick={onRetry}>
+        <RefreshCw size={14} /> {t('errors.retry')}
+      </button>
+    </div>
+  );
+}
+
 function ConfigTab({ t }: { t: Tfn }) {
   const toast = useToast();
   const [classes, setClasses] = useState<ClassConfigRow[]>([]);
+  const [defaults, setDefaults] = useState<ExamConfig>(DEFAULT_CONFIG);
   const [examsEnabled, setExamsEnabled] = useState(true);
   const [selected, setSelected] = useState<string>(DEFAULT_CLASS);
   const [draft, setDraft] = useState<ExamConfig | null>(null);
+  const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
 
+  // Si carica UNA sola volta. Prima `load` dipendeva da `selected`, quindi ogni
+  // lettera digitata nel campo "classe nuova" rileggeva dal server e sovrascriveva
+  // la configurazione che il docente stava componendo.
   const load = useCallback(async () => {
+    setError(null);
     const res = await authFetch<{ classes: ClassConfigRow[]; examsEnabled: boolean; defaults: ExamConfig }>('/api/teacher/config');
-    if (res.ok && res.data) {
-      setClasses(res.data.classes);
-      setExamsEnabled(res.data.examsEnabled);
-      const existing = res.data.classes.find((c) => c.class === selected);
-      setDraft(existing ? existing.config : res.data.defaults);
+    if (!res.ok || !res.data) {
+      setError(res.error ?? `HTTP ${res.status}`);
+      return;
     }
-  }, [selected]);
+    const data = res.data;
+    setClasses(data.classes);
+    setExamsEnabled(data.examsEnabled);
+    setDefaults(data.defaults);
+    setDraft((prev) => prev ?? data.classes.find((c) => c.class === DEFAULT_CLASS)?.config ?? data.defaults);
+  }, []);
 
   useEffect(() => {
     void load();
@@ -152,7 +191,13 @@ function ConfigTab({ t }: { t: Tfn }) {
     }
   };
 
-  if (!draft) return <div className="card">{t('common.loading')}</div>;
+  if (!draft) {
+    return (
+      <div className="card">
+        <LoadState t={t} error={error} onRetry={() => void load()} />
+      </div>
+    );
+  }
 
   const toggleModule = (m: ModuleKey) => {
     const has = draft.modules.includes(m);
@@ -184,7 +229,7 @@ function ConfigTab({ t }: { t: Tfn }) {
               const v = e.target.value;
               setSelected(v);
               const existing = classes.find((c) => c.class === v);
-              if (existing) setDraft(existing.config);
+              setDraft(existing ? existing.config : defaults);
             }}
           >
             <option value={DEFAULT_CLASS}>{t('admin.defaultClass')}</option>
@@ -199,7 +244,14 @@ function ConfigTab({ t }: { t: Tfn }) {
           </p>
           <input
             value={selected === DEFAULT_CLASS ? '' : selected}
-            onChange={(e) => setSelected(e.target.value.trim() || DEFAULT_CLASS)}
+            onChange={(e) => {
+              const v = e.target.value.trim() || DEFAULT_CLASS;
+              setSelected(v);
+              // Se la classe digitata ha già una configurazione, la mostro invece
+              // di lasciar salvare per sbaglio quella attualmente a schermo.
+              const existing = classes.find((c) => c.class === v);
+              if (existing) setDraft(existing.config);
+            }}
             placeholder="es. 3A"
             style={{ marginTop: 4 }}
           />
@@ -301,17 +353,27 @@ function ConfigTab({ t }: { t: Tfn }) {
 function ResultsTab({ t }: { t: Tfn }) {
   const [rows, setRows] = useState<ResultRow[] | null>(null);
   const [cls, setCls] = useState('');
+  const [error, setError] = useState<string | null>(null);
+  const [reload, setReload] = useState(0);
 
   useEffect(() => {
     let alive = true;
-    void (async () => {
-      const res = await authFetch<{ results: ResultRow[] }>(`/api/teacher/results${cls ? `?class=${encodeURIComponent(cls)}` : ''}`);
-      if (alive && res.ok && res.data) setRows(res.data.results);
-    })();
+    // Piccolo ritardo: filtrando per classe si digita, e senza questo partiva
+    // una query al database a ogni tasto.
+    const timer = setTimeout(() => {
+      void (async () => {
+        setError(null);
+        const res = await authFetch<{ results: ResultRow[] }>(`/api/teacher/results${cls ? `?class=${encodeURIComponent(cls)}` : ''}`);
+        if (!alive) return;
+        if (res.ok && res.data) setRows(res.data.results);
+        else setError(res.error ?? `HTTP ${res.status}`);
+      })();
+    }, 300);
     return () => {
       alive = false;
+      clearTimeout(timer);
     };
-  }, [cls]);
+  }, [cls, reload]);
 
   return (
     <div className="card">
@@ -327,8 +389,8 @@ function ResultsTab({ t }: { t: Tfn }) {
         </a>
       </div>
 
-      {!rows ? (
-        <p>{t('common.loading')}</p>
+      {!rows || error ? (
+        <LoadState t={t} error={error} onRetry={() => setReload((n) => n + 1)} />
       ) : rows.length === 0 ? (
         <p className="hint">{t('admin.noResults')}</p>
       ) : (
@@ -375,12 +437,20 @@ function ResultsTab({ t }: { t: Tfn }) {
 
 function LiveTab({ t }: { t: Tfn }) {
   const [rows, setRows] = useState<LiveRow[] | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [reload, setReload] = useState(0);
 
   useEffect(() => {
     let alive = true;
     const load = async () => {
       const res = await authFetch<{ live: LiveRow[] }>('/api/teacher/live');
-      if (alive && res.ok && res.data) setRows(res.data.live);
+      if (!alive) return;
+      if (res.ok && res.data) {
+        setRows(res.data.live);
+        setError(null);
+      } else {
+        setError(res.error ?? `HTTP ${res.status}`);
+      }
     };
     void load();
     const id = setInterval(load, 15_000);
@@ -388,7 +458,7 @@ function LiveTab({ t }: { t: Tfn }) {
       alive = false;
       clearInterval(id);
     };
-  }, []);
+  }, [reload]);
 
   return (
     <div className="card">
@@ -397,8 +467,16 @@ function LiveTab({ t }: { t: Tfn }) {
         <strong>{t('admin.onlineNow')}</strong>
         <span className="hint">(aggiornamento ogni 15 s)</span>
       </div>
+      {/* Se un aggiornamento periodico fallisce tengo a schermo l'ultimo elenco
+          valido — durante una verifica sparire di colpo sarebbe peggio — e
+          segnalo il problema sopra la tabella. */}
+      {rows && error && (
+        <p className="hint" style={{ color: 'var(--error)' }}>
+          {t('errors.loadFailed')} — {error}
+        </p>
+      )}
       {!rows ? (
-        <p>{t('common.loading')}</p>
+        <LoadState t={t} error={error} onRetry={() => setReload((n) => n + 1)} />
       ) : rows.length === 0 ? (
         <p className="hint">{t('admin.noResults')}</p>
       ) : (

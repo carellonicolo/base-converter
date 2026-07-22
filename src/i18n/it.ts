@@ -300,5 +300,7 @@ export const it = {
     reload: 'Ricarica l’app',
     details: 'Dettagli tecnici',
     network: 'Errore di rete. Controlla la connessione.',
+    loadFailed: 'Non è stato possibile caricare i dati.',
+    retry: 'Riprova',
   },
 };

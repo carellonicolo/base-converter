@@ -301,5 +301,7 @@ export const en: typeof it = {
     reload: 'Reload the app',
     details: 'Technical details',
     network: 'Network error. Check your connection.',
+    loadFailed: 'Could not load the data.',
+    retry: 'Retry',
   },
 };
