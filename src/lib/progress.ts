@@ -169,19 +169,28 @@ export function recordAttempt(prev: Progress, module: ModuleKey, correct: boolea
 
 /* ---------------- Persistenza locale ---------------- */
 
+/**
+ * Normalizza un oggetto Progress arbitrario (da localStorage o dal server)
+ * riempiendo i campi mancanti. Usato sia dallo studente sia dalla console
+ * docente, così la matematica di livello/precisione è identica per entrambi.
+ */
+export function coerceProgress(raw: unknown): Progress {
+  const parsed = (typeof raw === 'object' && raw !== null ? raw : {}) as Partial<Progress>;
+  const base = emptyProgress();
+  return {
+    ...base,
+    ...parsed,
+    byModule: { ...base.byModule, ...(parsed.byModule ?? {}) },
+    badges: Array.isArray(parsed.badges) ? parsed.badges : [],
+  };
+}
+
 export function loadProgress(): Progress {
   if (typeof localStorage === 'undefined') return emptyProgress();
   try {
     const raw = localStorage.getItem(KEY);
     if (!raw) return emptyProgress();
-    const parsed = JSON.parse(raw) as Partial<Progress>;
-    const base = emptyProgress();
-    return {
-      ...base,
-      ...parsed,
-      byModule: { ...base.byModule, ...(parsed.byModule ?? {}) },
-      badges: parsed.badges ?? [],
-    };
+    return coerceProgress(JSON.parse(raw));
   } catch {
     return emptyProgress();
   }

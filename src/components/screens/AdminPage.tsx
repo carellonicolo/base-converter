@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { ArrowLeft, Users, LogIn, Download, Radio, Eye, RefreshCw, ClipboardList, BookOpen, Send, X } from 'lucide-react';
 import { AppShell } from '../ui/AppShell';
 import { LoadState } from '../ui/LoadState';
+import { ProgressTab } from '../admin/ProgressTab';
 import { useI18n } from '../../i18n';
 import { useAuth } from '../../hooks/useAuth';
 import { useToast } from '../ui/Toast';
@@ -13,7 +14,7 @@ import { moduleLabel, examTitle, exercisePrompt, expectedHint } from '../../lib/
 import type { Exercise } from '../../../shared/exercises/generator';
 import type { TopicKey, Level } from '../../../shared/exam/catalog';
 
-type Tab = 'exams' | 'assignments' | 'results' | 'live';
+type Tab = 'exams' | 'assignments' | 'progress' | 'results' | 'live';
 type Tfn = (k: string, v?: Record<string, string | number>) => string;
 
 interface ExamRow {
@@ -117,6 +118,7 @@ export function AdminPage() {
   const tabs: [Tab, string][] = [
     ['exams', t('admin.tabExams')],
     ['assignments', t('admin.tabAssignments')],
+    ['progress', t('admin.tabProgress')],
     ['results', t('admin.tabResults')],
     ['live', t('admin.tabLive')],
   ];
@@ -148,6 +150,7 @@ export function AdminPage() {
 
         {tab === 'exams' && <ExamsTab t={t} />}
         {tab === 'assignments' && <AssignmentsTab t={t} />}
+        {tab === 'progress' && <ProgressTab t={t} now={Date.now()} />}
         {tab === 'results' && <ResultsTab t={t} />}
         {tab === 'live' && <LiveTab t={t} />}
       </div>

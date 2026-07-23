@@ -8,7 +8,6 @@ import {
   Target,
   ClipboardCheck,
   LayoutDashboard,
-  Users,
   Lock,
   ArrowRight,
 } from 'lucide-react';
@@ -28,7 +27,7 @@ interface Card {
 
 export function HomePage() {
   const { t } = useI18n();
-  const { user, isTeacher } = useAuth();
+  const { user } = useAuth();
 
   const tools: Card[] = [
     { to: '/convertitore', icon: Binary, title: t('home.convTitle'), text: t('home.convText') },
@@ -45,9 +44,8 @@ export function HomePage() {
   if (user) {
     learn.push({ to: '/dashboard', icon: LayoutDashboard, title: t('home.dashTitle'), text: t('home.dashText') });
   }
-  if (isTeacher) {
-    learn.push({ to: '/admin', icon: Users, title: t('home.teacherTitle'), text: t('home.teacherText'), badge: t('admin.title') });
-  }
+  // La console docente non compare qui: si raggiunge dal pulsante dedicato
+  // nella barra in alto (carello-shell), così l'accesso è uno solo.
 
   return (
     <AppShell>

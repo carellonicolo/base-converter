@@ -102,6 +102,24 @@ export async function getAssignment(env: Env, id: string): Promise<AssignmentRow
   return row ?? null;
 }
 
+/* ---------------- Progressi palestra ---------------- */
+
+export interface ProgressRow {
+  user_id: string;
+  email: string;
+  full_name: string;
+  data: string;
+  updated_at: string;
+}
+
+/** Tutti i progressi salvati (una riga per studente). Per la console docente. */
+export async function listAllProgress(env: Env): Promise<ProgressRow[]> {
+  const { results } = await env.DB.prepare(
+    `SELECT user_id, email, full_name, data, updated_at FROM bc_progress ORDER BY updated_at DESC`
+  ).all<ProgressRow>();
+  return results ?? [];
+}
+
 /** Classi già viste nei tentativi: rete di sicurezza se l'SSO non risponde. */
 export async function listKnownClasses(env: Env): Promise<string[]> {
   const { results } = await env.DB.prepare(

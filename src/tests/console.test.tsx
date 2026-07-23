@@ -30,6 +30,28 @@ const TEACHER = {
   classes: [],
 };
 
+const mod = (correct: number, attempts: number) => ({ attempts, correct });
+const emptyMods = { converter: mod(0, 0), arithmetic: mod(0, 0), signed: mod(0, 0), ieee: mod(0, 0), text: mod(0, 0) };
+
+/** Tre studenti con XP crescenti, così l'ordinamento e il podio sono verificabili. */
+const PROGRESS = {
+  classes: ['3A', '3B'],
+  students: [
+    {
+      userId: 's-carla', name: 'Carla Bassi', email: 'carla@s.it', classes: ['3A'], updatedAt: '2026-07-20T10:00:00Z',
+      progress: { xp: 300, streak: 0, bestStreak: 4, badges: ['firstStep'], byModule: { ...emptyMods, converter: mod(10, 12) }, updatedAt: '' },
+    },
+    {
+      userId: 's-aldo', name: 'Aldo Rossi', email: 'aldo@s.it', classes: ['3A'], updatedAt: '2026-07-22T10:00:00Z',
+      progress: { xp: 1200, streak: 0, bestStreak: 12, badges: ['firstStep', 'ten', 'streak10'], byModule: { ...emptyMods, converter: mod(30, 33) }, updatedAt: '' },
+    },
+    {
+      userId: 's-bruno', name: 'Bruno Verdi', email: 'bruno@s.it', classes: ['3B'], updatedAt: '2026-07-21T10:00:00Z',
+      progress: { xp: 700, streak: 0, bestStreak: 6, badges: ['firstStep', 'ten'], byModule: { ...emptyMods, signed: mod(20, 25) }, updatedAt: '' },
+    },
+  ],
+};
+
 /** Risponde come farebbero le Function nuove, con un docente autenticato. */
 function stubFetch() {
   vi.stubGlobal(
@@ -57,6 +79,7 @@ function stubFetch() {
       }
       if (url.includes('/api/teacher/classes')) return json({ classes: ['3A', '3B'], source: 'auth' });
       if (url.includes('/api/teacher/assignments')) return json({ assignments: [] });
+      if (url.includes('/api/teacher/progress')) return json(PROGRESS);
       return json({});
     })
   );
@@ -137,5 +160,49 @@ describe('console docente — nuovo modello a pool', () => {
     await waitFor(() => expect(screen.getByText('Binario')).toBeTruthy());
     fireEvent.click(screen.getByRole('button', { name: 'Assegnazioni' }));
     await waitFor(() => expect(screen.getByText(/Nessuna verifica assegnata/)).toBeTruthy());
+  });
+});
+
+describe('console docente — progressi della palestra', () => {
+  async function openProgress() {
+    stubFetch();
+    render(
+      <Providers>
+        <AdminPage />
+      </Providers>
+    );
+    await waitFor(() => expect(screen.getByText('Binario')).toBeTruthy());
+    fireEvent.click(screen.getByRole('button', { name: 'Progressi' }));
+    await waitFor(() => expect(screen.getByText('Classifica')).toBeTruthy());
+  }
+
+  // Ogni nome compare due volte (podio + classifica): le asserzioni d'ordine
+  // leggono la sola lista classifica tramite `.rank-name`.
+  const listNames = () => Array.from(document.querySelectorAll('.rank-name')).map((e) => e.textContent);
+
+  it('ordina gli studenti per XP decrescente', async () => {
+    await openProgress();
+    expect(listNames()).toEqual(['Aldo Rossi', 'Bruno Verdi', 'Carla Bassi']);
+  });
+
+  it('mostra il cruscotto con gli esercizi totali risolti della classe', async () => {
+    await openProgress();
+    // 10 + 30 + 20 = 60 esercizi risolti in totale.
+    expect(screen.getByText('60')).toBeTruthy();
+    expect(screen.getByText('Esercizi risolti')).toBeTruthy();
+  });
+
+  it('il filtro classe restringe agli studenti di quella classe', async () => {
+    await openProgress();
+    // 3B contiene solo Bruno: Aldo e Carla (3A) spariscono.
+    fireEvent.change(screen.getByLabelText('Classe'), { target: { value: '3B' } });
+    await waitFor(() => expect(listNames()).toEqual(['Bruno Verdi']));
+  });
+
+  it('espande il dettaglio di uno studente al click', async () => {
+    await openProgress();
+    // Il primo della classifica (Aldo) apre il dettaglio "Per argomento".
+    fireEvent.click(document.querySelector('.rank-main') as HTMLElement);
+    await waitFor(() => expect(screen.getByText('Per argomento')).toBeTruthy());
   });
 });
