@@ -1,6 +1,5 @@
 import { useMemo, useState } from 'react';
-import { Link } from 'react-router-dom';
-import { ArrowLeft, Type } from 'lucide-react';
+import { Type } from 'lucide-react';
 import { AppShell } from '../ui/AppShell';
 import { InfoBox } from '../ui/InfoBox';
 import { CopyButton } from '../ui/CopyButton';
@@ -37,15 +36,7 @@ export function TextPage() {
   const [tab, setTab] = useState<Tab>('ascii');
 
   return (
-    <AppShell
-      back={
-        <div className="breadcrumb">
-          <Link to="/">
-            <ArrowLeft size={14} style={{ verticalAlign: '-2px' }} /> {t('common.home')}
-          </Link>
-        </div>
-      }
-    >
+    <AppShell>
       <div className="module module-wide">
         <div className="module-head">
           <h1>

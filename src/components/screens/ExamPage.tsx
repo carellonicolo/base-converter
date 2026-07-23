@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Link } from 'react-router-dom';
-import { ArrowLeft, ClipboardCheck, LogIn, Timer, Eye, TriangleAlert } from 'lucide-react';
+import { ClipboardCheck, LogIn, Timer, Eye, TriangleAlert } from 'lucide-react';
 import { AppShell } from '../ui/AppShell';
 import { useI18n } from '../../i18n';
 import { useAuth } from '../../hooks/useAuth';
@@ -214,18 +213,10 @@ export function ExamPage() {
 
   const answeredCount = useMemo(() => answers.filter((a) => a.trim() !== '').length, [answers]);
 
-  const back = (
-    <div className="breadcrumb">
-      <Link to="/">
-        <ArrowLeft size={14} style={{ verticalAlign: '-2px' }} /> {t('common.home')}
-      </Link>
-    </div>
-  );
-
   /* ---------- non loggato ---------- */
   if (!loading && !user) {
     return (
-      <AppShell back={back}>
+      <AppShell>
         <div className="gate">
           <div className="landing-hero-icon" aria-hidden>
             <ClipboardCheck size={30} />
@@ -243,7 +234,7 @@ export function ExamPage() {
   /* ---------- esito ---------- */
   if (outcome) {
     return (
-      <AppShell back={back}>
+      <AppShell>
         <div className="module">
           <div className="voto-box">
             <div className="voto-head">{t('exam.resultTitle')}</div>
@@ -295,7 +286,7 @@ export function ExamPage() {
     const danger = remaining < 60_000;
     const warning = remaining < 5 * 60_000;
     return (
-      <AppShell>
+      <AppShell nav={false}>
         <div className="module">
           <div className="test-header-bar">
             <span className={`timer-badge${danger ? ' danger' : warning ? ' warning' : ''}`}>
@@ -365,7 +356,7 @@ export function ExamPage() {
   /* ---------- schermata iniziale ---------- */
   const examName = state?.exam ? examTitle(state.exam.topic, state.exam.level, t) : null;
   return (
-    <AppShell back={back}>
+    <AppShell>
       <div className="module">
         <div className="module-head">
           <h1>

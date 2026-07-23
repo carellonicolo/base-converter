@@ -303,6 +303,16 @@ export const en: typeof it = {
     notActive: 'Account not active. Contact your teacher.',
     goLogin: 'Go to sign-in',
   },
+  nav: {
+    tools: 'Tools',
+    converter: 'Converter',
+    arith: 'Arithmetic',
+    signed: 'Signed',
+    ieee: 'IEEE 754',
+    text: 'Text',
+    gym: 'Practice',
+    exam: 'Test',
+  },
   ex: {
     conv: 'Convert {value} from base {from} to base {to}.',
     arith: 'Compute {a} {opSym} {b} in base {base}. Give the result in the same base.',

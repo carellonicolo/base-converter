@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Link } from 'react-router-dom';
-import { ArrowLeft, Target, Flame, LogIn, RefreshCw, GraduationCap } from 'lucide-react';
+import { Target, Flame, LogIn, RefreshCw, GraduationCap } from 'lucide-react';
 import { AppShell } from '../ui/AppShell';
 import { InfoBox } from '../ui/InfoBox';
 import { BadgeGrid } from '../ui/BadgeGrid';
@@ -112,15 +111,7 @@ export function GymPage() {
   const tt = totals(progress);
 
   return (
-    <AppShell
-      back={
-        <div className="breadcrumb">
-          <Link to="/">
-            <ArrowLeft size={14} style={{ verticalAlign: '-2px' }} /> {t('common.home')}
-          </Link>
-        </div>
-      }
-    >
+    <AppShell>
       <div className="module">
         <div className="module-head">
           <h1>

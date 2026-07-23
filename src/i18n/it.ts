@@ -304,6 +304,16 @@ export const it = {
     notActive: 'Account non attivo. Contatta il docente.',
     goLogin: 'Vai al login',
   },
+  nav: {
+    tools: 'Strumenti',
+    converter: 'Convertitore',
+    arith: 'Aritmetica',
+    signed: 'Segno',
+    ieee: 'IEEE 754',
+    text: 'Testo',
+    gym: 'Palestra',
+    exam: 'Verifica',
+  },
   ex: {
     conv: 'Converti {value} da base {from} a base {to}.',
     arith: 'Calcola {a} {opSym} {b} in base {base}. Dai il risultato nella stessa base.',

@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
-import { ArrowLeft, LayoutDashboard, LogIn } from 'lucide-react';
+import { LayoutDashboard, LogIn } from 'lucide-react';
 import { AppShell } from '../ui/AppShell';
 import { BadgeGrid } from '../ui/BadgeGrid';
 import { LoadState } from '../ui/LoadState';
@@ -54,17 +53,9 @@ export function DashboardPage() {
   const lvl = levelInfo(progress.xp);
   const tt = totals(progress);
 
-  const back = (
-    <div className="breadcrumb">
-      <Link to="/">
-        <ArrowLeft size={14} style={{ verticalAlign: '-2px' }} /> {t('common.home')}
-      </Link>
-    </div>
-  );
-
   if (!loading && !user) {
     return (
-      <AppShell back={back}>
+      <AppShell>
         <div className="gate">
           <div className="landing-hero-icon" aria-hidden>
             <LayoutDashboard size={30} />
@@ -80,7 +71,7 @@ export function DashboardPage() {
   }
 
   return (
-    <AppShell back={back}>
+    <AppShell>
       <div className="module">
         <div className="module-head">
           <h1>

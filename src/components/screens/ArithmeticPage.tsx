@@ -1,6 +1,5 @@
 import { useMemo, useState } from 'react';
-import { Link } from 'react-router-dom';
-import { ArrowLeft, Calculator } from 'lucide-react';
+import { Calculator } from 'lucide-react';
 import { AppShell } from '../ui/AppShell';
 import { InfoBox } from '../ui/InfoBox';
 import { useI18n } from '../../i18n';
@@ -28,15 +27,7 @@ export function ArithmeticPage() {
   }, [op, a, b, base, t]);
 
   return (
-    <AppShell
-      back={
-        <div className="breadcrumb">
-          <Link to="/">
-            <ArrowLeft size={14} style={{ verticalAlign: '-2px' }} /> {t('common.home')}
-          </Link>
-        </div>
-      }
-    >
+    <AppShell>
       <div className="module">
         <div className="module-head">
           <h1>

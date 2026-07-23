@@ -1,6 +1,5 @@
 import { Fragment, useCallback, useMemo, useState } from 'react';
-import { Link } from 'react-router-dom';
-import { ArrowLeft, Diff } from 'lucide-react';
+import { Diff } from 'lucide-react';
 import { AppShell } from '../ui/AppShell';
 import { InfoBox } from '../ui/InfoBox';
 import { CopyButton } from '../ui/CopyButton';
@@ -79,15 +78,7 @@ export function SignedPage() {
   const steps = repr === 'twos' && value < 0n ? twosComplementSteps(value, bits) : [];
 
   return (
-    <AppShell
-      back={
-        <div className="breadcrumb">
-          <Link to="/">
-            <ArrowLeft size={14} style={{ verticalAlign: '-2px' }} /> {t('common.home')}
-          </Link>
-        </div>
-      }
-    >
+    <AppShell>
       <div className="module">
         <div className="module-head">
           <h1>

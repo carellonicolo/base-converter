@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { Link } from 'react-router-dom';
-import { ArrowLeft, Users, LogIn, Download, Radio, Eye, RefreshCw, ClipboardList, BookOpen, Send, X } from 'lucide-react';
+import { Users, LogIn, Download, Radio, Eye, RefreshCw, ClipboardList, BookOpen, Send, X } from 'lucide-react';
 import { AppShell } from '../ui/AppShell';
 import { LoadState } from '../ui/LoadState';
 import { ProgressTab } from '../admin/ProgressTab';
@@ -73,17 +72,9 @@ export function AdminPage() {
   const { user, loading, isTeacher, login } = useAuth();
   const [tab, setTab] = useState<Tab>('exams');
 
-  const back = (
-    <div className="breadcrumb">
-      <Link to="/">
-        <ArrowLeft size={14} style={{ verticalAlign: '-2px' }} /> {t('common.home')}
-      </Link>
-    </div>
-  );
-
   if (loading) {
     return (
-      <AppShell back={back}>
+      <AppShell>
         <div className="card" style={{ maxWidth: 520, margin: '2rem auto' }}>{t('common.loading')}</div>
       </AppShell>
     );
@@ -91,7 +82,7 @@ export function AdminPage() {
 
   if (!user) {
     return (
-      <AppShell back={back}>
+      <AppShell>
         <div className="gate">
           <div className="landing-hero-icon" aria-hidden>
             <Users size={30} />
@@ -107,7 +98,7 @@ export function AdminPage() {
 
   if (!isTeacher) {
     return (
-      <AppShell back={back}>
+      <AppShell>
         <div className="card" style={{ maxWidth: 520, margin: '2rem auto' }}>
           <h2 style={{ marginTop: 0 }}>{t('admin.teacherOnly')}</h2>
         </div>
@@ -124,7 +115,7 @@ export function AdminPage() {
   ];
 
   return (
-    <AppShell back={back}>
+    <AppShell>
       <div className="module module-wide">
         <div className="module-head">
           <h1>

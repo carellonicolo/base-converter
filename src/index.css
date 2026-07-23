@@ -331,15 +331,48 @@ label { display: block; font-weight: 600; margin-bottom: 0.35rem; font-size: 0.9
    ============================================================ */
 .module { max-width: 1080px; margin: 0 auto; }
 .module-wide { max-width: 1280px; }
-/* Riga sotto la shell: breadcrumb a sinistra, selettore lingua a destra. */
-.topbar-row {
-  display: flex; align-items: center; justify-content: space-between;
-  gap: 1rem; flex-wrap: wrap; margin: 0 0 1rem;
-  min-height: 32px;
+/* Toggle lingua DENTRO l'header unificato (slot app-actions della shell):
+   compatto, per stare in riga con i pulsanti tema/waffle. */
+.shell-lang .segmented { padding: 2px; border-radius: 999px; border-color: var(--border); background: var(--readonly-bg); }
+.shell-lang .segmented button { padding: 0.2rem 0.6rem; font-size: 0.72rem; }
+
+/* ============================================================
+   NAVBAR STRUMENTI — switch rapido tra le modalità (rotte).
+   La voce attiva è guidata da NavLink; la pillola colorata è pura CSS.
+   ============================================================ */
+.tool-nav-wrap { display: flex; justify-content: center; margin: 0 0 1.5rem; }
+.tool-nav {
+  display: flex; gap: 4px;
+  background: var(--readonly-bg);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 4px;
+  box-shadow: 0 2px 8px rgba(35, 32, 28, 0.05);
+  max-width: 100%;
+  overflow-x: auto;            /* rete di sicurezza su schermi strettissimi */
+  scrollbar-width: none;
 }
-.topbar-row .breadcrumb { margin-bottom: 0; }
-.topbar-row .segmented { padding: 2px; border-radius: 999px; }
-.topbar-row .segmented button { padding: 0.25rem 0.7rem; font-size: 0.78rem; }
+.tool-nav::-webkit-scrollbar { display: none; }
+.tool-tab {
+  position: relative;
+  display: inline-flex; align-items: center; gap: 6px;
+  color: var(--muted); text-decoration: none;
+  font-size: 13px; font-weight: 600;
+  padding: 7px 14px; border-radius: 999px;
+  white-space: nowrap;
+  transition: color 0.15s, background 0.15s;
+}
+.tool-tab:hover { color: var(--primary); }
+.tool-tab.active {
+  color: #fff;
+  background: linear-gradient(135deg, #ed8a3e 0%, var(--primary) 100%);
+  box-shadow: 0 3px 10px rgba(224, 102, 43, 0.35);
+}
+/* Su schermi stretti restano solo le icone: mai voci nascoste. */
+@media (max-width: 640px) {
+  .tool-tab { padding: 8px 11px; }
+  .tool-tab-label { display: none; }
+}
 
 .breadcrumb { display: flex; align-items: center; gap: 0.4rem; font-size: 0.88rem; margin-bottom: 0.75rem; color: var(--muted); flex-wrap: wrap; }
 .breadcrumb a { color: var(--primary); text-decoration: none; font-weight: 500; }

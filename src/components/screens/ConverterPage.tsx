@@ -1,6 +1,5 @@
 import { useMemo, useState } from 'react';
-import { Link } from 'react-router-dom';
-import { ArrowLeft, Binary } from 'lucide-react';
+import { Binary } from 'lucide-react';
 import { AppShell } from '../ui/AppShell';
 import { InfoBox } from '../ui/InfoBox';
 import { CopyButton } from '../ui/CopyButton';
@@ -55,15 +54,7 @@ export function ConverterPage() {
   const value = parsed.ok ? parsed.value : null;
 
   return (
-    <AppShell
-      back={
-        <div className="breadcrumb">
-          <Link to="/">
-            <ArrowLeft size={14} style={{ verticalAlign: '-2px' }} /> {t('common.home')}
-          </Link>
-        </div>
-      }
-    >
+    <AppShell>
       <div className="module">
         <div className="module-head">
           <h1>
