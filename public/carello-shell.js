@@ -279,7 +279,13 @@
         if (folderBtn) {
           e.preventDefault();
           this.renderFolder(folderBtn.getAttribute('data-folder'));
+          return;
         }
+        // Tessera-app: apre in una nuova scheda, quindi questa pagina resta
+        // dov'è. Chiudiamo il popup a mano (il listener sul document non
+        // scatta: i click nel popup sono fermati da stopPropagation), come
+        // fa il launcher di Google.
+        if (e.target.closest('a.tile')) pop.classList.remove('open');
       });
       // Pulsante "indietro": torna al livello principale.
       const backBtn = this.shadowRoot.getElementById('popback');
@@ -424,10 +430,13 @@
         .sort((a, b) => (Number(a.position_in_folder) || 0) - (Number(b.position_in_folder) || 0));
     }
 
-    // HTML di una tessera-app (link che naviga all'app).
+    // HTML di una tessera-app. Come il launcher di Google, l'app si apre in
+    // una NUOVA scheda: chi sta lavorando nell'app corrente non la perde.
+    // rel="noopener noreferrer" evita che la pagina aperta possa toccare
+    // window.opener (buona pratica anche fra sottodomini nostri).
     appTileHTML(a, idx) {
       return `
-        <a class="tile" href="${a.href}" data-i="${idx}">
+        <a class="tile" href="${a.href}" target="_blank" rel="noopener noreferrer" data-i="${idx}">
           <span class="ico" style="background:${a.color || '#E0662B'}">
             <span class="iconslot">${initials(a.name)}</span>
           </span>
