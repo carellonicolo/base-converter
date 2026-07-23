@@ -1,7 +1,8 @@
 import { useCallback, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowLeft, Users, LogIn, Download, Save, Radio, Eye, RefreshCw } from 'lucide-react';
+import { ArrowLeft, Users, LogIn, Download, Save, Radio, Eye } from 'lucide-react';
 import { AppShell } from '../ui/AppShell';
+import { LoadState } from '../ui/LoadState';
 import { useI18n } from '../../i18n';
 import { useAuth } from '../../hooks/useAuth';
 import { useToast } from '../ui/Toast';
@@ -123,26 +124,6 @@ export function AdminPage() {
 }
 
 type Tfn = (k: string, v?: Record<string, string | number>) => string;
-
-/**
- * Stato di attesa di una scheda della console.
- *
- * ⚠️ Un errore del server DEVE restare visibile: prima un 500 (per esempio
- * tabelle `bc_*` non ancora migrate) lasciava "Caricamento…" per sempre e la
- * console sembrava semplicemente morta, senza alcun indizio sulla causa.
- */
-function LoadState({ t, error, onRetry }: { t: Tfn; error: string | null; onRetry: () => void }) {
-  if (!error) return <p>{t('common.loading')}</p>;
-  return (
-    <div className="feedback ko" style={{ display: 'block' }}>
-      <strong>{t('errors.loadFailed')}</strong>
-      <p className="mono" style={{ margin: '0.5rem 0 0.75rem', fontSize: '0.85rem', wordBreak: 'break-word' }}>{error}</p>
-      <button className="btn btn-sm btn-secondary" type="button" onClick={onRetry}>
-        <RefreshCw size={14} /> {t('errors.retry')}
-      </button>
-    </div>
-  );
-}
 
 function ConfigTab({ t }: { t: Tfn }) {
   const toast = useToast();

@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { ArrowLeft, LayoutDashboard, LogIn } from 'lucide-react';
 import { AppShell } from '../ui/AppShell';
 import { BadgeGrid } from '../ui/BadgeGrid';
+import { LoadState } from '../ui/LoadState';
 import { useI18n } from '../../i18n';
 import { useAuth } from '../../hooks/useAuth';
 import { loadProgress, saveProgress, levelInfo, totals, type Progress } from '../../lib/progress';
@@ -24,7 +25,12 @@ export function DashboardPage() {
   const { t } = useI18n();
   const { user, loading, login } = useAuth();
   const [progress, setProgress] = useState<Progress>(loadProgress);
-  const [attempts, setAttempts] = useState<AttemptRow[]>([]);
+  // `null` = non ancora caricato. Deve restare distinto dalla lista vuota:
+  // prima partiva da [] e un errore di rete diventava "Nessuna verifica svolta",
+  // cioè lo studente credeva di aver perso il compito appena consegnato.
+  const [attempts, setAttempts] = useState<AttemptRow[] | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [reload, setReload] = useState(0);
 
   useEffect(() => {
     if (!user) return;
@@ -34,13 +40,16 @@ export function DashboardPage() {
       if (!alive) return;
       setProgress(merged);
       saveProgress(merged);
+      setError(null);
       const res = await authFetch<{ attempts: AttemptRow[] }>('/api/student/attempts');
-      if (alive && res.ok && res.data) setAttempts(res.data.attempts);
+      if (!alive) return;
+      if (res.ok && res.data) setAttempts(res.data.attempts);
+      else setError(res.error ?? `HTTP ${res.status}`);
     })();
     return () => {
       alive = false;
     };
-  }, [user]);
+  }, [user, reload]);
 
   const lvl = levelInfo(progress.xp);
   const tt = totals(progress);
@@ -150,7 +159,9 @@ export function DashboardPage() {
 
         <div className="card">
           <h2 style={{ marginTop: 0, fontSize: '1.05rem' }}>{t('dash.recentExams')}</h2>
-          {attempts.length === 0 ? (
+          {!attempts || error ? (
+            <LoadState t={t} error={error} onRetry={() => setReload((n) => n + 1)} />
+          ) : attempts.length === 0 ? (
             <p className="hint">{t('dash.noExams')}</p>
           ) : (
             <table className="data-table">
