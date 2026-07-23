@@ -672,6 +672,44 @@ label { display: block; font-weight: 600; margin-bottom: 0.35rem; font-size: 0.9
 }
 
 /* ============================================================
+   MODALE CON INTESTAZIONE (anteprima verifica, assegnazione)
+   ============================================================ */
+.modal-backdrop {
+  position: fixed; inset: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 9999; padding: 1rem;
+  animation: fadeIn 0.2s ease-out;
+}
+/* Il contenuto largo (tabella dell'anteprima) può eccedere lo schermo:
+   il pannello scorre al suo interno invece di sforare. */
+.modal-backdrop > .modal {
+  max-width: 900px; width: 100%; max-height: 88vh;
+  padding: 0; display: flex; flex-direction: column; overflow: hidden;
+}
+.modal-backdrop > .modal.modal-sm { max-width: 460px; }
+.modal-head {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 1rem; padding: 1.1rem 1.4rem;
+  border-bottom: 1px solid var(--border);
+}
+.modal-head h2 { margin: 0; font-size: 1.1rem; }
+.modal-body { padding: 1.25rem 1.4rem; overflow: auto; }
+
+/* ============================================================
+   POOL DELLE VERIFICHE (console docente)
+   ============================================================ */
+.exam-pool { display: flex; flex-direction: column; gap: 0.5rem; }
+.exam-pool-row {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 0.75rem; flex-wrap: wrap;
+  padding: 0.6rem 0.85rem; border-radius: 12px;
+  background: var(--readonly-bg); border: 1px solid var(--border);
+}
+.exam-pool-info { display: flex; align-items: center; gap: 0.6rem; flex-wrap: wrap; }
+.exam-pool-meta { color: var(--muted); font-size: 0.88rem; }
+
+/* ============================================================
    TOAST
    ============================================================ */
 .toast-container {

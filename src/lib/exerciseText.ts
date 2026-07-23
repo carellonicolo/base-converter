@@ -87,6 +87,11 @@ export function expectedHint(ex: Exercise): string {
   }
 }
 
+/** Titolo di una verifica del catalogo: "Binario · Livello 2". */
+export function examTitle(topic: string, level: number, t: Tfn): string {
+  return `${t(`topic.${topic}`)} · ${t(`level.short${level}`)}`;
+}
+
 /** Nome leggibile del modulo. */
 export function moduleLabel(module: string, t: Tfn): string {
   switch (module) {

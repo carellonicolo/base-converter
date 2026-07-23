@@ -9,7 +9,7 @@ import { useToast } from '../ui/Toast';
 import { useFocusMonitor } from '../../hooks/useFocusMonitor';
 import { authFetch } from '../../lib/auth';
 import { fmtClock, fmtGrade } from '../../lib/format';
-import { exercisePrompt, expectedHint, moduleLabel } from '../../lib/exerciseText';
+import { exercisePrompt, expectedHint, moduleLabel, examTitle } from '../../lib/exerciseText';
 import type { Exercise } from '../../../shared/exercises/generator';
 
 /** Domanda inviata dal server: SENZA la risposta attesa. */
@@ -21,10 +21,21 @@ interface Question {
   points: number;
 }
 
+interface ExamMeta {
+  id: string;
+  topic: string;
+  level: number;
+  modules: string[];
+}
+
 interface ExamState {
   user: { name: string; email: string; class: string | null; isTeacher: boolean };
-  enabled: boolean;
-  config: { durationMin: number; questionCount: number; modules: string[]; difficulty: string; passGrade: number };
+  /** Esiste un'assegnazione aperta per la classe dello studente. */
+  assigned: boolean;
+  /** La verifica assegnata non è più nel catalogo (edge case). */
+  staleExam?: boolean;
+  exam?: ExamMeta;
+  config?: { durationMin: number; questionCount: number; modules: string[]; difficulty: string; passGrade: number };
   current: null | {
     id: string;
     startedAt: string;
@@ -32,6 +43,8 @@ interface ExamState {
     questions: Question[];
     answers: string[];
   };
+  /** Verifica già consegnata: si mostra l'esito, non si ripete. */
+  submitted: null | { grade: number | null; correctCount: number; totalCount: number };
 }
 
 interface Outcome {
@@ -350,6 +363,7 @@ export function ExamPage() {
   }
 
   /* ---------- schermata iniziale ---------- */
+  const examName = state?.exam ? examTitle(state.exam.topic, state.exam.level, t) : null;
   return (
     <AppShell back={back}>
       <div className="module">
@@ -366,19 +380,41 @@ export function ExamPage() {
         {error ? (
           <div className="card">
             <h2 style={{ marginTop: 0, fontSize: '1.05rem' }}>
-              {error.code === 'pending' ? t('auth.pending') : t('exam.disabledTitle')}
+              {error.code === 'pending' ? t('auth.pending') : t('exam.notAssignedTitle')}
             </h2>
             <p className="hint">{error.message}</p>
           </div>
         ) : !state ? (
           <div className="card">{t('common.loading')}</div>
-        ) : !state.enabled ? (
+        ) : state.submitted ? (
           <div className="card">
-            <h2 style={{ marginTop: 0, fontSize: '1.05rem' }}>{t('exam.disabledTitle')}</h2>
-            <p className="hint">{t('exam.disabledBody')}</p>
+            <h2 style={{ marginTop: 0, fontSize: '1.05rem' }}>{t('exam.alreadyDoneTitle')}</h2>
+            {examName && <span className="chip primary" style={{ marginBottom: '0.75rem' }}>{examName}</span>}
+            <p className="hint">{t('exam.alreadyDoneBody')}</p>
+            <div className="voto-box" style={{ marginTop: '0.5rem' }}>
+              <p className="voto10">{fmtGrade(state.submitted.grade)}</p>
+              <div className="voto-sub">
+                {t('exam.correctCount', { ok: state.submitted.correctCount, tot: state.submitted.totalCount })}
+              </div>
+            </div>
+          </div>
+        ) : state.staleExam ? (
+          <div className="card">
+            <h2 style={{ marginTop: 0, fontSize: '1.05rem' }}>{t('exam.staleTitle')}</h2>
+            <p className="hint">{t('exam.staleBody')}</p>
+          </div>
+        ) : !state.assigned || !state.config ? (
+          <div className="card">
+            <h2 style={{ marginTop: 0, fontSize: '1.05rem' }}>{t('exam.notAssignedTitle')}</h2>
+            <p className="hint">{t('exam.notAssignedBody')}</p>
           </div>
         ) : (
           <div className="card">
+            {examName && (
+              <span className="chip primary" style={{ marginBottom: '1rem', display: 'inline-block' }}>
+                {examName}
+              </span>
+            )}
             <div className="stat-grid">
               <div className="stat-tile">
                 <div className="stat-value">{state.config.durationMin}</div>

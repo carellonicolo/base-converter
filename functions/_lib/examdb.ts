@@ -4,76 +4,111 @@
  * Calcolatrice (vedi migrations/0001_bc_init.sql).
  */
 
-import { DEFAULT_CLASS, DEFAULT_CONFIG, parseConfig, type ExamConfig } from '../../shared/exam/config';
+import type { ExamConfig } from '../../shared/exam/config';
 import type { Env, Identity } from './shared';
 
-export interface ResolvedConfig {
-  config: ExamConfig;
-  /** Da dove viene la config: nome classe, '*' o 'builtin'. */
-  source: string;
+/* ---------------- Assegnazioni ---------------- */
+
+export interface AssignmentRow {
+  id: string;
+  exam_id: string;
+  class: string;
+  status: string;
+  duration_min: number | null;
+  created_by: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface AssignmentWithCounts extends AssignmentRow {
+  attempts: number;
+  submitted: number;
+  live: number;
+}
+
+export async function listAssignments(env: Env): Promise<AssignmentWithCounts[]> {
+  const { results } = await env.DB.prepare(
+    `SELECT a.*,
+            (SELECT COUNT(*) FROM bc_attempts t WHERE t.assignment_id = a.id) AS attempts,
+            (SELECT COUNT(*) FROM bc_attempts t WHERE t.assignment_id = a.id AND t.submitted_at IS NOT NULL) AS submitted,
+            (SELECT COUNT(*) FROM bc_attempts t WHERE t.assignment_id = a.id AND t.submitted_at IS NULL) AS live
+     FROM bc_assignments a
+     ORDER BY a.created_at DESC`
+  ).all<AssignmentWithCounts>();
+  return results ?? [];
 }
 
 /**
- * Risolve la configurazione per uno studente: prima una riga esplicita di una
- * delle sue classi approvate (in ordine), poi la default '*', poi il builtin.
+ * Assegna una verifica a una classe, chiudendo quella eventualmente già aperta
+ * per la stessa classe. Ritorna quante ne ha chiuse, così la console può dirlo
+ * invece di farlo di nascosto.
  */
-export async function resolveConfig(env: Env, classes: string[]): Promise<ResolvedConfig> {
-  const candidates = [...classes, DEFAULT_CLASS];
-  const placeholders = candidates.map(() => '?').join(',');
-  const { results } = await env.DB.prepare(
-    `SELECT class, config FROM bc_class_config WHERE class IN (${placeholders})`
+export async function createAssignment(
+  env: Env,
+  id: string,
+  examId: string,
+  cls: string,
+  durationMin: number | null,
+  byEmail: string
+): Promise<{ closed: number }> {
+  const now = new Date().toISOString();
+  const closed = await env.DB.prepare(
+    `UPDATE bc_assignments SET status = 'closed', updated_at = ? WHERE class = ? AND status = 'open'`
   )
-    .bind(...candidates)
-    .all<{ class: string; config: string }>();
-
-  const byClass = new Map((results ?? []).map((r) => [r.class, r]));
-  for (const c of candidates) {
-    const row = byClass.get(c);
-    if (row) {
-      let parsed: unknown = {};
-      try {
-        parsed = JSON.parse(row.config);
-      } catch {
-        parsed = {};
-      }
-      return { config: parseConfig(parsed), source: row.class };
-    }
-  }
-  return { config: DEFAULT_CONFIG, source: 'builtin' };
-}
-
-export async function upsertClassConfig(env: Env, cls: string, config: ExamConfig, byEmail: string): Promise<void> {
-  await env.DB.prepare(
-    `INSERT INTO bc_class_config (class, config, updated_at, updated_by)
-     VALUES (?, ?, ?, ?)
-     ON CONFLICT(class) DO UPDATE SET
-       config = excluded.config,
-       updated_at = excluded.updated_at,
-       updated_by = excluded.updated_by`
-  )
-    .bind(cls, JSON.stringify(config), new Date().toISOString(), byEmail)
+    .bind(now, cls)
     .run();
+  await env.DB.prepare(
+    `INSERT INTO bc_assignments (id, exam_id, class, status, duration_min, created_by, created_at, updated_at)
+     VALUES (?, ?, ?, 'open', ?, ?, ?, ?)`
+  )
+    .bind(id, examId, cls, durationMin, byEmail, now, now)
+    .run();
+  return { closed: closed.meta?.changes ?? 0 };
 }
 
-export async function listClassConfigs(env: Env): Promise<{ class: string; config: ExamConfig; updated_at: string }[]> {
-  const { results } = await env.DB.prepare(`SELECT class, config, updated_at FROM bc_class_config ORDER BY class`).all<{
-    class: string;
-    config: string;
-    updated_at: string;
-  }>();
-  return (results ?? []).map((r) => {
-    let parsed: unknown = {};
-    try {
-      parsed = JSON.parse(r.config);
-    } catch {
-      parsed = {};
-    }
-    return { class: r.class, config: parseConfig(parsed), updated_at: r.updated_at };
-  });
+export async function setAssignmentStatus(env: Env, id: string, status: 'open' | 'closed'): Promise<boolean> {
+  // Riaprire richiede che la classe non abbia già un'altra prova aperta,
+  // altrimenti lo studente si troverebbe davanti a due verifiche.
+  if (status === 'open') {
+    const row = await env.DB.prepare(`SELECT class FROM bc_assignments WHERE id = ?`).bind(id).first<{ class: string }>();
+    if (!row) return false;
+    await env.DB.prepare(
+      `UPDATE bc_assignments SET status = 'closed', updated_at = ? WHERE class = ? AND status = 'open' AND id <> ?`
+    )
+      .bind(new Date().toISOString(), row.class, id)
+      .run();
+  }
+  const res = await env.DB.prepare(`UPDATE bc_assignments SET status = ?, updated_at = ? WHERE id = ?`)
+    .bind(status, new Date().toISOString(), id)
+    .run();
+  return (res.meta?.changes ?? 0) > 0;
 }
 
-export async function deleteClassConfig(env: Env, cls: string): Promise<void> {
-  await env.DB.prepare(`DELETE FROM bc_class_config WHERE class = ?`).bind(cls).run();
+/** L'assegnazione aperta per una delle classi dello studente (la più recente). */
+export async function findOpenAssignment(env: Env, classes: string[]): Promise<AssignmentRow | null> {
+  if (!classes.length) return null;
+  const placeholders = classes.map(() => '?').join(',');
+  const row = await env.DB.prepare(
+    `SELECT * FROM bc_assignments WHERE status = 'open' AND class IN (${placeholders})
+     ORDER BY created_at DESC LIMIT 1`
+  )
+    .bind(...classes)
+    .first<AssignmentRow>();
+  return row ?? null;
+}
+
+export async function getAssignment(env: Env, id: string): Promise<AssignmentRow | null> {
+  const row = await env.DB.prepare(`SELECT * FROM bc_assignments WHERE id = ?`).bind(id).first<AssignmentRow>();
+  return row ?? null;
+}
+
+/** Classi già viste nei tentativi: rete di sicurezza se l'SSO non risponde. */
+export async function listKnownClasses(env: Env): Promise<string[]> {
+  const { results } = await env.DB.prepare(
+    `SELECT DISTINCT class FROM bc_attempts WHERE class IS NOT NULL AND class <> ''
+     UNION SELECT DISTINCT class FROM bc_assignments WHERE class <> ''`
+  ).all<{ class: string }>();
+  return (results ?? []).map((r) => r.class).sort();
 }
 
 /* ---------------- Tentativi ---------------- */
@@ -97,6 +132,8 @@ export interface AttemptRow {
   started_at: string;
   submitted_at: string | null;
   last_seen_at: string;
+  assignment_id: string | null;
+  exam_id: string | null;
 }
 
 /** Tentativo aperto (non consegnato) dell'utente, se esiste. */
@@ -109,20 +146,48 @@ export async function findOpenAttempt(env: Env, userId: string): Promise<Attempt
   return row ?? null;
 }
 
+/**
+ * Tentativo dell'utente per QUESTA assegnazione, consegnato o no.
+ * Serve a impedire di rifare due volte la stessa prova.
+ */
+export async function findAttemptForAssignment(env: Env, userId: string, assignmentId: string): Promise<AttemptRow | null> {
+  const row = await env.DB.prepare(
+    `SELECT * FROM bc_attempts WHERE user_id = ? AND assignment_id = ? ORDER BY started_at DESC LIMIT 1`
+  )
+    .bind(userId, assignmentId)
+    .first<AttemptRow>();
+  return row ?? null;
+}
+
 export async function createAttempt(
   env: Env,
   id: string,
   identity: Identity,
   cls: string | null,
   seed: number,
-  config: ExamConfig
+  config: ExamConfig,
+  assignmentId: string,
+  examId: string
 ): Promise<void> {
   const now = new Date().toISOString();
   await env.DB.prepare(
-    `INSERT INTO bc_attempts (id, user_id, email, full_name, class, seed, config, answers, started_at, last_seen_at, total_count)
-     VALUES (?, ?, ?, ?, ?, ?, ?, '[]', ?, ?, ?)`
+    `INSERT INTO bc_attempts (id, user_id, email, full_name, class, seed, config, answers, started_at, last_seen_at, total_count, assignment_id, exam_id)
+     VALUES (?, ?, ?, ?, ?, ?, ?, '[]', ?, ?, ?, ?, ?)`
   )
-    .bind(id, identity.userId, identity.email, identity.name, cls, seed, JSON.stringify(config), now, now, config.questionCount)
+    .bind(
+      id,
+      identity.userId,
+      identity.email,
+      identity.name,
+      cls,
+      seed,
+      JSON.stringify(config),
+      now,
+      now,
+      config.questionCount,
+      assignmentId,
+      examId
+    )
     .run();
 }
 
@@ -195,29 +260,3 @@ export async function listLiveAttempts(env: Env, sinceMs = 3 * 60 * 1000): Promi
   return results ?? [];
 }
 
-/* ---------------- Settings ---------------- */
-
-export async function getSetting(env: Env, key: string): Promise<string> {
-  try {
-    const row = await env.DB.prepare(`SELECT value FROM bc_settings WHERE key = ?`).bind(key).first<{ value: string }>();
-    return row?.value ?? '';
-  } catch {
-    return '';
-  }
-}
-
-export async function setSetting(env: Env, key: string, value: string): Promise<void> {
-  await env.DB.prepare(
-    `INSERT INTO bc_settings (key, value, updated_at) VALUES (?, ?, ?)
-     ON CONFLICT(key) DO UPDATE SET value = excluded.value, updated_at = excluded.updated_at`
-  )
-    .bind(key, value, new Date().toISOString())
-    .run();
-}
-
-/** Master-switch globale delle verifiche (default: attivo). */
-export async function getExamsEnabled(env: Env): Promise<boolean> {
-  const v = await getSetting(env, 'exams_enabled');
-  if (v === '') return true;
-  return v === 'true';
-}

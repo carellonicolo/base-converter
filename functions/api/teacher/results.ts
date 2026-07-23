@@ -4,6 +4,7 @@
  */
 import { jsonOk, jsonError, requireTeacher, type Env } from '../../_lib/shared';
 import { listAllAttempts } from '../../_lib/examdb';
+import { findExam } from '../../../shared/exam/catalog';
 
 export const onRequestGet: PagesFunction<Env> = async ({ request, env }) => {
   const access = await requireTeacher(request);
@@ -17,7 +18,7 @@ export const onRequestGet: PagesFunction<Env> = async ({ request, env }) => {
     const rows = await listAllAttempts(env, cls && cls !== '*' ? cls : null);
 
     if (format === 'csv') {
-      const header = ['Studente', 'Email', 'Classe', 'Voto', 'Corrette', 'Totale', 'Uscite', 'Consegnato'];
+      const header = ['Studente', 'Email', 'Classe', 'Verifica', 'Voto', 'Corrette', 'Totale', 'Uscite', 'Consegnato'];
       const lines = [header.join(';')];
       for (const r of rows) {
         lines.push(
@@ -25,6 +26,7 @@ export const onRequestGet: PagesFunction<Env> = async ({ request, env }) => {
             csv(r.full_name),
             csv(r.email),
             csv(r.class ?? ''),
+            csv(r.exam_id ?? ''),
             String(r.grade ?? '').replace('.', ','),
             String(r.correct_count),
             String(r.total_count),
@@ -42,18 +44,24 @@ export const onRequestGet: PagesFunction<Env> = async ({ request, env }) => {
     }
 
     return jsonOk({
-      results: rows.map((r) => ({
-        id: r.id,
-        name: r.full_name,
-        email: r.email,
-        class: r.class,
-        grade: r.grade,
-        correct_count: r.correct_count,
-        total_count: r.total_count,
-        away_events: r.away_events,
-        away_ms: r.away_ms,
-        submitted_at: r.submitted_at,
-      })),
+      results: rows.map((r) => {
+        const spec = r.exam_id ? findExam(r.exam_id) : null;
+        return {
+          id: r.id,
+          name: r.full_name,
+          email: r.email,
+          class: r.class,
+          examId: r.exam_id,
+          examTopic: spec?.topic ?? null,
+          examLevel: spec?.level ?? null,
+          grade: r.grade,
+          correct_count: r.correct_count,
+          total_count: r.total_count,
+          away_events: r.away_events,
+          away_ms: r.away_ms,
+          submitted_at: r.submitted_at,
+        };
+      }),
     });
   } catch (e) {
     return jsonError(500, `Errore DB: ${e instanceof Error ? e.message : String(e)}`);

@@ -14,13 +14,43 @@
 import { convert, formatIntInBase, baseName } from '../engine/bases';
 import { compute, type Op } from '../engine/arithmetic';
 import { encode as signEncode, decode as signDecode, type Repr } from '../engine/signed';
-import { encode as ieeeEncode, analyzeBits } from '../engine/ieee754';
+import { encode as ieeeEncode, analyzeBits, type Format } from '../engine/ieee754';
 import { utf8Bytes, textToBase64, asciiTable } from '../engine/text';
 
 export type ModuleKey = 'converter' | 'arithmetic' | 'signed' | 'ieee' | 'text';
 export type Difficulty = 'easy' | 'medium' | 'hard';
 
 export const MODULES: ModuleKey[] = ['converter', 'arithmetic', 'signed', 'ieee', 'text'];
+
+/**
+ * Restrizioni su cosa può uscire, così una verifica può essere monotematica
+ * ("solo binario", "solo complemento a due") mentre la palestra resta libera.
+ *
+ * La difficoltà continua a governare la GRANDEZZA dei numeri; i vincoli
+ * governano l'ARGOMENTO. Sono due assi indipendenti: esiste una prova sul solo
+ * binario che è comunque difficile.
+ *
+ * Omettere un campo = nessuna restrizione su quell'aspetto.
+ */
+export interface Constraints {
+  /**
+   * Base che deve comparire in OGNI conversione, come partenza o come arrivo.
+   * È ciò che rende una prova "solo binario": senza questo, una lista di basi
+   * ammesse produrrebbe anche conversioni fra le altre (10→16 in una prova
+   * sul binario).
+   */
+  anchorBase?: number;
+  /** Basi ammesse: l'altro estremo della conversione, o la base dell'aritmetica. */
+  bases?: number[];
+  /** Operazioni ammesse nell'aritmetica in base. */
+  ops?: Op[];
+  /** Rappresentazioni ammesse per i numeri con segno. */
+  reprs?: Repr[];
+  /** Ampiezze in bit ammesse per i numeri con segno. */
+  bits?: number[];
+  /** Formati IEEE 754 ammessi. */
+  formats?: Format[];
+}
 
 export type ExerciseKind =
   | 'conv'
@@ -80,11 +110,27 @@ function randInt(rng: () => number, min: number, max: number): number {
 
 /* ---------------- Generatori per modulo ---------------- */
 
-function genConverter(rng: () => number, d: Difficulty, id: string): Exercise {
+function genConverter(rng: () => number, d: Difficulty, id: string, c?: Constraints): Exercise {
   let from: number;
   let to: number;
   let value: number;
-  if (d === 'easy') {
+  if (c?.anchorBase !== undefined || (c?.bases && c.bases.length >= 2)) {
+    const [lo, hi] = d === 'easy' ? [1, 63] : d === 'medium' ? [16, 1023] : [100, 65535];
+    if (c.anchorBase !== undefined) {
+      const others = (c.bases ?? [10]).filter((b) => b !== c.anchorBase);
+      const other = others.length ? pick(rng, others) : 10;
+      // Si alterna il verso: convertire VERSO il binario e DA binario sono due
+      // abilità distinte, e una prova monotematica deve esercitarle entrambe.
+      const anchorFirst = rng() < 0.5;
+      from = anchorFirst ? c.anchorBase : other;
+      to = anchorFirst ? other : c.anchorBase;
+    } else {
+      const bases = c.bases as number[];
+      from = pick(rng, bases);
+      to = pick(rng, bases.filter((b) => b !== from));
+    }
+    value = randInt(rng, lo, hi);
+  } else if (d === 'easy') {
     const pair = pick(rng, [
       [10, 2],
       [2, 10],
@@ -117,9 +163,15 @@ function genConverter(rng: () => number, d: Difficulty, id: string): Exercise {
   };
 }
 
-function genArithmetic(rng: () => number, d: Difficulty, id: string): Exercise {
-  const base = d === 'easy' ? 2 : pick(rng, [2, 8, 16]);
-  const op: Op = d === 'easy' ? 'add' : d === 'medium' ? pick(rng, ['add', 'sub'] as Op[]) : pick(rng, ['add', 'sub', 'mul'] as Op[]);
+function genArithmetic(rng: () => number, d: Difficulty, id: string, c?: Constraints): Exercise {
+  const base = c?.bases?.length ? pick(rng, c.bases) : d === 'easy' ? 2 : pick(rng, [2, 8, 16]);
+  const op: Op = c?.ops?.length
+    ? pick(rng, c.ops)
+    : d === 'easy'
+      ? 'add'
+      : d === 'medium'
+        ? pick(rng, ['add', 'sub'] as Op[])
+        : pick(rng, ['add', 'sub', 'mul'] as Op[]);
   const maxV = d === 'easy' ? 15 : d === 'medium' ? 255 : 4095;
   let a = randInt(rng, 1, maxV);
   let b = randInt(rng, 1, op === 'mul' ? Math.min(15, maxV) : maxV);
@@ -138,10 +190,16 @@ function genArithmetic(rng: () => number, d: Difficulty, id: string): Exercise {
   };
 }
 
-function genSigned(rng: () => number, d: Difficulty, id: string): Exercise {
-  const bits = d === 'easy' ? 8 : pick(rng, [8, 16]);
-  const repr: Repr = d === 'easy' ? 'twos' : d === 'medium' ? pick(rng, ['twos', 'ones'] as Repr[]) : pick(rng, ['twos', 'ones', 'signMag', 'excess'] as Repr[]);
-  const limit = bits === 8 ? 100 : 20000;
+function genSigned(rng: () => number, d: Difficulty, id: string, c?: Constraints): Exercise {
+  const bits = c?.bits?.length ? pick(rng, c.bits) : d === 'easy' ? 8 : pick(rng, [8, 16]);
+  const repr: Repr = c?.reprs?.length
+    ? pick(rng, c.reprs)
+    : d === 'easy'
+      ? 'twos'
+      : d === 'medium'
+        ? pick(rng, ['twos', 'ones'] as Repr[])
+        : pick(rng, ['twos', 'ones', 'signMag', 'excess'] as Repr[]);
+  const limit = bits === 8 ? 100 : bits === 16 ? 20000 : bits === 4 ? 7 : 1_000_000;
   const value = randInt(rng, -limit, limit);
   const encodeDirection = rng() < 0.5;
   const encoded = signEncode(BigInt(value), bits, repr);
@@ -167,42 +225,47 @@ function genSigned(rng: () => number, d: Difficulty, id: string): Exercise {
   };
 }
 
-function genIeee(rng: () => number, d: Difficulty, id: string): Exercise {
+function genIeee(rng: () => number, d: Difficulty, id: string, c?: Constraints): Exercise {
   const simple = [1, 2, 0.5, -1, -2, 4, 0.25, 8, -0.5];
+  /** Il formato vincolato vince; senza vincoli restano i default per difficoltà. */
+  const fmt = (fallback: Format): Format => (c?.formats?.length ? pick(rng, c.formats) : fallback);
   if (d === 'easy') {
     // Dato un valore semplice, quanti bit di esponente memorizzato?
     const v = pick(rng, simple);
-    const bits = ieeeEncode(v, 'single');
-    const info = analyzeBits(bits, 'single');
+    const f = fmt('single');
+    const bits = ieeeEncode(v, f);
+    const info = analyzeBits(bits, f);
     return {
       id,
       module: 'ieee',
       kind: 'ieeeExponent',
       difficulty: d,
-      params: { value: v, format: 'single' },
+      params: { value: v, format: f },
       answer: String(info.expRaw),
       points: 1,
     };
   }
   if (d === 'medium') {
     const v = pick(rng, simple);
+    const f = fmt('half');
     return {
       id,
       module: 'ieee',
       kind: 'ieeeValue',
       difficulty: d,
-      params: { bits: ieeeEncode(v, 'half'), format: 'half' },
+      params: { bits: ieeeEncode(v, f), format: f },
       answer: String(v),
       points: 2,
     };
   }
   const v = pick(rng, [3.5, -6.25, 12.75, 0.375, -1.5]);
+  const f = fmt('half');
   return {
     id,
     module: 'ieee',
     kind: 'ieeeValue',
     difficulty: d,
-    params: { bits: ieeeEncode(v, 'half'), format: 'half' },
+    params: { bits: ieeeEncode(v, f), format: f },
     answer: String(v),
     points: 3,
   };
@@ -260,7 +323,9 @@ function genText(rng: () => number, d: Difficulty, id: string): Exercise {
   };
 }
 
-const GENERATORS: Record<ModuleKey, (rng: () => number, d: Difficulty, id: string) => Exercise> = {
+type Gen = (rng: () => number, d: Difficulty, id: string, c?: Constraints) => Exercise;
+
+const GENERATORS: Record<ModuleKey, Gen> = {
   converter: genConverter,
   arithmetic: genArithmetic,
   signed: genSigned,
@@ -269,9 +334,15 @@ const GENERATORS: Record<ModuleKey, (rng: () => number, d: Difficulty, id: strin
 };
 
 /** Genera un singolo esercizio deterministico. */
-export function generateExercise(module: ModuleKey, difficulty: Difficulty, seed: number, index = 0): Exercise {
+export function generateExercise(
+  module: ModuleKey,
+  difficulty: Difficulty,
+  seed: number,
+  index = 0,
+  constraints?: Constraints
+): Exercise {
   const rng = makeRng(seed + index * 7919);
-  return GENERATORS[module](rng, difficulty, `${module}-${seed}-${index}`);
+  return GENERATORS[module](rng, difficulty, `${module}-${seed}-${index}`, constraints);
 }
 
 /**
@@ -282,14 +353,15 @@ export function generateSet(
   modules: ModuleKey[],
   difficulty: Difficulty,
   count: number,
-  seed: number
+  seed: number,
+  constraints?: Constraints
 ): Exercise[] {
   const mods = modules.length ? modules : MODULES;
   const out: Exercise[] = [];
   for (let i = 0; i < count; i++) {
     const rng = makeRng(seed + i * 104729);
     const m = mods[Math.floor(rng() * mods.length) % mods.length];
-    out.push(generateExercise(m, difficulty, seed, i));
+    out.push(generateExercise(m, difficulty, seed, i, constraints));
   }
   return out;
 }

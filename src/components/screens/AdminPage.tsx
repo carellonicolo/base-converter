@@ -1,23 +1,45 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowLeft, Users, LogIn, Download, Save, Radio, Eye } from 'lucide-react';
+import { ArrowLeft, Users, LogIn, Download, Radio, Eye, RefreshCw, ClipboardList, BookOpen, Send, X } from 'lucide-react';
 import { AppShell } from '../ui/AppShell';
 import { LoadState } from '../ui/LoadState';
 import { useI18n } from '../../i18n';
 import { useAuth } from '../../hooks/useAuth';
 import { useToast } from '../ui/Toast';
+import { useConfirm } from '../ui/Confirm';
 import { authFetch } from '../../lib/auth';
 import { fmtGrade, fmtDateTime, fmtClock } from '../../lib/format';
-import { moduleLabel } from '../../lib/exerciseText';
-import { MODULES, type ModuleKey, type Difficulty } from '../../../shared/exercises/generator';
-import { DEFAULT_CLASS, DEFAULT_CONFIG, type ExamConfig } from '../../../shared/exam/config';
+import { moduleLabel, examTitle, exercisePrompt, expectedHint } from '../../lib/exerciseText';
+import type { Exercise } from '../../../shared/exercises/generator';
+import type { TopicKey, Level } from '../../../shared/exam/catalog';
 
-type Tab = 'config' | 'results' | 'live';
+type Tab = 'exams' | 'assignments' | 'results' | 'live';
+type Tfn = (k: string, v?: Record<string, string | number>) => string;
 
-interface ClassConfigRow {
+interface ExamRow {
+  id: string;
+  topic: TopicKey;
+  level: Level;
+  modules: string[];
+  difficulty: string;
+  questionCount: number;
+  durationMin: number;
+  passGrade: number;
+}
+
+interface AssignmentRow {
+  id: string;
+  examId: string;
   class: string;
-  config: ExamConfig;
-  updated_at: string;
+  status: 'open' | 'closed';
+  durationMin: number | null;
+  createdBy: string;
+  createdAt: string;
+  attempts: number;
+  submitted: number;
+  live: number;
+  exam: { topic: TopicKey; level: Level; questionCount: number; durationMin: number } | null;
+  missing: boolean;
 }
 
 interface ResultRow {
@@ -25,6 +47,8 @@ interface ResultRow {
   name: string;
   email: string;
   class: string | null;
+  examTopic: TopicKey | null;
+  examLevel: Level | null;
   grade: number | null;
   correct_count: number;
   total_count: number;
@@ -37,15 +61,16 @@ interface LiveRow {
   name: string;
   email: string;
   class: string | null;
+  examTopic: TopicKey | null;
+  examLevel: Level | null;
   away_events: number;
   remainingMs: number;
-  last_seen_at: string;
 }
 
 export function AdminPage() {
   const { t } = useI18n();
   const { user, loading, isTeacher, login } = useAuth();
-  const [tab, setTab] = useState<Tab>('config');
+  const [tab, setTab] = useState<Tab>('exams');
 
   const back = (
     <div className="breadcrumb">
@@ -55,8 +80,6 @@ export function AdminPage() {
     </div>
   );
 
-  // Finché l'identità non è risolta non si può decidere nulla: senza questo
-  // gate la console si montava (e chiamava le API docente) anche a chi non lo è.
   if (loading) {
     return (
       <AppShell back={back}>
@@ -91,6 +114,13 @@ export function AdminPage() {
     );
   }
 
+  const tabs: [Tab, string][] = [
+    ['exams', t('admin.tabExams')],
+    ['assignments', t('admin.tabAssignments')],
+    ['results', t('admin.tabResults')],
+    ['live', t('admin.tabLive')],
+  ];
+
   return (
     <AppShell back={back}>
       <div className="module module-wide">
@@ -104,18 +134,20 @@ export function AdminPage() {
         </div>
 
         <div className="admin-tabs">
-          <button className={`btn btn-sm ${tab === 'config' ? '' : 'btn-secondary'}`} onClick={() => setTab('config')} type="button">
-            {t('admin.tabConfig')}
-          </button>
-          <button className={`btn btn-sm ${tab === 'results' ? '' : 'btn-secondary'}`} onClick={() => setTab('results')} type="button">
-            {t('admin.tabResults')}
-          </button>
-          <button className={`btn btn-sm ${tab === 'live' ? '' : 'btn-secondary'}`} onClick={() => setTab('live')} type="button">
-            {t('admin.tabLive')}
-          </button>
+          {tabs.map(([key, label]) => (
+            <button
+              key={key}
+              className={`btn btn-sm ${tab === key ? '' : 'btn-secondary'}`}
+              onClick={() => setTab(key)}
+              type="button"
+            >
+              {label}
+            </button>
+          ))}
         </div>
 
-        {tab === 'config' && <ConfigTab t={t} />}
+        {tab === 'exams' && <ExamsTab t={t} />}
+        {tab === 'assignments' && <AssignmentsTab t={t} />}
         {tab === 'results' && <ResultsTab t={t} />}
         {tab === 'live' && <LiveTab t={t} />}
       </div>
@@ -123,213 +155,400 @@ export function AdminPage() {
   );
 }
 
-type Tfn = (k: string, v?: Record<string, string | number>) => string;
+/* ============================ Pool / catalogo ============================ */
 
-function ConfigTab({ t }: { t: Tfn }) {
-  const toast = useToast();
-  const [classes, setClasses] = useState<ClassConfigRow[]>([]);
-  const [defaults, setDefaults] = useState<ExamConfig>(DEFAULT_CONFIG);
-  const [examsEnabled, setExamsEnabled] = useState(true);
-  const [selected, setSelected] = useState<string>(DEFAULT_CLASS);
-  const [draft, setDraft] = useState<ExamConfig | null>(null);
+const TOPIC_ORDER: TopicKey[] = ['binary', 'hex', 'mixed', 'arith', 'float', 'signed', 'twos'];
+
+function ExamsTab({ t }: { t: Tfn }) {
+  const [exams, setExams] = useState<ExamRow[] | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [saving, setSaving] = useState(false);
+  const [reload, setReload] = useState(0);
+  const [previewId, setPreviewId] = useState<string | null>(null);
+  const [assignFor, setAssignFor] = useState<ExamRow | null>(null);
 
-  // Si carica UNA sola volta. Prima `load` dipendeva da `selected`, quindi ogni
-  // lettera digitata nel campo "classe nuova" rileggeva dal server e sovrascriveva
-  // la configurazione che il docente stava componendo.
+  useEffect(() => {
+    let alive = true;
+    void (async () => {
+      setError(null);
+      const res = await authFetch<{ exams: ExamRow[] }>('/api/teacher/exams');
+      if (!alive) return;
+      if (res.ok && res.data) setExams(res.data.exams);
+      else setError(res.error ?? `HTTP ${res.status}`);
+    })();
+    return () => {
+      alive = false;
+    };
+  }, [reload]);
+
+  const byTopic = useMemo(() => {
+    const map = new Map<TopicKey, ExamRow[]>();
+    for (const e of exams ?? []) {
+      const arr = map.get(e.topic) ?? [];
+      arr.push(e);
+      map.set(e.topic, arr);
+    }
+    for (const arr of map.values()) arr.sort((a, b) => a.level - b.level);
+    return map;
+  }, [exams]);
+
+  if (!exams || error) {
+    return (
+      <div className="card">
+        <LoadState t={t} error={error} onRetry={() => setReload((n) => n + 1)} />
+      </div>
+    );
+  }
+
+  return (
+    <>
+      <p className="hint" style={{ marginTop: 0 }}>{t('admin.poolLead')}</p>
+      {TOPIC_ORDER.filter((topic) => byTopic.has(topic)).map((topic) => (
+        <div className="card" key={topic}>
+          <h2 style={{ marginTop: 0, fontSize: '1.05rem', display: 'flex', alignItems: 'center', gap: 8 }}>
+            <BookOpen size={18} /> {t(`topic.${topic}`)}
+          </h2>
+          <div className="exam-pool">
+            {(byTopic.get(topic) ?? []).map((e) => (
+              <div className="exam-pool-row" key={e.id}>
+                <div className="exam-pool-info">
+                  <span className="chip primary">{t(`level.short${e.level}`)}</span>
+                  <span className="exam-pool-meta">
+                    {e.questionCount} {t('admin.questionsShort')} · {e.durationMin} {t('admin.minutes')}
+                  </span>
+                </div>
+                <div className="row" style={{ gap: '0.4rem' }}>
+                  <button className="btn btn-sm btn-secondary" type="button" onClick={() => setPreviewId(e.id)}>
+                    <Eye size={14} /> {t('admin.preview')}
+                  </button>
+                  <button className="btn btn-sm" type="button" onClick={() => setAssignFor(e)}>
+                    <Send size={14} /> {t('admin.assign')}
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      ))}
+
+      {previewId && <PreviewModal t={t} examId={previewId} onClose={() => setPreviewId(null)} />}
+      {assignFor && (
+        <AssignModal
+          t={t}
+          exam={assignFor}
+          onClose={() => setAssignFor(null)}
+        />
+      )}
+    </>
+  );
+}
+
+interface PreviewQuestion {
+  index: number;
+  module: string;
+  kind: string;
+  params: Record<string, string | number>;
+  points: number;
+  answer: string;
+}
+
+function asExercise(q: PreviewQuestion): Exercise {
+  return {
+    id: `q${q.index}`,
+    module: q.module as Exercise['module'],
+    kind: q.kind as Exercise['kind'],
+    difficulty: 'medium',
+    params: q.params,
+    answer: q.answer,
+    points: q.points,
+  };
+}
+
+function PreviewModal({ t, examId, onClose }: { t: Tfn; examId: string; onClose: () => void }) {
+  const [data, setData] = useState<{ exam: ExamRow; questions: PreviewQuestion[] } | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [seed, setSeed] = useState<number | null>(null);
+
   const load = useCallback(async () => {
     setError(null);
-    const res = await authFetch<{ classes: ClassConfigRow[]; examsEnabled: boolean; defaults: ExamConfig }>('/api/teacher/config');
-    if (!res.ok || !res.data) {
-      setError(res.error ?? `HTTP ${res.status}`);
-      return;
-    }
-    const data = res.data;
-    setClasses(data.classes);
-    setExamsEnabled(data.examsEnabled);
-    setDefaults(data.defaults);
-    setDraft((prev) => prev ?? data.classes.find((c) => c.class === DEFAULT_CLASS)?.config ?? data.defaults);
-  }, []);
+    const q = seed ? `&seed=${seed}` : '';
+    const res = await authFetch<{ exam: ExamRow; questions: PreviewQuestion[] }>(`/api/teacher/exams?id=${encodeURIComponent(examId)}${q}`);
+    if (res.ok && res.data) setData(res.data);
+    else setError(res.error ?? `HTTP ${res.status}`);
+  }, [examId, seed]);
 
   useEffect(() => {
     void load();
   }, [load]);
 
-  const save = async () => {
-    if (!draft) return;
+  // Un nuovo seed pseudo-casuale per rigenerare gli esempi mostrati.
+  const reshuffle = () => setSeed((Date.now() % 2_000_000_000) + 1);
+
+  return (
+    <div className="modal-backdrop" onClick={onClose}>
+      <div className="modal" onClick={(e) => e.stopPropagation()}>
+        <div className="modal-head">
+          <h2>
+            {data ? examTitle(data.exam.topic, data.exam.level, t) : t('admin.previewTitle')}
+          </h2>
+          <button className="icon-btn" type="button" onClick={onClose} aria-label={t('common.close')}>
+            <X size={18} />
+          </button>
+        </div>
+        <div className="modal-body">
+          {!data || error ? (
+            <LoadState t={t} error={error} onRetry={() => void load()} />
+          ) : (
+            <>
+              <div className="row row-wrap" style={{ justifyContent: 'space-between', marginBottom: '0.75rem' }}>
+                <span className="hint">
+                  {data.exam.questionCount} {t('admin.questionsShort')} · {data.exam.durationMin} {t('admin.minutes')}
+                </span>
+                <button className="btn btn-sm btn-ghost" type="button" onClick={reshuffle}>
+                  <RefreshCw size={14} /> {t('admin.reshuffle')}
+                </button>
+              </div>
+              <div className="table-scroll">
+                <table className="result-table">
+                  <thead>
+                    <tr>
+                      <th>#</th>
+                      <th>{t('dash.module')}</th>
+                      <th>{t('exam.title')}</th>
+                      <th>{t('admin.answerCol')}</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {data.questions.map((q) => (
+                      <tr key={q.index}>
+                        <td>{q.index + 1}</td>
+                        <td>{moduleLabel(q.module, t)}</td>
+                        <td>{exercisePrompt(asExercise(q), t)}</td>
+                        <td className="mono">
+                          {q.answer} <span className="hint">{expectedHint(asExercise(q))}</span>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function AssignModal({ t, exam, onClose }: { t: Tfn; exam: ExamRow; onClose: () => void }) {
+  const toast = useToast();
+  const [classes, setClasses] = useState<string[] | null>(null);
+  const [cls, setCls] = useState('');
+  const [duration, setDuration] = useState('');
+  const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    let alive = true;
+    void (async () => {
+      const res = await authFetch<{ classes: string[] }>('/api/teacher/classes');
+      if (!alive) return;
+      setClasses(res.ok && res.data ? res.data.classes : []);
+    })();
+    return () => {
+      alive = false;
+    };
+  }, []);
+
+  const submit = async () => {
+    const chosen = cls.trim();
+    if (!chosen) {
+      toast(t('admin.chooseClass'), 'error');
+      return;
+    }
     setSaving(true);
-    const res = await authFetch<{ classes: ClassConfigRow[] }>('/api/teacher/config', {
-      method: 'PUT',
-      body: JSON.stringify({ class: selected, config: draft, examsEnabled }),
+    const res = await authFetch<{ ok: boolean; closedPrevious: number }>('/api/teacher/assignments', {
+      method: 'POST',
+      body: JSON.stringify({
+        examId: exam.id,
+        class: chosen,
+        durationMin: duration.trim() === '' ? null : Number(duration),
+      }),
     });
     setSaving(false);
     if (res.ok) {
-      toast(t('admin.saved'), 'success');
-      if (res.data?.classes) setClasses(res.data.classes);
+      toast(t('admin.assignedOk', { class: chosen }), 'success');
+      if (res.data && res.data.closedPrevious > 0) toast(t('admin.closedPrevious', { class: chosen }), 'info');
+      onClose();
     } else {
       toast(res.error ?? t('errors.network'), 'error');
     }
   };
 
-  if (!draft) {
+  return (
+    <div className="modal-backdrop" onClick={onClose}>
+      <div className="modal modal-sm" onClick={(e) => e.stopPropagation()}>
+        <div className="modal-head">
+          <h2>{t('admin.assignTitle', { exam: examTitle(exam.topic, exam.level, t) })}</h2>
+          <button className="icon-btn" type="button" onClick={onClose} aria-label={t('common.close')}>
+            <X size={18} />
+          </button>
+        </div>
+        <div className="modal-body">
+          <div className="field">
+            <label htmlFor="assign-class">{t('admin.chooseClass')}</label>
+            {classes === null ? (
+              <p className="hint">{t('admin.classesLoading')}</p>
+            ) : (
+              <>
+                {classes.length > 0 ? (
+                  <select id="assign-class" value={cls} onChange={(e) => setCls(e.target.value)}>
+                    <option value="">—</option>
+                    {classes.map((c) => (
+                      <option key={c} value={c}>
+                        {c}
+                      </option>
+                    ))}
+                  </select>
+                ) : (
+                  <p className="hint">{t('admin.noClasses')}</p>
+                )}
+                <label htmlFor="assign-class-manual" style={{ marginTop: 10 }}>
+                  {t('admin.classManual')}
+                </label>
+                <input
+                  id="assign-class-manual"
+                  value={cls}
+                  onChange={(e) => setCls(e.target.value)}
+                  placeholder="es. 3A"
+                />
+              </>
+            )}
+          </div>
+          <div className="field">
+            <label htmlFor="assign-duration">{t('admin.durationOverride', { n: exam.durationMin })}</label>
+            <input
+              id="assign-duration"
+              type="number"
+              min={1}
+              max={240}
+              value={duration}
+              onChange={(e) => setDuration(e.target.value)}
+              placeholder={String(exam.durationMin)}
+            />
+          </div>
+          <button className="btn" type="button" onClick={submit} disabled={saving}>
+            <Send size={16} /> {saving ? t('common.loading') : t('admin.confirmAssign')}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ============================ Assegnazioni ============================ */
+
+function AssignmentsTab({ t }: { t: Tfn }) {
+  const toast = useToast();
+  const confirm = useConfirm();
+  const [rows, setRows] = useState<AssignmentRow[] | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [reload, setReload] = useState(0);
+
+  useEffect(() => {
+    let alive = true;
+    void (async () => {
+      setError(null);
+      const res = await authFetch<{ assignments: AssignmentRow[] }>('/api/teacher/assignments');
+      if (!alive) return;
+      if (res.ok && res.data) setRows(res.data.assignments);
+      else setError(res.error ?? `HTTP ${res.status}`);
+    })();
+    return () => {
+      alive = false;
+    };
+  }, [reload]);
+
+  const toggle = async (a: AssignmentRow) => {
+    const next = a.status === 'open' ? 'closed' : 'open';
+    const ok = await confirm({
+      message: next === 'closed' ? t('admin.confirmClose') : t('admin.confirmReopen'),
+      confirmLabel: next === 'closed' ? t('admin.close') : t('admin.open'),
+      danger: next === 'closed',
+    });
+    if (!ok) return;
+    const res = await authFetch('/api/teacher/assignments', {
+      method: 'PATCH',
+      body: JSON.stringify({ id: a.id, status: next }),
+    });
+    if (res.ok) setReload((n) => n + 1);
+    else toast(res.error ?? t('errors.network'), 'error');
+  };
+
+  if (!rows || error) {
     return (
       <div className="card">
-        <LoadState t={t} error={error} onRetry={() => void load()} />
+        <LoadState t={t} error={error} onRetry={() => setReload((n) => n + 1)} />
       </div>
     );
   }
 
-  const toggleModule = (m: ModuleKey) => {
-    const has = draft.modules.includes(m);
-    const next = has ? draft.modules.filter((x) => x !== m) : [...draft.modules, m];
-    setDraft({ ...draft, modules: next.length ? next : draft.modules });
-  };
-
   return (
     <div className="card">
-      <div className="field">
-        <label>
-          <input
-            type="checkbox"
-            checked={examsEnabled}
-            onChange={(e) => setExamsEnabled(e.target.checked)}
-            style={{ width: 'auto', marginRight: 8 }}
-          />
-          {t('admin.examEnabled')} (globale)
-        </label>
-      </div>
-
-      <div className="field-row">
-        <div className="field">
-          <label htmlFor="adm-class">{t('admin.classLabel')}</label>
-          <select
-            id="adm-class"
-            value={selected}
-            onChange={(e) => {
-              const v = e.target.value;
-              setSelected(v);
-              const existing = classes.find((c) => c.class === v);
-              setDraft(existing ? existing.config : defaults);
-            }}
-          >
-            <option value={DEFAULT_CLASS}>{t('admin.defaultClass')}</option>
-            {classes.filter((c) => c.class !== DEFAULT_CLASS).map((c) => (
-              <option key={c.class} value={c.class}>
-                {c.class}
-              </option>
-            ))}
-          </select>
-          <p className="hint" style={{ marginTop: 6 }}>
-            Puoi digitare una classe nuova nel campo qui sotto.
-          </p>
-          <input
-            value={selected === DEFAULT_CLASS ? '' : selected}
-            onChange={(e) => {
-              const v = e.target.value.trim() || DEFAULT_CLASS;
-              setSelected(v);
-              // Se la classe digitata ha già una configurazione, la mostro invece
-              // di lasciar salvare per sbaglio quella attualmente a schermo.
-              const existing = classes.find((c) => c.class === v);
-              if (existing) setDraft(existing.config);
-            }}
-            placeholder="es. 3A"
-            style={{ marginTop: 4 }}
-          />
+      <p className="hint" style={{ marginTop: 0 }}>{t('admin.assignmentsLead')}</p>
+      {rows.length === 0 ? (
+        <p className="hint">{t('admin.noAssignments')}</p>
+      ) : (
+        <div className="table-scroll">
+          <table className="data-table">
+            <thead>
+              <tr>
+                <th>{t('admin.exam')}</th>
+                <th>{t('admin.classLabel')}</th>
+                <th>{t('common.check')}</th>
+                <th>{t('admin.liveCount')}</th>
+                <th>{t('admin.submittedCount')}</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              {rows.map((a) => (
+                <tr key={a.id}>
+                  <td>
+                    {a.exam ? (
+                      examTitle(a.exam.topic, a.exam.level, t)
+                    ) : (
+                      <span className="hint">{a.examId} · {t('admin.staleExam')}</span>
+                    )}
+                    <br />
+                    <span className="hint">{t('admin.createdBy')}: {a.createdBy || '—'}</span>
+                  </td>
+                  <td><ClipboardList size={13} style={{ verticalAlign: '-2px' }} /> {a.class}</td>
+                  <td>
+                    <span className={`chip ${a.status === 'open' ? 'primary' : ''}`}>
+                      {a.status === 'open' ? t('admin.statusOpen') : t('admin.statusClosed')}
+                    </span>
+                  </td>
+                  <td className="mono">{a.live}</td>
+                  <td className="mono">{a.submitted}</td>
+                  <td>
+                    <button
+                      className={`btn btn-sm ${a.status === 'open' ? 'btn-ghost' : 'btn-secondary'}`}
+                      type="button"
+                      onClick={() => toggle(a)}
+                    >
+                      {a.status === 'open' ? t('admin.close') : t('admin.open')}
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
-
-        <div className="field">
-          <label>
-            <input
-              type="checkbox"
-              checked={draft.enabled}
-              onChange={(e) => setDraft({ ...draft, enabled: e.target.checked })}
-              style={{ width: 'auto', marginRight: 8 }}
-            />
-            {t('admin.examEnabled')} ({t('admin.classLabel').toLowerCase()})
-          </label>
-        </div>
-      </div>
-
-      <div className="field-row">
-        <div className="field">
-          <label htmlFor="adm-dur">{t('admin.examDuration')}</label>
-          <input
-            id="adm-dur"
-            type="number"
-            min={1}
-            max={240}
-            value={draft.durationMin}
-            onChange={(e) => setDraft({ ...draft, durationMin: Number(e.target.value) })}
-          />
-        </div>
-        <div className="field">
-          <label htmlFor="adm-q">{t('admin.examQuestions')}</label>
-          <input
-            id="adm-q"
-            type="number"
-            min={1}
-            max={50}
-            value={draft.questionCount}
-            onChange={(e) => setDraft({ ...draft, questionCount: Number(e.target.value) })}
-          />
-        </div>
-      </div>
-
-      <div className="field">
-        <label>{t('admin.modules')}</label>
-        <div className="row row-wrap" style={{ gap: '0.4rem' }}>
-          {MODULES.map((m) => (
-            <button
-              key={m}
-              type="button"
-              className={`chip${draft.modules.includes(m) ? ' primary' : ''}`}
-              style={{ cursor: 'pointer' }}
-              onClick={() => toggleModule(m)}
-              aria-pressed={draft.modules.includes(m)}
-            >
-              {moduleLabel(m, t)}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      <div className="field-row">
-        <div className="field">
-          <label>{t('admin.difficulty')}</label>
-          <div className="segmented">
-            {(['easy', 'medium', 'hard'] as Difficulty[]).map((d) => (
-              <button
-                key={d}
-                type="button"
-                className={draft.difficulty === d ? 'active' : ''}
-                onClick={() => setDraft({ ...draft, difficulty: d })}
-              >
-                {t(`gym.${d}`)}
-              </button>
-            ))}
-          </div>
-        </div>
-        <div className="field">
-          <label htmlFor="adm-pass">{t('admin.passThreshold')}</label>
-          <input
-            id="adm-pass"
-            type="number"
-            min={0}
-            max={10}
-            step={0.25}
-            value={draft.passGrade}
-            onChange={(e) => setDraft({ ...draft, passGrade: Number(e.target.value) })}
-          />
-        </div>
-      </div>
-
-      <button className="btn" type="button" onClick={save} disabled={saving}>
-        <Save size={16} /> {saving ? t('common.loading') : t('admin.saveConfig')}
-      </button>
+      )}
     </div>
   );
 }
+
+/* ============================ Risultati ============================ */
 
 function ResultsTab({ t }: { t: Tfn }) {
   const [rows, setRows] = useState<ResultRow[] | null>(null);
@@ -339,12 +558,12 @@ function ResultsTab({ t }: { t: Tfn }) {
 
   useEffect(() => {
     let alive = true;
-    // Piccolo ritardo: filtrando per classe si digita, e senza questo partiva
-    // una query al database a ogni tasto.
     const timer = setTimeout(() => {
       void (async () => {
         setError(null);
-        const res = await authFetch<{ results: ResultRow[] }>(`/api/teacher/results${cls ? `?class=${encodeURIComponent(cls)}` : ''}`);
+        const res = await authFetch<{ results: ResultRow[] }>(
+          `/api/teacher/results${cls ? `?class=${encodeURIComponent(cls)}` : ''}`
+        );
         if (!alive) return;
         if (res.ok && res.data) setRows(res.data.results);
         else setError(res.error ?? `HTTP ${res.status}`);
@@ -359,12 +578,7 @@ function ResultsTab({ t }: { t: Tfn }) {
   return (
     <div className="card">
       <div className="row row-wrap" style={{ justifyContent: 'space-between', marginBottom: '1rem' }}>
-        <input
-          value={cls}
-          onChange={(e) => setCls(e.target.value)}
-          placeholder={t('admin.classLabel')}
-          style={{ maxWidth: 200 }}
-        />
+        <input value={cls} onChange={(e) => setCls(e.target.value)} placeholder={t('admin.classLabel')} style={{ maxWidth: 200 }} />
         <a className="btn btn-sm btn-secondary" href={`/api/teacher/results?format=csv${cls ? `&class=${encodeURIComponent(cls)}` : ''}`}>
           <Download size={15} /> {t('admin.exportCsv')}
         </a>
@@ -381,6 +595,7 @@ function ResultsTab({ t }: { t: Tfn }) {
               <tr>
                 <th>{t('admin.student')}</th>
                 <th>{t('admin.classLabel')}</th>
+                <th>{t('admin.exam')}</th>
                 <th>{t('admin.grade')}</th>
                 <th>{t('exam.reviewTitle')}</th>
                 <th>{t('admin.awayEvents')}</th>
@@ -396,6 +611,7 @@ function ResultsTab({ t }: { t: Tfn }) {
                     <span className="hint">{r.email}</span>
                   </td>
                   <td>{r.class ?? '—'}</td>
+                  <td>{r.examTopic && r.examLevel ? examTitle(r.examTopic, r.examLevel, t) : '—'}</td>
                   <td className="mono" style={{ fontWeight: 700, color: (r.grade ?? 0) >= 6 ? 'var(--success)' : 'var(--error)' }}>
                     {fmtGrade(r.grade)}
                   </td>
@@ -415,6 +631,8 @@ function ResultsTab({ t }: { t: Tfn }) {
     </div>
   );
 }
+
+/* ============================ In diretta ============================ */
 
 function LiveTab({ t }: { t: Tfn }) {
   const [rows, setRows] = useState<LiveRow[] | null>(null);
@@ -448,9 +666,6 @@ function LiveTab({ t }: { t: Tfn }) {
         <strong>{t('admin.onlineNow')}</strong>
         <span className="hint">(aggiornamento ogni 15 s)</span>
       </div>
-      {/* Se un aggiornamento periodico fallisce tengo a schermo l'ultimo elenco
-          valido — durante una verifica sparire di colpo sarebbe peggio — e
-          segnalo il problema sopra la tabella. */}
       {rows && error && (
         <p className="hint" style={{ color: 'var(--error)' }}>
           {t('errors.loadFailed')} — {error}
@@ -466,6 +681,7 @@ function LiveTab({ t }: { t: Tfn }) {
             <tr>
               <th>{t('admin.student')}</th>
               <th>{t('admin.classLabel')}</th>
+              <th>{t('admin.exam')}</th>
               <th>{t('exam.timeLeft')}</th>
               <th>{t('admin.awayEvents')}</th>
             </tr>
@@ -479,6 +695,7 @@ function LiveTab({ t }: { t: Tfn }) {
                   <span className="hint">{r.email}</span>
                 </td>
                 <td>{r.class ?? '—'}</td>
+                <td>{r.examTopic && r.examLevel ? examTitle(r.examTopic, r.examLevel, t) : '—'}</td>
                 <td className="mono">{fmtClock(r.remainingMs)}</td>
                 <td className="mono" style={{ color: r.away_events > 0 ? 'var(--error)' : undefined }}>
                   <Eye size={14} style={{ verticalAlign: '-2px' }} /> {r.away_events}
