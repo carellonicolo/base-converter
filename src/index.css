@@ -340,7 +340,11 @@ label { display: block; font-weight: 600; margin-bottom: 0.35rem; font-size: 0.9
    NAVBAR STRUMENTI — switch rapido tra le modalità (rotte).
    La voce attiva è guidata da NavLink; la pillola colorata è pura CSS.
    ============================================================ */
-.tool-nav-wrap { display: flex; justify-content: center; margin: 0 0 1.5rem; }
+/* Spazio simmetrico: stesso respiro verso l'header (sopra) e verso il titolo
+   (sotto), così la barra resta centrata nella fascia — come in calculator. */
+.tool-nav-wrap { display: flex; justify-content: center; margin: 1.5rem 0; }
+/* Stesso respiro sotto l'header quando la navbar è nascosta (verifica). */
+.nav-hidden-gap { height: 1.5rem; }
 .tool-nav {
   display: flex; gap: 4px;
   background: var(--readonly-bg);

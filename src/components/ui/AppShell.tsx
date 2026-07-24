@@ -43,7 +43,10 @@ export function AppShell({ children, nav = true }: Props) {
           <LangToggle />
         </span>
       </carello-shell>
-      {nav && <ToolNav />}
+      {/* La navbar fa anche da distanziatore dall'header. Quando è nascosta
+          (verifica in corso) manteniamo lo stesso respiro, per non incollare il
+          contenuto sotto la barra unificata. */}
+      {nav ? <ToolNav /> : <div className="nav-hidden-gap" aria-hidden />}
       {children}
       <Footer />
     </div>
