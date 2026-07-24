@@ -7,6 +7,14 @@
    riordini dall'Hub compare qui automaticamente. Nessuna lista da
    aggiornare a mano.
 
+   LOGO DEL BRAND (in alto a sinistra): mostra la FAVICON dell'app corrente,
+   letta a runtime dalla <link rel="icon"> della pagina, invece di un glifo
+   fisso uguale per tutte. Poiché ogni favicon del "Kit Carello" è la stessa
+   scatola arancione con un glifo diverso, il logo indica a colpo d'occhio in
+   quale app ti trovi. Se la pagina non ha una favicon, si ripiega sul glifo
+   "tocco accademico". Nessun attributo da aggiungere: il file resta IDENTICO
+   in tutte le app.
+
    - Icone: stesse icone Lucide scelte nell'Hub (campo icon_name).
    - Link:  campo href.
    - Colore: campo color (stringa hsl(...) salvata dall'Hub).
@@ -74,6 +82,17 @@
   function initials(name) {
     const w = String(name || '?').trim().split(/\s+/);
     return ((w[0] || '')[0] || '') + ((w[1] || '')[0] || '');
+  }
+
+  // Favicon della pagina corrente: la stessa <link rel="icon"> che il browser
+  // mostra nella tab. La usiamo come logo del brand così ogni app espone il
+  // proprio simbolo. Nota: rel~="icon" matcha SOLO il token esatto "icon", non
+  // "apple-touch-icon"; querySelector prende la prima nel DOM (l'SVG del Kit).
+  // href è già un URL assoluto risolto dal browser (funziona per-sottodominio).
+  function readFaviconHref() {
+    const link = document.querySelector('link[rel~="icon"]');
+    const href = link ? link.href : '';
+    return href && href.trim() ? href : null;
   }
 
   // Tema: replica ESATTA della logica dell'app (hook useTheme + bootstrap in
@@ -201,6 +220,24 @@
 
       this.attachShadow({ mode: 'open' });
       this.shadowRoot.innerHTML = this.template(appName, appIcon, accent, user, hubHome);
+
+      // Logo del brand = FAVICON dell'app corrente. Sostituiamo il glifo di
+      // default solo a caricamento avvenuto (fav.onload): così, se la favicon è
+      // lenta o assente, resta visibile il "tocco accademico" e non c'è mai un
+      // riquadro vuoto. La classe has-favicon toglie il gradiente arancione del
+      // box (la favicon ha già la sua scatola: eviteremmo un doppio arancio).
+      const faviconHref = readFaviconHref();
+      const brandLogo = this.shadowRoot.getElementById('brandLogo');
+      if (faviconHref && brandLogo) {
+        const fav = new Image();
+        fav.alt = '';
+        fav.onload = () => {
+          brandLogo.innerHTML = '';
+          brandLogo.appendChild(fav);
+          brandLogo.classList.add('has-favicon');
+        };
+        fav.src = faviconHref;
+      }
 
       // Pulsante console (header): visibile solo se l'app dichiara la URL
       // E l'utente loggato è un docente. Gli studenti non lo vedono proprio.
@@ -540,7 +577,11 @@
            definisce (es. Flow Chart); il fallback resta l'arancio Carello. */
         .logo{ width:34px; height:34px; border-radius:11px;
                background:linear-gradient(135deg, var(--theme-accent, #ff8a4c), var(--primary-color, #e0662b));
-               display:flex; align-items:center; justify-content:center; box-shadow:0 4px 11px rgba(0,0,0,.22); flex-shrink:0; }
+               display:flex; align-items:center; justify-content:center; box-shadow:0 4px 11px rgba(0,0,0,.22); flex-shrink:0; overflow:hidden; }
+        /* Il logo ospita la favicon dell'app (che ha GIÀ la sua scatola arancione):
+           togliamo il gradiente per non raddoppiarlo, l'immagine riempie il box. */
+        .logo.has-favicon{ background:none; }
+        .logo img{ width:100%; height:100%; border-radius:inherit; object-fit:cover; display:block; }
         .name{ font-size:15px; font-weight:700; letter-spacing:-.01em; color:var(--c-ink); white-space:nowrap; }
         .sep{ color:var(--c-sep); }
         .crumb{ display:inline-flex; align-items:center; gap:6px; font-size:13.5px; font-weight:600; white-space:nowrap; color:var(--primary-color, ${accent}); text-decoration:none; cursor:pointer; border-radius:8px; padding:3px 7px; transition:background .15s; }
@@ -637,7 +678,7 @@
       <div class="bar">
         <div class="brand">
           <a class="brandlink" href="${hubHome}" title="Vai all'Hub — tutte le app">
-            <span class="logo">
+            <span class="logo" id="brandLogo">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
             </span>
             <span class="name">Prof. Carello</span>
