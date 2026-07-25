@@ -154,6 +154,37 @@
     return role === 'teacher' || role === 'super_admin';
   }
 
+  // Tracciamento "app aperta" (solo utenti loggati). L'IdP non può dedurre da
+  // sé quali app usa uno studente: le app verificano il cookie in locale con la
+  // chiave pubblica e chiamano /api/userinfo lato server, senza Origin/Referer.
+  // Questa shell invece gira nel browser e conosce il nome dell'app: manda un
+  // beacon a POST <auth>/api/track/app-open. La richiesta è cross-origin ma
+  // SAME-SITE (sottodomini di nicolocarello.it), quindi il cookie nc_session
+  // viene inviato con credentials:'include'.
+  // Best-effort e non bloccante: qualunque errore viene ignorato in silenzio.
+  // Il guard su sessionStorage evita un evento per ogni navigazione interna
+  // nella stessa scheda (l'IdP fa comunque de-duplica lato server).
+  function trackAppOpen(authUrl, appName) {
+    if (!authUrl) return;
+    const key = 'nc_app_open_sent';
+    try {
+      if (sessionStorage.getItem(key)) return;
+      sessionStorage.setItem(key, String(Date.now()));
+    } catch (e) {
+      /* sessionStorage non disponibile: si affida alla de-duplica lato server */
+    }
+    try {
+      fetch(authUrl.replace(/\/$/, '') + '/api/track/app-open', {
+        method: 'POST',
+        credentials: 'include',
+        keepalive: true,
+        // text/plain = richiesta CORS "semplice": nessun preflight OPTIONS.
+        headers: { 'Content-Type': 'text/plain;charset=UTF-8' },
+        body: JSON.stringify({ app: appName, href: window.location.origin }),
+      }).catch(function () {});
+    } catch (e) {}
+  }
+
   async function fetchHub(hubUrl) {
     const endpoint = hubUrl.replace(/\/$/, '') + '/api/db';
     // niente credentials: la lettura è pubblica, evita complicazioni CORS
@@ -413,6 +444,13 @@
         // Mantiene l'icona allineata anche se il tema cambia da fuori la shell.
         this._themeBtnObserver = new MutationObserver(syncThemeBtn);
         this._themeBtnObserver.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+      }
+
+      // Traccia l'apertura dell'app: solo con sessione attiva (profileName
+      // esiste solo se c'è il cookie nc_profile) e solo dalle APP, non
+      // dall'IdP stesso (dove authUrl coincide con l'origine della pagina).
+      if (profileName && authUrl.replace(/\/$/, '') !== window.location.origin) {
+        trackAppOpen(authUrl, appName);
       }
 
       // 1) mostra subito la cache (o il fallback statico)
