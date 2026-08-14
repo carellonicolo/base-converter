@@ -1,20 +1,28 @@
 # Configurazione del progetto Cloudflare Pages "base-converter".
 #
-# Questo file è la FONTE DI VERITÀ dei binding: al deploy sostituisce le
-# variabili/binding impostati a mano nel dashboard.
+# Questo file governa i binding: al deploy SOVRASCRIVE quelli che nomina.
+# Attenzione, non li azzera: un binding presente sul dashboard e non
+# dichiarato qui sopravvive al deploy. Per rimuoverlo serve il dashboard o
+# l'API.
 #
-# D1: si riusa il database esistente `ccna1` (limite piano free quasi
-# raggiunto); tutte le tabelle di questa app sono prefissate `bc_`,
-# quindi non interferiscono con le tabelle di CCNA1/Calcolatrice.
+# Tutte le tabelle di questa app sono prefissate `bc_`, quindi il passaggio
+# al database condiviso non ha richiesto nemmeno una modifica al codice:
+# cambia solo dove punta il binding.
 #
 # Migrazioni: applicare a mano con
-#   npx wrangler d1 execute ccna1 --remote --file=migrations/0001_bc_init.sql
+#   npx wrangler d1 execute piattaforma --remote --file=migrations/0001_bc_init.sql
 
 name = "base-converter"
 pages_build_output_dir = "dist"
 compatibility_date = "2026-07-01"
 
+# Consolidamento 2026-08-13: dal database `ccna1`, condiviso con CCNA1 e la
+# calcolatrice, al database unico della piattaforma.
+#
+# Nota: `bc_settings` è stata eliminata invece che migrata — zero righe e
+# zero riferimenti in tutti e tre i repository. Le impostazioni condivise
+# della piattaforma vivono ora in `settings`, con la colonna `app`.
 [[d1_databases]]
 binding = "DB"
-database_name = "ccna1"
-database_id = "c3b75339-db87-44b4-8ca8-45998b4a4253"
+database_name = "piattaforma"
+database_id = "ef8ab1b7-1db7-4d8a-a4b4-24ec663a5b0b"
