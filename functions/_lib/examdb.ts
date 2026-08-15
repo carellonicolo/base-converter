@@ -1,7 +1,17 @@
 /**
- * Accesso alle tabelle `bc_*` nel database D1 condiviso `ccna1`.
- * Le tabelle sono prefissate `bc_` e non toccano quelle di CCNA1 o della
- * Calcolatrice (vedi migrations/0001_bc_init.sql).
+ * Accesso ai dati della calcolatrice nel database `piattaforma`.
+ *
+ * Le tabelle proprie sono prefissate `bc_`. I TENTATIVI però non sono più
+ * solo nostri: la spina dorsale di ogni prova — chi, quando, che stato,
+ * che voto, quante distrazioni — vive nella tabella condivisa `verifiche`
+ * (app = 'bc'), la stessa che usano CCNA1, VLSM, AFS, Turing e 80x86.
+ * In `bc_attempts` resta ciò che è davvero della calcolatrice: seme,
+ * configurazione, risposte, conteggi. Vedi migrations/0003_bc_verifiche.sql.
+ *
+ * Verso il resto dell'applicazione questo modulo continua a parlare la
+ * lingua di prima: `AttemptRow` ha gli stessi campi di sempre, e nessun
+ * altro file ha dovuto cambiare. La giunzione fra le due tabelle sta qui
+ * dentro, e solo qui.
  */
 
 import type { ExamConfig } from '../../shared/exam/config';
@@ -29,9 +39,9 @@ export interface AssignmentWithCounts extends AssignmentRow {
 export async function listAssignments(env: Env): Promise<AssignmentWithCounts[]> {
   const { results } = await env.DB.prepare(
     `SELECT a.*,
-            (SELECT COUNT(*) FROM bc_attempts t WHERE t.assignment_id = a.id) AS attempts,
-            (SELECT COUNT(*) FROM bc_attempts t WHERE t.assignment_id = a.id AND t.submitted_at IS NOT NULL) AS submitted,
-            (SELECT COUNT(*) FROM bc_attempts t WHERE t.assignment_id = a.id AND t.submitted_at IS NULL) AS live
+            (SELECT COUNT(*) FROM verifiche v WHERE v.app = 'bc' AND v.assegnazione_id = a.id) AS attempts,
+            (SELECT COUNT(*) FROM verifiche v WHERE v.app = 'bc' AND v.assegnazione_id = a.id AND v.stato = 'consegnata') AS submitted,
+            (SELECT COUNT(*) FROM verifiche v WHERE v.app = 'bc' AND v.assegnazione_id = a.id AND v.stato = 'in_corso') AS live
      FROM bc_assignments a
      ORDER BY a.created_at DESC`
   ).all<AssignmentWithCounts>();
@@ -123,7 +133,8 @@ export async function listAllProgress(env: Env): Promise<ProgressRow[]> {
 /** Classi già viste nei tentativi: rete di sicurezza se l'SSO non risponde. */
 export async function listKnownClasses(env: Env): Promise<string[]> {
   const { results } = await env.DB.prepare(
-    `SELECT DISTINCT class FROM bc_attempts WHERE class IS NOT NULL AND class <> ''
+    `SELECT DISTINCT student_class AS class FROM verifiche
+       WHERE app = 'bc' AND student_class IS NOT NULL AND student_class <> ''
      UNION SELECT DISTINCT class FROM bc_assignments WHERE class <> ''`
   ).all<{ class: string }>();
   return (results ?? []).map((r) => r.class).sort();
@@ -154,10 +165,40 @@ export interface AttemptRow {
   exam_id: string | null;
 }
 
+/**
+ * La giunzione fra le due tabelle, scritta una volta sola.
+ *
+ * `verifiche` porta la spina dorsale, `bc_attempts` il contenuto della
+ * prova. Gli alias riportano i nomi storici perché il resto
+ * dell'applicazione — e il JSON che manda al browser — parla ancora
+ * quella lingua: cambiare qui il vocabolario avrebbe voluto dire toccare
+ * sei file di API e la console del docente, senza guadagnarci nulla.
+ */
+const SELECT_TENTATIVO = `
+  SELECT a.id,
+         v.student_id      AS user_id,
+         a.email,
+         v.student_name    AS full_name,
+         v.student_class   AS class,
+         a.seed, a.config, a.answers,
+         v.punteggio       AS score,
+         v.punteggio_max   AS max_score,
+         v.voto10          AS grade,
+         a.correct_count, a.total_count,
+         v.distrazioni     AS away_events,
+         v.distrazioni_ms  AS away_ms,
+         v.iniziata_il     AS started_at,
+         v.consegnata_il   AS submitted_at,
+         v.aggiornata_il   AS last_seen_at,
+         v.assegnazione_id AS assignment_id,
+         v.prova_id        AS exam_id
+    FROM bc_attempts a
+    JOIN verifiche v ON v.app = 'bc' AND v.id = a.id`;
+
 /** Tentativo aperto (non consegnato) dell'utente, se esiste. */
 export async function findOpenAttempt(env: Env, userId: string): Promise<AttemptRow | null> {
   const row = await env.DB.prepare(
-    `SELECT * FROM bc_attempts WHERE user_id = ? AND submitted_at IS NULL ORDER BY started_at DESC LIMIT 1`
+    `${SELECT_TENTATIVO} WHERE v.student_id = ? AND v.stato = 'in_corso' ORDER BY v.iniziata_il DESC LIMIT 1`
   )
     .bind(userId)
     .first<AttemptRow>();
@@ -170,7 +211,7 @@ export async function findOpenAttempt(env: Env, userId: string): Promise<Attempt
  */
 export async function findAttemptForAssignment(env: Env, userId: string, assignmentId: string): Promise<AttemptRow | null> {
   const row = await env.DB.prepare(
-    `SELECT * FROM bc_attempts WHERE user_id = ? AND assignment_id = ? ORDER BY started_at DESC LIMIT 1`
+    `${SELECT_TENTATIVO} WHERE v.student_id = ? AND v.assegnazione_id = ? ORDER BY v.iniziata_il DESC LIMIT 1`
   )
     .bind(userId, assignmentId)
     .first<AttemptRow>();
@@ -188,29 +229,27 @@ export async function createAttempt(
   examId: string
 ): Promise<void> {
   const now = new Date().toISOString();
-  await env.DB.prepare(
-    `INSERT INTO bc_attempts (id, user_id, email, full_name, class, seed, config, answers, started_at, last_seen_at, total_count, assignment_id, exam_id)
-     VALUES (?, ?, ?, ?, ?, ?, ?, '[]', ?, ?, ?, ?, ?)`
-  )
-    .bind(
-      id,
-      identity.userId,
-      identity.email,
-      identity.name,
-      cls,
-      seed,
-      JSON.stringify(config),
-      now,
-      now,
-      config.questionCount,
-      assignmentId,
-      examId
-    )
-    .run();
+  // Le due righe nascono insieme o non nascono: una prova senza la sua
+  // riga in `verifiche` sarebbe invisibile a ogni lettura (la giunzione la
+  // scarterebbe), e una riga in `verifiche` senza contenuto non si
+  // potrebbe ricostruire. `batch` è transazionale in D1.
+  await env.DB.batch([
+    env.DB.prepare(
+      `INSERT INTO verifiche (app, id, categoria, assegnazione_id, prova_id, student_id, student_name, student_class,
+                              stato, iniziata_il, aggiornata_il)
+       VALUES ('bc', ?, 'verifica', ?, ?, ?, ?, ?, 'in_corso', ?, ?)`
+    ).bind(id, assignmentId, examId, identity.userId, identity.name, cls, now, now),
+    env.DB.prepare(
+      `INSERT INTO bc_attempts (id, email, seed, config, answers, total_count)
+       VALUES (?, ?, ?, ?, '[]', ?)`
+    ).bind(id, identity.email, seed, JSON.stringify(config), config.questionCount),
+  ]);
 }
 
 export async function touchAttempt(env: Env, id: string, awayEvents: number, awayMs: number): Promise<void> {
-  await env.DB.prepare(`UPDATE bc_attempts SET last_seen_at = ?, away_events = ?, away_ms = ? WHERE id = ?`)
+  await env.DB.prepare(
+    `UPDATE verifiche SET aggiornata_il = ?, distrazioni = ?, distrazioni_ms = ? WHERE app = 'bc' AND id = ?`
+  )
     .bind(new Date().toISOString(), awayEvents, awayMs, id)
     .run();
 }
@@ -227,31 +266,27 @@ export async function finalizeAttempt(
   awayEvents: number,
   awayMs: number
 ): Promise<void> {
-  await env.DB.prepare(
-    `UPDATE bc_attempts
-     SET answers = ?, score = ?, max_score = ?, grade = ?, correct_count = ?, total_count = ?,
-         away_events = ?, away_ms = ?, submitted_at = ?, last_seen_at = ?
-     WHERE id = ?`
-  )
-    .bind(
-      JSON.stringify(answers),
-      score,
-      maxScore,
-      grade,
-      correctCount,
-      totalCount,
-      awayEvents,
-      awayMs,
-      new Date().toISOString(),
-      new Date().toISOString(),
-      id
-    )
-    .run();
+  const now = new Date().toISOString();
+  // `voto_auto` conserva quello che ha calcolato la macchina: se un giorno
+  // il docente correggerà a mano, `voto10` cambierà e resterà la traccia
+  // di quale dei due numeri è suo.
+  await env.DB.batch([
+    env.DB.prepare(
+      `UPDATE verifiche
+          SET stato = 'consegnata', consegnata_il = ?, aggiornata_il = ?,
+              punteggio = ?, punteggio_max = ?, voto10 = ?, voto_auto = ?,
+              distrazioni = ?, distrazioni_ms = ?
+        WHERE app = 'bc' AND id = ?`
+    ).bind(now, now, score, maxScore, grade, grade, awayEvents, awayMs, id),
+    env.DB.prepare(
+      `UPDATE bc_attempts SET answers = ?, correct_count = ?, total_count = ? WHERE id = ?`
+    ).bind(JSON.stringify(answers), correctCount, totalCount, id),
+  ]);
 }
 
 export async function listUserAttempts(env: Env, userId: string, limit = 20): Promise<AttemptRow[]> {
   const { results } = await env.DB.prepare(
-    `SELECT * FROM bc_attempts WHERE user_id = ? AND submitted_at IS NOT NULL ORDER BY submitted_at DESC LIMIT ?`
+    `${SELECT_TENTATIVO} WHERE v.student_id = ? AND v.stato = 'consegnata' ORDER BY v.consegnata_il DESC LIMIT ?`
   )
     .bind(userId, limit)
     .all<AttemptRow>();
@@ -260,8 +295,8 @@ export async function listUserAttempts(env: Env, userId: string, limit = 20): Pr
 
 export async function listAllAttempts(env: Env, cls: string | null, limit = 500): Promise<AttemptRow[]> {
   const sql = cls
-    ? `SELECT * FROM bc_attempts WHERE class = ? AND submitted_at IS NOT NULL ORDER BY submitted_at DESC LIMIT ?`
-    : `SELECT * FROM bc_attempts WHERE submitted_at IS NOT NULL ORDER BY submitted_at DESC LIMIT ?`;
+    ? `${SELECT_TENTATIVO} WHERE v.student_class = ? AND v.stato = 'consegnata' ORDER BY v.consegnata_il DESC LIMIT ?`
+    : `${SELECT_TENTATIVO} WHERE v.stato = 'consegnata' ORDER BY v.consegnata_il DESC LIMIT ?`;
   const stmt = cls ? env.DB.prepare(sql).bind(cls, limit) : env.DB.prepare(sql).bind(limit);
   const { results } = await stmt.all<AttemptRow>();
   return results ?? [];
@@ -271,7 +306,7 @@ export async function listAllAttempts(env: Env, cls: string | null, limit = 500)
 export async function listLiveAttempts(env: Env, sinceMs = 3 * 60 * 1000): Promise<AttemptRow[]> {
   const since = new Date(Date.now() - sinceMs).toISOString();
   const { results } = await env.DB.prepare(
-    `SELECT * FROM bc_attempts WHERE submitted_at IS NULL AND last_seen_at >= ? ORDER BY last_seen_at DESC LIMIT 200`
+    `${SELECT_TENTATIVO} WHERE v.stato = 'in_corso' AND v.aggiornata_il >= ? ORDER BY v.aggiornata_il DESC LIMIT 200`
   )
     .bind(since)
     .all<AttemptRow>();
