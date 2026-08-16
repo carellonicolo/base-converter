@@ -4,7 +4,7 @@
   Referrer-Policy: strict-origin-when-cross-origin
   Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=(), usb=(), interest-cohort=()
   Strict-Transport-Security: max-age=31536000
-  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: https://auth.nicolocarello.it; connect-src 'self' https://nicolocarello.it https://unpkg.com https://auth.nicolocarello.it; font-src 'self' data: https://fonts.gstatic.com; worker-src 'self'; object-src 'none'; base-uri 'self'; frame-ancestors 'none'; manifest-src 'self'; form-action 'self'
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' https://auth.nicolocarello.it; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: https://auth.nicolocarello.it; connect-src 'self' https://nicolocarello.it https://unpkg.com https://auth.nicolocarello.it; font-src 'self' data: https://fonts.gstatic.com; worker-src 'self'; object-src 'none'; base-uri 'self'; frame-ancestors 'none'; manifest-src 'self'; form-action 'self'
 
 # NOTE CSP:
 #  - style-src/font-src consentono Google Fonts (Lexend + JetBrains Mono del tema Carello).

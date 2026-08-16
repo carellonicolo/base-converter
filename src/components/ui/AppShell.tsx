@@ -16,7 +16,7 @@ interface Props {
 
 /**
  * Guscio dell'app: top bar unificata Carello (web component, vedi
- * public/carello-shell.js) + navbar strumenti + contenuto + footer.
+ * https://auth.nicolocarello.it/carello-shell.js (origine unica, vedi AUTH/CARELLO-SHELL.md)) + navbar strumenti + contenuto + footer.
  *
  * - Il toggle IT/EN vive DENTRO l'header, nello slot `app-actions` previsto
  *   dalla shell per i controlli specifici dell'app (nessuna modifica al web

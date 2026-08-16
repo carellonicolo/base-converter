@@ -1,4 +1,4 @@
-// Tipi per il custom element <carello-shell> (web component, vedi public/carello-shell.js).
+// Tipi per il custom element <carello-shell> (web component, vedi https://auth.nicolocarello.it/carello-shell.js (origine unica, vedi AUTH/CARELLO-SHELL.md)).
 // Solo dichiarazioni di tipo: nessun impatto a runtime.
 declare namespace JSX {
   interface IntrinsicElements {
