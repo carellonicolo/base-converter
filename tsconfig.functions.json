@@ -12,5 +12,9 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true
   },
-  "include": ["functions", "shared"]
+  "include": ["functions", "shared"],
+  // I test di shared/ restano fuori: li compila gia' `tsc -b` col resto
+  // dell'app. Tenerli qui legherebbe il build alla presenza di `vitest` tra
+  // i moduli installati, e questo controllo ora blocca il deploy.
+  "exclude": ["**/*.test.ts"]
 }
