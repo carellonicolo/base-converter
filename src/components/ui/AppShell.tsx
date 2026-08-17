@@ -36,7 +36,7 @@ export function AppShell({ children, nav = true }: Props) {
         data-auth-url={AUTH_ORIGIN}
         data-dash-url="/dashboard"
         data-dash-label="Dashboard"
-        data-theme-key="bc_theme"
+        data-theme-key="nc_theme"
         data-console-url="/admin"
       >
         <span slot="app-actions" className="shell-lang">

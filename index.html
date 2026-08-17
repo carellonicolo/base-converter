@@ -24,7 +24,15 @@
     <script>
       (function () {
         try {
-          var stored = localStorage.getItem('bc_theme');
+          var stored = localStorage.getItem('nc_theme');
+          if (!stored) {
+            // Migrazione una tantum dalla vecchia chiave, 17/08/2026: la
+            // preferenza tema e' unica per tutta la piattaforma. Questo
+            // bootstrap gira prima di React, quindi da qui in poi tutti
+            // leggono solo 'nc_theme'.
+            stored = localStorage.getItem('bc_theme');
+            if (stored) localStorage.setItem('nc_theme', stored);
+          }
           var theme = stored || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
           document.documentElement.setAttribute('data-theme', theme);
           if (theme === 'dark') document.documentElement.classList.add('dark');
