@@ -1,5 +1,18 @@
 -- Migrazione 0001 — Base Converter (converter.nicolocarello.it).
 --
+-- ⚠️  DUE DELLE TABELLE CREATE QUI NON ESISTONO PIÙ, ed è corretto così:
+--
+--       bc_class_config  eliminata dalla migrazione 0002, che la sostituisce
+--                        con bc_assignments.
+--       bc_settings      confluita nella tabella condivisa `settings`
+--                        (colonne app/key/value) durante il consolidamento
+--                        dei database del 13/08/2026. Nessuna riga di codice
+--                        la nomina più.
+--
+--     Il database di questa app ha oggi tre tabelle: bc_assignments,
+--     bc_attempts, bc_progress. Questo file è storia, non fotografia — per
+--     lo schema reale in produzione vedi SCHEMA.sql, in questa cartella.
+--
 -- ⚠️ Queste tabelle vivono nel database D1 CONDIVISO `ccna1` (limite di 10 DB
 -- del piano free). Tutte le tabelle di questa app sono prefissate `bc_` e non
 -- toccano le tabelle di CCNA1 (quiz) né della Calcolatrice (`calc_`).
