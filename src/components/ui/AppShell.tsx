@@ -35,7 +35,6 @@ export function AppShell({ children, nav = true }: Props) {
         data-hub-url="https://nicolocarello.it"
         data-auth-url={AUTH_ORIGIN}
         data-dash-url="/dashboard"
-        data-dash-label="Dashboard"
         data-theme-key="nc_theme"
         data-console-url="/admin"
       >
