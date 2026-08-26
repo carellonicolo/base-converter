@@ -2,14 +2,18 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import App from './App';
 import { ErrorBoundary } from './components/ErrorBoundary';
-import { BackgroundDecor } from './components/ui/BackgroundDecor';
+// Le bolle sfocate non si montano più: il fondo di tutte le app della
+// piattaforma è la nuvola di punti di carello-ambient.js, caricato in
+// index.html dalla stessa origine della shell (vedi AUTH/CARELLO-SHELL.md).
+// Il componente resta nel repo, con le classi .bg-blob* in index.css:
+// rimettere <BackgroundDecor /> qui sotto è tutto il rollback che serve.
+// import { BackgroundDecor } from './components/ui/BackgroundDecor';
 import { I18nProvider } from './i18n';
 import './index.css';
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <ErrorBoundary>
-      <BackgroundDecor />
       <I18nProvider>
         <App />
       </I18nProvider>
