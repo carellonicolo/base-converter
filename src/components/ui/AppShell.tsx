@@ -26,7 +26,10 @@ interface Props {
  */
 export function AppShell({ children, nav = true }: Props) {
   return (
-    <div className="shell">
+    // La barra unificata sta FUORI da .shell: quel contenitore ha un padding-top
+    // che la staccava dal bordo della finestra. Ora è ancorata al top come in
+    // Macchina di Turing e 80x86; il padding resta al contenuto, dove serve.
+    <>
       <carello-shell
         app-name="Base Converter"
         app-icon="Binary"
@@ -42,12 +45,14 @@ export function AppShell({ children, nav = true }: Props) {
           <LangToggle />
         </span>
       </carello-shell>
-      {/* La navbar fa anche da distanziatore dall'header. Quando è nascosta
-          (verifica in corso) manteniamo lo stesso respiro, per non incollare il
-          contenuto sotto la barra unificata. */}
-      {nav ? <ToolNav /> : <div className="nav-hidden-gap" aria-hidden />}
-      {children}
-      <Footer />
-    </div>
+      <div className="shell">
+        {/* Niente distanziatore quando la navbar è nascosta (verifica in corso):
+            il respiro sotto la barra lo dà il padding-top di .shell, che c'è in
+            entrambi i casi. */}
+        {nav && <ToolNav />}
+        {children}
+        <Footer />
+      </div>
+    </>
   );
 }

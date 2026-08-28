@@ -70,15 +70,15 @@
 
 * { box-sizing: border-box; }
 
+/* Fondo pagina: colore piatto, e basta.
+   Gli aloni li disegna carello-ambient.js (--amb-backdrop, z-index -1),
+   caricato da AUTH in index.html. Qui sopravvivevano quelli del tema
+   precedente e i due strati si sommavano. Stessa resa di Macchina di Turing,
+   che il fondo lo lascia al token e alla nuvola. Vedi AUTH/CARELLO-SHELL.md. */
 html, body {
   margin: 0;
   padding: 0;
-  background:
-    radial-gradient(circle at 12% 15%, rgba(224, 102, 43, 0.12) 0%, transparent 38%),
-    radial-gradient(circle at 88% 30%, rgba(255, 138, 76, 0.10) 0%, transparent 42%),
-    radial-gradient(ellipse at 50% 95%, rgba(237, 138, 62, 0.08) 0%, transparent 48%),
-    var(--bg);
-  background-attachment: fixed;
+  background: var(--bg);
   color: var(--fg);
   font-family: var(--font-sans);
   font-size: 15px;
@@ -87,68 +87,29 @@ html, body {
   overflow-x: hidden;
 }
 
-[data-theme='dark'] body {
-  background:
-    radial-gradient(circle at 12% 15%, rgba(238, 123, 67, 0.20) 0%, transparent 40%),
-    radial-gradient(circle at 88% 30%, rgba(255, 154, 82, 0.15) 0%, transparent 44%),
-    radial-gradient(ellipse at 50% 95%, rgba(224, 102, 43, 0.12) 0%, transparent 50%),
-    var(--bg);
-  background-attachment: fixed;
-}
-
-body::before {
-  content: '';
-  position: fixed;
-  inset: 0;
-  background-image:
-    linear-gradient(rgba(224, 102, 43, 0.03) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(224, 102, 43, 0.03) 1px, transparent 1px);
-  background-size: 56px 56px;
-  pointer-events: none;
-  z-index: -2;
-}
-[data-theme='dark'] body::before {
-  background-image:
-    linear-gradient(rgba(255, 255, 255, 0.035) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 255, 255, 0.035) 1px, transparent 1px);
-}
+/* Il tema scuro non ha più una regola sua: `--bg` cambia già con
+   [data-theme='dark'], e la griglia 56px che stava in body::before non c'è
+   più — la piattaforma non ce l'ha. */
 
 code, kbd, pre, samp, .mono { font-family: var(--font-mono); }
 
-/* ---------------- Sfondo animato (blob) ---------------- */
-.bg-decor {
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  z-index: -1;
-  overflow: hidden;
-  contain: layout paint;
-  animation: bg-decor-hue 24s ease-in-out infinite;
-}
-.bg-blob { position: absolute; border-radius: 50%; filter: blur(65px); will-change: transform; }
-.bg-blob-1 { top: -180px; left: -120px; width: 520px; height: 520px; background: rgba(224, 102, 43, 0.30); animation: bg-blob-1-anim 14s ease-in-out infinite; }
-.bg-blob-2 { top: 35%; right: -180px; width: 600px; height: 600px; background: rgba(255, 138, 76, 0.26); animation: bg-blob-2-anim 11s ease-in-out infinite; }
-.bg-blob-3 { bottom: -250px; left: 30%; width: 680px; height: 680px; background: rgba(237, 138, 62, 0.22); animation: bg-blob-3-anim 17s ease-in-out infinite; }
-/* In dark le bolle erano troppo cariche e impastavano lo sfondo di marrone:
-   tenute più basse restano un accento caldo senza sporcare la lettura. */
-[data-theme='dark'] .bg-blob-1 { background: rgba(238, 123, 67, 0.18); }
-[data-theme='dark'] .bg-blob-2 { background: rgba(255, 154, 82, 0.14); }
-[data-theme='dark'] .bg-blob-3 { background: rgba(224, 102, 43, 0.12); }
+/* Le bolle sfocate non ci sono più: dal 25/08/2026 il fondo di tutte le app
+   della piattaforma è la nuvola di punti di carello-ambient.js, e da allora
+   .bg-decor / .bg-blob* non le montava più nessuno — l'import in main.tsx era
+   commentato. Erano ~90 righe di CSS e tre keyframe che nessun elemento
+   raggiungeva. Il rollback vero non è più qui: è togliere lo <script>
+   dell'ambient da index.html. Vedi AUTH/CARELLO-SHELL.md. */
 
-@keyframes bg-blob-1-anim { 0%{transform:translate(0,0) scale(1)} 25%{transform:translate(220px,140px) scale(1.25)} 50%{transform:translate(60px,280px) scale(.85)} 75%{transform:translate(-90px,160px) scale(1.1)} 100%{transform:translate(0,0) scale(1)} }
-@keyframes bg-blob-2-anim { 0%{transform:translate(0,0) scale(1)} 33%{transform:translate(-260px,150px) scale(1.3)} 66%{transform:translate(180px,-110px) scale(.78)} 100%{transform:translate(0,0) scale(1)} }
-@keyframes bg-blob-3-anim { 0%{transform:translate(0,0) scale(1)} 40%{transform:translate(200px,-230px) scale(.8)} 70%{transform:translate(-200px,110px) scale(1.22)} 100%{transform:translate(0,0) scale(1)} }
-@keyframes bg-decor-hue { 0%,100%{filter:hue-rotate(-8deg)} 50%{filter:hue-rotate(10deg)} }
-
-@media (prefers-reduced-motion: reduce) {
-  .bg-blob, .bg-decor { animation: none; }
-}
 @media print {
-  .bg-decor, body::before { display: none !important; }
   body { background: white !important; }
 }
 
 #root { min-height: 100vh; position: relative; z-index: 0; }
+
+/* display/position/z-index della barra: ora nel blocco :host del web
+   component (AUTH/public/carello-shell.js). Erano gli stessi valori ripetuti
+   in sei repo. Per sovrascriverli qui basta una regola `carello-shell { … }`:
+   il CSS del documento ospite vince sempre su :host. */
 
 .shell {
   width: 100%;
@@ -341,10 +302,11 @@ label { display: block; font-weight: 600; margin-bottom: 0.35rem; font-size: 0.9
    La voce attiva è guidata da NavLink; la pillola colorata è pura CSS.
    ============================================================ */
 /* Spazio simmetrico: stesso respiro verso l'header (sopra) e verso il titolo
-   (sotto), così la barra resta centrata nella fascia — come in calculator. */
-.tool-nav-wrap { display: flex; justify-content: center; margin: 1.5rem 0; }
-/* Stesso respiro sotto l'header quando la navbar è nascosta (verifica). */
-.nav-hidden-gap { height: 1.5rem; }
+   (sotto), così la barra resta centrata nella fascia — come in calculator.
+   Il respiro SOPRA ora lo dà il padding-top di .shell: da quando la
+   <carello-shell> sta fuori da quel contenitore, un margin-top qui si
+   sommerebbe al padding e la fascia risulterebbe doppia. */
+.tool-nav-wrap { display: flex; justify-content: center; margin: 0 0 1.5rem; }
 .tool-nav {
   display: flex; gap: 4px;
   background: var(--readonly-bg);
