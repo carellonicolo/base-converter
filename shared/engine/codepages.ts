@@ -1,0 +1,326 @@
+/**
+ * Code page a 8 bit: le tre tabelle che hanno «esteso» ASCII in modi diversi.
+ *
+ * ASCII vero è a 7 bit: 128 caratteri, e finisce lì. Quando è arrivato l'ottavo
+ * bit ognuno ci ha messo dentro quello che gli serviva, e sono nate decine di
+ * code page incompatibili tra loro. Qui ne teniamo tre, quelle che uno studente
+ * incontra davvero:
+ *
+ *   - CP437    l'«ASCII esteso» del PC IBM/DOS: accentate, greco, box-drawing.
+ *   - Latin-1  ISO 8859-1, lo standard ISO: 128–159 sono controlli C1,
+ *              160–255 le lettere dell'Europa occidentale.
+ *   - CP1252   quella di Windows e del web pre-UTF-8: come Latin-1, ma nel
+ *              buco 128–159 ci mette €, virgolette curve e trattini tipografici.
+ *
+ * Lo stesso byte 0xE0 vale «α» in CP437, «à» in Latin-1 e «à» in CP1252: è
+ * esattamente l'ambiguità che ha portato a Unicode, e la pagina la mostra
+ * invece di nasconderla.
+ *
+ * ⚠️ La metà bassa (0–127) è identica in tutte e tre: è ASCII, e questo è il
+ * punto. Qui teniamo solo la metà ALTA (128–255), come code point Unicode.
+ */
+
+/** Il byte non è assegnato in questa code page (buchi di CP1252). */
+export const UNASSIGNED = -1;
+
+/**
+ * CP437 (IBM PC, 1981) — byte 128–255 → code point Unicode.
+ * Nessun buco: tutti e 128 i byte hanno un glifo.
+ */
+export const CP437_HIGH: readonly number[] = [
+  0x00c7, 0x00fc, 0x00e9, 0x00e2, 0x00e4, 0x00e0, 0x00e5, 0x00e7,
+  0x00ea, 0x00eb, 0x00e8, 0x00ef, 0x00ee, 0x00ec, 0x00c4, 0x00c5,
+  0x00c9, 0x00e6, 0x00c6, 0x00f4, 0x00f6, 0x00f2, 0x00fb, 0x00f9,
+  0x00ff, 0x00d6, 0x00dc, 0x00a2, 0x00a3, 0x00a5, 0x20a7, 0x0192,
+  0x00e1, 0x00ed, 0x00f3, 0x00fa, 0x00f1, 0x00d1, 0x00aa, 0x00ba,
+  0x00bf, 0x2310, 0x00ac, 0x00bd, 0x00bc, 0x00a1, 0x00ab, 0x00bb,
+  0x2591, 0x2592, 0x2593, 0x2502, 0x2524, 0x2561, 0x2562, 0x2556,
+  0x2555, 0x2563, 0x2551, 0x2557, 0x255d, 0x255c, 0x255b, 0x2510,
+  0x2514, 0x2534, 0x252c, 0x251c, 0x2500, 0x253c, 0x255e, 0x255f,
+  0x255a, 0x2554, 0x2569, 0x2566, 0x2560, 0x2550, 0x256c, 0x2567,
+  0x2568, 0x2564, 0x2565, 0x2559, 0x2558, 0x2552, 0x2553, 0x256b,
+  0x256a, 0x2518, 0x250c, 0x2588, 0x2584, 0x258c, 0x2590, 0x2580,
+  0x03b1, 0x00df, 0x0393, 0x03c0, 0x03a3, 0x03c3, 0x00b5, 0x03c4,
+  0x03a6, 0x0398, 0x03a9, 0x03b4, 0x221e, 0x03c6, 0x03b5, 0x2229,
+  0x2261, 0x00b1, 0x2265, 0x2264, 0x2320, 0x2321, 0x00f7, 0x2248,
+  0x00b0, 0x2219, 0x00b7, 0x221a, 0x207f, 0x00b2, 0x25a0, 0x00a0,
+];
+
+/**
+ * Windows-1252 — byte 128–255 → code point Unicode.
+ * Da 160 in su coincide con Latin-1; sotto (128–159), dove ISO mette i
+ * controlli C1, Microsoft ha messo la punteggiatura tipografica.
+ * Cinque byte restano non assegnati: 0x81 0x8D 0x8F 0x90 0x9D → UNASSIGNED.
+ */
+export const CP1252_HIGH: readonly number[] = [
+  0x20ac, -1, 0x201a, 0x0192, 0x201e, 0x2026, 0x2020, 0x2021,
+  0x02c6, 0x2030, 0x0160, 0x2039, 0x0152, -1, 0x017d, -1,
+  -1, 0x2018, 0x2019, 0x201c, 0x201d, 0x2022, 0x2013, 0x2014,
+  0x02dc, 0x2122, 0x0161, 0x203a, 0x0153, -1, 0x017e, 0x0178,
+  0x00a0, 0x00a1, 0x00a2, 0x00a3, 0x00a4, 0x00a5, 0x00a6, 0x00a7,
+  0x00a8, 0x00a9, 0x00aa, 0x00ab, 0x00ac, 0x00ad, 0x00ae, 0x00af,
+  0x00b0, 0x00b1, 0x00b2, 0x00b3, 0x00b4, 0x00b5, 0x00b6, 0x00b7,
+  0x00b8, 0x00b9, 0x00ba, 0x00bb, 0x00bc, 0x00bd, 0x00be, 0x00bf,
+  0x00c0, 0x00c1, 0x00c2, 0x00c3, 0x00c4, 0x00c5, 0x00c6, 0x00c7,
+  0x00c8, 0x00c9, 0x00ca, 0x00cb, 0x00cc, 0x00cd, 0x00ce, 0x00cf,
+  0x00d0, 0x00d1, 0x00d2, 0x00d3, 0x00d4, 0x00d5, 0x00d6, 0x00d7,
+  0x00d8, 0x00d9, 0x00da, 0x00db, 0x00dc, 0x00dd, 0x00de, 0x00df,
+  0x00e0, 0x00e1, 0x00e2, 0x00e3, 0x00e4, 0x00e5, 0x00e6, 0x00e7,
+  0x00e8, 0x00e9, 0x00ea, 0x00eb, 0x00ec, 0x00ed, 0x00ee, 0x00ef,
+  0x00f0, 0x00f1, 0x00f2, 0x00f3, 0x00f4, 0x00f5, 0x00f6, 0x00f7,
+  0x00f8, 0x00f9, 0x00fa, 0x00fb, 0x00fc, 0x00fd, 0x00fe, 0x00ff,
+];
+
+/**
+ * Nomi Unicode ufficiali dei caratteri usati dalle tre code page.
+ * Restano in inglese come i nomi dei controlli ASCII in `text.ts`: sono nomi
+ * propri dello standard, non testo dell'interfaccia, e si cercano così.
+ */
+export const UNICODE_NAMES: Readonly<Record<number, string>> = {
+  0x00a0: 'No-Break Space',
+  0x00a1: 'Inverted Exclamation Mark',
+  0x00a2: 'Cent Sign',
+  0x00a3: 'Pound Sign',
+  0x00a4: 'Currency Sign',
+  0x00a5: 'Yen Sign',
+  0x00a6: 'Broken Bar',
+  0x00a7: 'Section Sign',
+  0x00a8: 'Diaeresis',
+  0x00a9: 'Copyright Sign',
+  0x00aa: 'Feminine Ordinal Indicator',
+  0x00ab: 'Left Double Angle Quotation Mark',
+  0x00ac: 'Not Sign',
+  0x00ad: 'Soft Hyphen',
+  0x00ae: 'Registered Sign',
+  0x00af: 'Macron',
+  0x00b0: 'Degree Sign',
+  0x00b1: 'Plus-Minus Sign',
+  0x00b2: 'Superscript Two',
+  0x00b3: 'Superscript Three',
+  0x00b4: 'Acute Accent',
+  0x00b5: 'Micro Sign',
+  0x00b6: 'Pilcrow Sign',
+  0x00b7: 'Middle Dot',
+  0x00b8: 'Cedilla',
+  0x00b9: 'Superscript One',
+  0x00ba: 'Masculine Ordinal Indicator',
+  0x00bb: 'Right Double Angle Quotation Mark',
+  0x00bc: 'Vulgar Fraction One Quarter',
+  0x00bd: 'Vulgar Fraction One Half',
+  0x00be: 'Vulgar Fraction Three Quarters',
+  0x00bf: 'Inverted Question Mark',
+  0x00c0: 'Latin Capital Letter A With Grave',
+  0x00c1: 'Latin Capital Letter A With Acute',
+  0x00c2: 'Latin Capital Letter A With Circumflex',
+  0x00c3: 'Latin Capital Letter A With Tilde',
+  0x00c4: 'Latin Capital Letter A With Diaeresis',
+  0x00c5: 'Latin Capital Letter A With Ring Above',
+  0x00c6: 'Latin Capital Letter AE',
+  0x00c7: 'Latin Capital Letter C With Cedilla',
+  0x00c8: 'Latin Capital Letter E With Grave',
+  0x00c9: 'Latin Capital Letter E With Acute',
+  0x00ca: 'Latin Capital Letter E With Circumflex',
+  0x00cb: 'Latin Capital Letter E With Diaeresis',
+  0x00cc: 'Latin Capital Letter I With Grave',
+  0x00cd: 'Latin Capital Letter I With Acute',
+  0x00ce: 'Latin Capital Letter I With Circumflex',
+  0x00cf: 'Latin Capital Letter I With Diaeresis',
+  0x00d0: 'Latin Capital Letter Eth',
+  0x00d1: 'Latin Capital Letter N With Tilde',
+  0x00d2: 'Latin Capital Letter O With Grave',
+  0x00d3: 'Latin Capital Letter O With Acute',
+  0x00d4: 'Latin Capital Letter O With Circumflex',
+  0x00d5: 'Latin Capital Letter O With Tilde',
+  0x00d6: 'Latin Capital Letter O With Diaeresis',
+  0x00d7: 'Multiplication Sign',
+  0x00d8: 'Latin Capital Letter O With Stroke',
+  0x00d9: 'Latin Capital Letter U With Grave',
+  0x00da: 'Latin Capital Letter U With Acute',
+  0x00db: 'Latin Capital Letter U With Circumflex',
+  0x00dc: 'Latin Capital Letter U With Diaeresis',
+  0x00dd: 'Latin Capital Letter Y With Acute',
+  0x00de: 'Latin Capital Letter Thorn',
+  0x00df: 'Latin Small Letter Sharp S',
+  0x00e0: 'Latin Small Letter A With Grave',
+  0x00e1: 'Latin Small Letter A With Acute',
+  0x00e2: 'Latin Small Letter A With Circumflex',
+  0x00e3: 'Latin Small Letter A With Tilde',
+  0x00e4: 'Latin Small Letter A With Diaeresis',
+  0x00e5: 'Latin Small Letter A With Ring Above',
+  0x00e6: 'Latin Small Letter AE',
+  0x00e7: 'Latin Small Letter C With Cedilla',
+  0x00e8: 'Latin Small Letter E With Grave',
+  0x00e9: 'Latin Small Letter E With Acute',
+  0x00ea: 'Latin Small Letter E With Circumflex',
+  0x00eb: 'Latin Small Letter E With Diaeresis',
+  0x00ec: 'Latin Small Letter I With Grave',
+  0x00ed: 'Latin Small Letter I With Acute',
+  0x00ee: 'Latin Small Letter I With Circumflex',
+  0x00ef: 'Latin Small Letter I With Diaeresis',
+  0x00f0: 'Latin Small Letter Eth',
+  0x00f1: 'Latin Small Letter N With Tilde',
+  0x00f2: 'Latin Small Letter O With Grave',
+  0x00f3: 'Latin Small Letter O With Acute',
+  0x00f4: 'Latin Small Letter O With Circumflex',
+  0x00f5: 'Latin Small Letter O With Tilde',
+  0x00f6: 'Latin Small Letter O With Diaeresis',
+  0x00f7: 'Division Sign',
+  0x00f8: 'Latin Small Letter O With Stroke',
+  0x00f9: 'Latin Small Letter U With Grave',
+  0x00fa: 'Latin Small Letter U With Acute',
+  0x00fb: 'Latin Small Letter U With Circumflex',
+  0x00fc: 'Latin Small Letter U With Diaeresis',
+  0x00fd: 'Latin Small Letter Y With Acute',
+  0x00fe: 'Latin Small Letter Thorn',
+  0x00ff: 'Latin Small Letter Y With Diaeresis',
+  0x0152: 'Latin Capital Ligature OE',
+  0x0153: 'Latin Small Ligature OE',
+  0x0160: 'Latin Capital Letter S With Caron',
+  0x0161: 'Latin Small Letter S With Caron',
+  0x0178: 'Latin Capital Letter Y With Diaeresis',
+  0x017d: 'Latin Capital Letter Z With Caron',
+  0x017e: 'Latin Small Letter Z With Caron',
+  0x0192: 'Latin Small Letter F With Hook',
+  0x02c6: 'Modifier Letter Circumflex Accent',
+  0x02dc: 'Small Tilde',
+  0x0393: 'Greek Capital Letter Gamma',
+  0x0398: 'Greek Capital Letter Theta',
+  0x03a3: 'Greek Capital Letter Sigma',
+  0x03a6: 'Greek Capital Letter Phi',
+  0x03a9: 'Greek Capital Letter Omega',
+  0x03b1: 'Greek Small Letter Alpha',
+  0x03b4: 'Greek Small Letter Delta',
+  0x03b5: 'Greek Small Letter Epsilon',
+  0x03c0: 'Greek Small Letter Pi',
+  0x03c3: 'Greek Small Letter Sigma',
+  0x03c4: 'Greek Small Letter Tau',
+  0x03c6: 'Greek Small Letter Phi',
+  0x2013: 'En Dash',
+  0x2014: 'Em Dash',
+  0x2018: 'Left Single Quotation Mark',
+  0x2019: 'Right Single Quotation Mark',
+  0x201a: 'Single Low-9 Quotation Mark',
+  0x201c: 'Left Double Quotation Mark',
+  0x201d: 'Right Double Quotation Mark',
+  0x201e: 'Double Low-9 Quotation Mark',
+  0x2020: 'Dagger',
+  0x2021: 'Double Dagger',
+  0x2022: 'Bullet',
+  0x2026: 'Horizontal Ellipsis',
+  0x2030: 'Per Mille Sign',
+  0x2039: 'Single Left-Pointing Angle Quotation Mark',
+  0x203a: 'Single Right-Pointing Angle Quotation Mark',
+  0x207f: 'Superscript Latin Small Letter N',
+  0x20a7: 'Peseta Sign',
+  0x20ac: 'Euro Sign',
+  0x2122: 'Trade Mark Sign',
+  0x2219: 'Bullet Operator',
+  0x221a: 'Square Root',
+  0x221e: 'Infinity',
+  0x2229: 'Intersection',
+  0x2248: 'Almost Equal To',
+  0x2261: 'Identical To',
+  0x2264: 'Less-Than Or Equal To',
+  0x2265: 'Greater-Than Or Equal To',
+  0x2310: 'Reversed Not Sign',
+  0x2320: 'Top Half Integral',
+  0x2321: 'Bottom Half Integral',
+  0x2500: 'Box Drawings Light Horizontal',
+  0x2502: 'Box Drawings Light Vertical',
+  0x250c: 'Box Drawings Light Down And Right',
+  0x2510: 'Box Drawings Light Down And Left',
+  0x2514: 'Box Drawings Light Up And Right',
+  0x2518: 'Box Drawings Light Up And Left',
+  0x251c: 'Box Drawings Light Vertical And Right',
+  0x2524: 'Box Drawings Light Vertical And Left',
+  0x252c: 'Box Drawings Light Down And Horizontal',
+  0x2534: 'Box Drawings Light Up And Horizontal',
+  0x253c: 'Box Drawings Light Vertical And Horizontal',
+  0x2550: 'Box Drawings Double Horizontal',
+  0x2551: 'Box Drawings Double Vertical',
+  0x2552: 'Box Drawings Down Single And Right Double',
+  0x2553: 'Box Drawings Down Double And Right Single',
+  0x2554: 'Box Drawings Double Down And Right',
+  0x2555: 'Box Drawings Down Single And Left Double',
+  0x2556: 'Box Drawings Down Double And Left Single',
+  0x2557: 'Box Drawings Double Down And Left',
+  0x2558: 'Box Drawings Up Single And Right Double',
+  0x2559: 'Box Drawings Up Double And Right Single',
+  0x255a: 'Box Drawings Double Up And Right',
+  0x255b: 'Box Drawings Up Single And Left Double',
+  0x255c: 'Box Drawings Up Double And Left Single',
+  0x255d: 'Box Drawings Double Up And Left',
+  0x255e: 'Box Drawings Vertical Single And Right Double',
+  0x255f: 'Box Drawings Vertical Double And Right Single',
+  0x2560: 'Box Drawings Double Vertical And Right',
+  0x2561: 'Box Drawings Vertical Single And Left Double',
+  0x2562: 'Box Drawings Vertical Double And Left Single',
+  0x2563: 'Box Drawings Double Vertical And Left',
+  0x2564: 'Box Drawings Down Single And Horizontal Double',
+  0x2565: 'Box Drawings Down Double And Horizontal Single',
+  0x2566: 'Box Drawings Double Down And Horizontal',
+  0x2567: 'Box Drawings Up Single And Horizontal Double',
+  0x2568: 'Box Drawings Up Double And Horizontal Single',
+  0x2569: 'Box Drawings Double Up And Horizontal',
+  0x256a: 'Box Drawings Vertical Single And Horizontal Double',
+  0x256b: 'Box Drawings Vertical Double And Horizontal Single',
+  0x256c: 'Box Drawings Double Vertical And Horizontal',
+  0x2580: 'Upper Half Block',
+  0x2584: 'Lower Half Block',
+  0x2588: 'Full Block',
+  0x258c: 'Left Half Block',
+  0x2590: 'Right Half Block',
+  0x2591: 'Light Shade',
+  0x2592: 'Medium Shade',
+  0x2593: 'Dark Shade',
+  0x25a0: 'Black Square',
+};
+
+
+/**
+ * ISO 8859-1 (Latin-1) — byte 128–255 → code point Unicode.
+ * È l'unica code page con la mappatura identità: il byte N *è* il code point
+ * U+00N. Non per caso: i primi 256 code point di Unicode sono stati presi da
+ * Latin-1 apposta, per rendere la conversione banale.
+ */
+export const LATIN1_HIGH: readonly number[] = Array.from({ length: 128 }, (_, i) => 128 + i);
+
+/**
+ * Controlli C1 (128–159) di ISO 8859-1: la seconda serie di caratteri di
+ * controllo, pensata per i terminali e oggi di fatto inutilizzata — ma i byte
+ * sono occupati, ed è per questo che Latin-1 offre «solo» 96 caratteri in più.
+ */
+export const C1_NAMES: Readonly<Record<number, { abbr: string; name: string }>> = {
+  128: { abbr: 'PAD', name: 'Padding Character' },
+  129: { abbr: 'HOP', name: 'High Octet Preset' },
+  130: { abbr: 'BPH', name: 'Break Permitted Here' },
+  131: { abbr: 'NBH', name: 'No Break Here' },
+  132: { abbr: 'IND', name: 'Index' },
+  133: { abbr: 'NEL', name: 'Next Line' },
+  134: { abbr: 'SSA', name: 'Start of Selected Area' },
+  135: { abbr: 'ESA', name: 'End of Selected Area' },
+  136: { abbr: 'HTS', name: 'Character Tabulation Set' },
+  137: { abbr: 'HTJ', name: 'Character Tabulation With Justification' },
+  138: { abbr: 'VTS', name: 'Line Tabulation Set' },
+  139: { abbr: 'PLD', name: 'Partial Line Forward' },
+  140: { abbr: 'PLU', name: 'Partial Line Backward' },
+  141: { abbr: 'RI', name: 'Reverse Line Feed' },
+  142: { abbr: 'SS2', name: 'Single Shift Two' },
+  143: { abbr: 'SS3', name: 'Single Shift Three' },
+  144: { abbr: 'DCS', name: 'Device Control String' },
+  145: { abbr: 'PU1', name: 'Private Use One' },
+  146: { abbr: 'PU2', name: 'Private Use Two' },
+  147: { abbr: 'STS', name: 'Set Transmit State' },
+  148: { abbr: 'CCH', name: 'Cancel Character' },
+  149: { abbr: 'MW', name: 'Message Waiting' },
+  150: { abbr: 'SPA', name: 'Start of Guarded Area' },
+  151: { abbr: 'EPA', name: 'End of Guarded Area' },
+  152: { abbr: 'SOS', name: 'Start of String' },
+  153: { abbr: 'SGCI', name: 'Single Graphic Character Introducer' },
+  154: { abbr: 'SCI', name: 'Single Character Introducer' },
+  155: { abbr: 'CSI', name: 'Control Sequence Introducer' },
+  156: { abbr: 'ST', name: 'String Terminator' },
+  157: { abbr: 'OSC', name: 'Operating System Command' },
+  158: { abbr: 'PM', name: 'Privacy Message' },
+  159: { abbr: 'APC', name: 'Application Program Command' },
+};

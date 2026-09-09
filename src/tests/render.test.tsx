@@ -149,3 +149,78 @@ describe('cambio lingua', () => {
     expect(screen.getByText(/Basi numeriche e codifiche/i)).toBeTruthy();
   });
 });
+
+describe('Tabella dei caratteri — comportamento', () => {
+  function renderText() {
+    return render(
+      <Providers>
+        <TextPage />
+      </Providers>
+    );
+  }
+
+  it('mostra 128 celle in ASCII e 256 con una code page estesa', () => {
+    const { container } = renderText();
+    expect(container.querySelectorAll('.ascii-cell')).toHaveLength(128);
+    fireEvent.click(screen.getByText('CP437'));
+    expect(container.querySelectorAll('.ascii-cell')).toHaveLength(256);
+  });
+
+  it('un byte esteso mostra il confronto tra le code page', () => {
+    const { container } = renderText();
+    fireEvent.click(screen.getByText('CP437'));
+    fireEvent.click(container.querySelector('[data-code="224"]')!);
+    expect(screen.getByText(/Lo stesso byte nelle altre code page/i)).toBeTruthy();
+    // Lo stesso byte 224: «α» sul PC IBM, «à» negli altri due.
+    expect(screen.getAllByText('Greek Small Letter Alpha').length).toBeGreaterThan(0);
+    expect(screen.getAllByText('Latin Small Letter A With Grave').length).toBe(2);
+  });
+
+  it('tornando ad ASCII la selezione rientra nei 128 caratteri', () => {
+    const { container } = renderText();
+    fireEvent.click(screen.getByText('CP437'));
+    fireEvent.click(container.querySelector('[data-code="224"]')!);
+    fireEvent.click(screen.getByText('ASCII'));
+    // 224 non esiste in ASCII: si ripiega su 224 − 128 = 96.
+    expect(container.querySelector('.ascii-cell.sel')?.getAttribute('data-code')).toBe('96');
+  });
+
+  it('la ricerca smorza i caratteri che non corrispondono', () => {
+    const { container } = renderText();
+    fireEvent.change(screen.getByLabelText(/Cerca carattere/i), { target: { value: 'line feed' } });
+    expect(container.querySelectorAll('.ascii-cell.dim')).toHaveLength(127);
+    expect(container.querySelector('.ascii-cell:not(.dim)')?.getAttribute('data-code')).toBe('10');
+  });
+
+  it('con un solo carattere cerca il carattere, non i nomi che lo contengono', () => {
+    const { container } = renderText();
+    const box = screen.getByLabelText(/Cerca carattere/i);
+    // «a» da solo → «A» (65), «a» (97) e il byte 0x0A (10, LF): tre letture
+    // legittime della stessa stringa. Con la ricerca sui nomi si
+    // accenderebbero anche Space, Cancel, Backspace… e non servirebbe a nulla.
+    fireEvent.change(box, { target: { value: 'a' } });
+    const lit = [...container.querySelectorAll('.ascii-cell:not(.dim)')].map((c) => Number(c.getAttribute('data-code')));
+    expect(lit.sort((x, y) => x - y)).toEqual([10, 65, 97]);
+    // Con due caratteri torna a cercare anche nei nomi.
+    fireEvent.change(box, { target: { value: 'escape' } });
+    expect(container.querySelectorAll('.ascii-cell:not(.dim)').length).toBeGreaterThan(1);
+  });
+
+  it('trova un carattere esteso dal suo code point Unicode', () => {
+    const { container } = renderText();
+    fireEvent.click(screen.getByText('CP437'));
+    fireEvent.change(screen.getByLabelText(/Cerca carattere/i), { target: { value: 'U+03B1' } });
+    const lit = [...container.querySelectorAll('.ascii-cell:not(.dim)')].map((c) => c.getAttribute('data-code'));
+    expect(lit).toEqual(['224']); // α sta al byte 224 in CP437
+  });
+
+  it('le frecce spostano la selezione nella griglia', () => {
+    const { container } = renderText();
+    const grid = container.querySelector('.ascii-grid')!;
+    fireEvent.click(container.querySelector('[data-code="65"]')!);
+    fireEvent.keyDown(grid, { key: 'ArrowDown' }); // +16
+    expect(container.querySelector('.ascii-cell.sel')?.getAttribute('data-code')).toBe('81');
+    fireEvent.keyDown(grid, { key: 'ArrowLeft' });
+    expect(container.querySelector('.ascii-cell.sel')?.getAttribute('data-code')).toBe('80');
+  });
+});

@@ -1,11 +1,11 @@
 import { useMemo, useState } from 'react';
 import { Type } from 'lucide-react';
 import { AppShell } from '../ui/AppShell';
+import { AsciiTab } from '../text/AsciiTab';
 import { InfoBox } from '../ui/InfoBox';
 import { CopyButton } from '../ui/CopyButton';
 import { useI18n } from '../../i18n';
 import {
-  asciiTable,
   codePoints,
   encodeText,
   utf8Explain,
@@ -77,57 +77,6 @@ export function TextPage() {
 }
 
 type Tfn = (k: string, v?: Record<string, string | number>) => string;
-
-function AsciiTab({ t }: { t: Tfn }) {
-  const [q, setQ] = useState('');
-  const rows = useMemo(() => {
-    const all = asciiTable();
-    const query = q.trim().toLowerCase();
-    if (!query) return all;
-    return all.filter(
-      (e) =>
-        e.name.toLowerCase().includes(query) ||
-        e.display.toLowerCase().includes(query) ||
-        String(e.code) === query ||
-        e.code.toString(16) === query.replace(/^0x/, '')
-    );
-  }, [q]);
-
-  return (
-    <div className="card">
-      <div className="field">
-        <label htmlFor="ascii-q">{t('text.search')}</label>
-        <input id="ascii-q" value={q} onChange={(e) => setQ(e.target.value)} placeholder="LF, 65, 0x41…" />
-      </div>
-      <div className="table-scroll">
-        <table className="data-table">
-          <thead>
-            <tr>
-              <th>{t('text.dec')}</th>
-              <th>{t('text.hex')}</th>
-              <th>{t('text.bin')}</th>
-              <th>{t('text.char')}</th>
-              <th>{t('text.name')}</th>
-            </tr>
-          </thead>
-          <tbody>
-            {rows.map((e) => (
-              <tr key={e.code}>
-                <td className="mono">{e.code}</td>
-                <td className="mono">{e.code.toString(16).toUpperCase().padStart(2, '0')}</td>
-                <td className="mono">{e.code.toString(2).padStart(8, '0')}</td>
-                <td className="mono char-glyph" style={{ color: e.isControl ? 'var(--muted)' : 'var(--primary)' }}>
-                  {e.display}
-                </td>
-                <td>{e.name}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-    </div>
-  );
-}
 
 function UnicodeTab({ t }: { t: Tfn }) {
   const [block, setBlock] = useState(0);

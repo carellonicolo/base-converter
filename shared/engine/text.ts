@@ -6,6 +6,20 @@
  * in modo che ogni passaggio sia ispezionabile.
  */
 
+import {
+  C1_NAMES,
+  CP437_HIGH,
+  CP1252_HIGH,
+  LATIN1_HIGH,
+  UNASSIGNED,
+  UNICODE_NAMES,
+} from './codepages';
+
+// Ri-esportate da qui perché `text.ts` resta l'unico punto d'ingresso del
+// modulo «testo»: chi consuma il motore non deve sapere che i dati stanno in
+// un file a parte.
+export { C1_NAMES, CP437_HIGH, CP1252_HIGH, LATIN1_HIGH, UNASSIGNED, UNICODE_NAMES } from './codepages';
+
 /* ============================================================
    ASCII
    ============================================================ */
@@ -47,16 +61,74 @@ export const CONTROL_NAMES: Record<number, { abbr: string; name: string }> = {
   127: { abbr: 'DEL', name: 'Delete' },
 };
 
+/** Simbolo con cui rendiamo visibile uno spazio (U+2420 SYMBOL FOR SPACE). */
+const SPACE_GLYPH = '␠';
+
+export type CharCategory =
+  | 'control'
+  | 'digit'
+  | 'upper'
+  | 'lower'
+  | 'punct'
+  | 'space'
+  | 'extended'
+  | 'unassigned';
+
 export interface AsciiEntry {
+  /** Il byte (0..255): quello che sta davvero in memoria. */
   code: number;
+  /** Il carattere reso in JavaScript (stringa vuota se il byte non è assegnato). */
   char: string;
+  /** Cosa scrivere in tabella: il glifo, oppure la sigla per i controlli. */
   display: string;
   isControl: boolean;
   name: string;
-  category: 'control' | 'digit' | 'upper' | 'lower' | 'punct' | 'space';
+  category: CharCategory;
+  /**
+   * Code point Unicode corrispondente, o UNASSIGNED (-1).
+   * Sotto 128 coincide sempre con `code`; sopra dipende dalla code page —
+   * ed è precisamente il motivo per cui Unicode è stato inventato.
+   */
+  cp: number;
 }
 
-function asciiCategory(code: number): AsciiEntry['category'] {
+/* ------------------------------------------------------------
+   Code page: quale tabella si sta guardando.
+   ------------------------------------------------------------ */
+
+export type CodePage = 'ascii' | 'cp437' | 'latin1' | 'cp1252';
+
+export interface CodePageInfo {
+  key: CodePage;
+  /** Etichetta breve per i controlli dell'interfaccia. */
+  label: string;
+  /** Nome per esteso, da mostrare in intestazione ed export. */
+  fullName: string;
+  bits: 7 | 8;
+  /** 128 per ASCII, 256 per le code page estese. */
+  size: number;
+  year: number;
+}
+
+export const CODE_PAGES: readonly CodePageInfo[] = [
+  { key: 'ascii', label: 'ASCII', fullName: 'US-ASCII (ISO 646) — 7 bit', bits: 7, size: 128, year: 1963 },
+  { key: 'cp437', label: 'CP437', fullName: 'Code page 437 — IBM PC / DOS', bits: 8, size: 256, year: 1981 },
+  { key: 'latin1', label: 'Latin-1', fullName: 'ISO 8859-1 (Latin-1)', bits: 8, size: 256, year: 1987 },
+  { key: 'cp1252', label: 'Windows-1252', fullName: 'Windows-1252 (ANSI)', bits: 8, size: 256, year: 1990 },
+];
+
+export function codePageInfo(page: CodePage): CodePageInfo {
+  return CODE_PAGES.find((p) => p.key === page) ?? CODE_PAGES[0];
+}
+
+/** Metà alta (128..255) di ogni code page, come code point Unicode. */
+const HIGH_HALF: Record<Exclude<CodePage, 'ascii'>, readonly number[]> = {
+  cp437: CP437_HIGH,
+  latin1: LATIN1_HIGH,
+  cp1252: CP1252_HIGH,
+};
+
+function asciiCategory(code: number): CharCategory {
   if (code < 32 || code === 127) return 'control';
   if (code === 32) return 'space';
   if (code >= 48 && code <= 57) return 'digit';
@@ -65,22 +137,111 @@ function asciiCategory(code: number): AsciiEntry['category'] {
   return 'punct';
 }
 
-/** Tabella ASCII completa (0..127). */
-export function asciiTable(): AsciiEntry[] {
-  const out: AsciiEntry[] = [];
-  for (let code = 0; code < 128; code++) {
-    const ctl = CONTROL_NAMES[code];
-    const isControl = !!ctl;
-    out.push({
+/** Voce della metà bassa: identica in tutte le code page, perché è ASCII. */
+function lowEntry(code: number): AsciiEntry {
+  const ctl = CONTROL_NAMES[code];
+  const isControl = !!ctl;
+  return {
+    code,
+    char: String.fromCharCode(code),
+    display: isControl ? ctl.abbr : code === 32 ? SPACE_GLYPH : String.fromCharCode(code),
+    isControl,
+    name: isControl ? ctl.name : code === 32 ? 'Space' : String.fromCharCode(code),
+    category: asciiCategory(code),
+    cp: code,
+  };
+}
+
+/** Voce della metà alta: qui le tre code page divergono. */
+function highEntry(code: number, page: Exclude<CodePage, 'ascii'>): AsciiEntry {
+  const cp = HIGH_HALF[page][code - 128] ?? UNASSIGNED;
+
+  if (cp === UNASSIGNED) {
+    return {
       code,
-      char: String.fromCharCode(code),
-      display: isControl ? ctl.abbr : code === 32 ? '␠' : String.fromCharCode(code),
-      isControl,
-      name: isControl ? ctl.name : code === 32 ? 'Space' : String.fromCharCode(code),
-      category: asciiCategory(code),
-    });
+      char: '',
+      display: '—',
+      isControl: false,
+      name: 'Unassigned',
+      category: 'unassigned',
+      cp: UNASSIGNED,
+    };
   }
-  return out;
+
+  // In Latin-1 i byte 128–159 sono i controlli C1: occupano lo spazio ma non
+  // hanno un glifo. In CP437 e CP1252 quegli stessi byte sono caratteri veri.
+  const c1 = page === 'latin1' ? C1_NAMES[code] : undefined;
+  if (c1) {
+    return {
+      code,
+      char: String.fromCodePoint(cp),
+      display: c1.abbr,
+      isControl: true,
+      name: c1.name,
+      category: 'control',
+      cp,
+    };
+  }
+
+  const char = String.fromCodePoint(cp);
+  return {
+    code,
+    char,
+    // U+00A0 (spazio unificatore) è invisibile: gli diamo lo stesso trattamento
+    // riservato allo spazio ASCII, altrimenti la cella sembrerebbe vuota.
+    display: cp === 0x00a0 ? SPACE_GLYPH : char,
+    isControl: false,
+    name: UNICODE_NAMES[cp] ?? 'U+' + cp.toString(16).toUpperCase().padStart(4, '0'),
+    category: 'extended',
+    cp,
+  };
+}
+
+/**
+ * Le tabelle sono immutabili e vengono ricostruite di continuo (griglia,
+ * ricerca, confronto tra code page, export): le costruiamo una volta sola.
+ */
+const TABLE_CACHE = new Map<CodePage, readonly AsciiEntry[]>();
+
+/**
+ * Tabella dei caratteri di una code page: 128 voci per ASCII, 256 per le
+ * estensioni a 8 bit. L'array restituito NON va modificato (è congelato).
+ */
+export function charTable(page: CodePage = 'ascii'): readonly AsciiEntry[] {
+  const cached = TABLE_CACHE.get(page);
+  if (cached) return cached;
+
+  const out: AsciiEntry[] = [];
+  for (let code = 0; code < 128; code++) out.push(lowEntry(code));
+  if (page !== 'ascii') {
+    for (let code = 128; code < 256; code++) out.push(highEntry(code, page));
+  }
+  const frozen = Object.freeze(out);
+  TABLE_CACHE.set(page, frozen);
+  return frozen;
+}
+
+/**
+ * Tabella ASCII completa (0..127), come copia modificabile.
+ *
+ * Resta una funzione a sé perché la usa anche il generatore di esercizi
+ * (`shared/exercises/generator.ts`): la sua firma e il suo contenuto sono
+ * vincolati, cambiarli cambierebbe le domande delle verifiche ufficiali.
+ */
+export function asciiTable(): AsciiEntry[] {
+  return charTable('ascii').map((e) => ({ ...e }));
+}
+
+/**
+ * Lo stesso byte letto con le tre code page estese.
+ * È il confronto che rende evidente perché un file «con le accentate sbagliate»
+ * non è un file rotto: è solo letto con la tabella sbagliata.
+ */
+export function compareAcrossPages(code: number): { page: CodePageInfo; entry: AsciiEntry }[] {
+  return CODE_PAGES.filter((p) => p.key !== 'ascii').map((page) => ({
+    page,
+    entry: charTable(page.key)[code],
+  }));
 }
 
 /* ============================================================
