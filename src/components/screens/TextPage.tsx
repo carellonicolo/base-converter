@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react';
 import { Type } from 'lucide-react';
 import { AppShell } from '../ui/AppShell';
 import { AsciiTab } from '../text/AsciiTab';
+import { TheoryButton } from '../text/TheoryModal';
 import { InfoBox } from '../ui/InfoBox';
 import { CopyButton } from '../ui/CopyButton';
 import { useI18n } from '../../i18n';
@@ -48,19 +49,25 @@ export function TextPage() {
           <p>{t('text.lead')}</p>
         </div>
 
-        <div className="segmented" style={{ marginBottom: '1.25rem' }}>
-          <button className={tab === 'ascii' ? 'active' : ''} onClick={() => setTab('ascii')} type="button">
-            {t('text.tabAscii')}
-          </button>
-          <button className={tab === 'unicode' ? 'active' : ''} onClick={() => setTab('unicode')} type="button">
-            {t('text.tabUnicode')}
-          </button>
-          <button className={tab === 'encode' ? 'active' : ''} onClick={() => setTab('encode')} type="button">
-            {t('text.tabEncode')}
-          </button>
-          <button className={tab === 'base64' ? 'active' : ''} onClick={() => setTab('base64')} type="button">
-            {t('text.tabBase64')}
-          </button>
+        {/* Il pulsante «Teoria» sta accanto alle schede e non dentro la scheda:
+            così è sempre nello stesso posto, e compare solo dove c'è qualcosa
+            da leggere. */}
+        <div className="text-tabs">
+          <div className="segmented">
+            <button className={tab === 'ascii' ? 'active' : ''} onClick={() => setTab('ascii')} type="button">
+              {t('text.tabAscii')}
+            </button>
+            <button className={tab === 'unicode' ? 'active' : ''} onClick={() => setTab('unicode')} type="button">
+              {t('text.tabUnicode')}
+            </button>
+            <button className={tab === 'encode' ? 'active' : ''} onClick={() => setTab('encode')} type="button">
+              {t('text.tabEncode')}
+            </button>
+            <button className={tab === 'base64' ? 'active' : ''} onClick={() => setTab('base64')} type="button">
+              {t('text.tabBase64')}
+            </button>
+          </div>
+          {(tab === 'ascii' || tab === 'unicode') && <TheoryButton topic={tab} />}
         </div>
 
         {tab === 'ascii' && <AsciiTab t={t} />}

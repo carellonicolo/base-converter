@@ -1,7 +1,8 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { Users, LogIn, Download, Radio, Eye, RefreshCw, ClipboardList, BookOpen, Send, X } from 'lucide-react';
+import { Users, LogIn, Download, Radio, Eye, RefreshCw, ClipboardList, BookOpen, Send } from 'lucide-react';
 import { AppShell } from '../ui/AppShell';
 import { LoadState } from '../ui/LoadState';
+import { Modal } from '../ui/Modal';
 import { ProgressTab } from '../admin/ProgressTab';
 import { useI18n } from '../../i18n';
 import { useAuth } from '../../hooks/useAuth';
@@ -278,17 +279,8 @@ function PreviewModal({ t, examId, onClose }: { t: Tfn; examId: string; onClose:
   const reshuffle = () => setSeed((Date.now() % 2_000_000_000) + 1);
 
   return (
-    <div className="modal-backdrop" onClick={onClose}>
-      <div className="modal" onClick={(e) => e.stopPropagation()}>
-        <div className="modal-head">
-          <h2>
-            {data ? examTitle(data.exam.topic, data.exam.level, t) : t('admin.previewTitle')}
-          </h2>
-          <button className="icon-btn" type="button" onClick={onClose} aria-label={t('common.close')}>
-            <X size={18} />
-          </button>
-        </div>
-        <div className="modal-body">
+    <Modal title={data ? examTitle(data.exam.topic, data.exam.level, t) : t('admin.previewTitle')} onClose={onClose}>
+      <>
           {!data || error ? (
             <LoadState t={t} error={error} onRetry={() => void load()} />
           ) : (
@@ -327,9 +319,8 @@ function PreviewModal({ t, examId, onClose }: { t: Tfn; examId: string; onClose:
               </div>
             </>
           )}
-        </div>
-      </div>
-    </div>
+      </>
+    </Modal>
   );
 }
 
@@ -378,15 +369,8 @@ function AssignModal({ t, exam, onClose }: { t: Tfn; exam: ExamRow; onClose: () 
   };
 
   return (
-    <div className="modal-backdrop" onClick={onClose}>
-      <div className="modal modal-sm" onClick={(e) => e.stopPropagation()}>
-        <div className="modal-head">
-          <h2>{t('admin.assignTitle', { exam: examTitle(exam.topic, exam.level, t) })}</h2>
-          <button className="icon-btn" type="button" onClick={onClose} aria-label={t('common.close')}>
-            <X size={18} />
-          </button>
-        </div>
-        <div className="modal-body">
+    <Modal title={t('admin.assignTitle', { exam: examTitle(exam.topic, exam.level, t) })} onClose={onClose} size="sm">
+      <>
           <div className="field">
             <label htmlFor="assign-class">{t('admin.chooseClass')}</label>
             {classes === null ? (
@@ -432,9 +416,8 @@ function AssignModal({ t, exam, onClose }: { t: Tfn; exam: ExamRow; onClose: () 
           <button className="btn" type="button" onClick={submit} disabled={saving}>
             <Send size={16} /> {saving ? t('common.loading') : t('admin.confirmAssign')}
           </button>
-        </div>
-      </div>
-    </div>
+      </>
+    </Modal>
   );
 }
 

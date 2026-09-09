@@ -2,6 +2,8 @@ import { Fragment, useCallback, useMemo, useRef, useState } from 'react';
 import { FileDown, ImageDown, Loader2, Search } from 'lucide-react';
 import { CopyButton } from '../ui/CopyButton';
 import { useToast } from '../ui/Toast';
+import { useI18n } from '../../i18n';
+import { charNote } from '../../i18n/charNotes';
 import {
   CODE_PAGES,
   charTable,
@@ -273,6 +275,7 @@ function CharDetail({
   t: Tfn;
   onSwitchPage: (page: CodePage) => void;
 }) {
+  const { lang } = useI18n();
   const utf8 = entry.char ? utf8Bytes(entry.char) : [];
   const hi = entry.code >> 4;
   const lo = entry.code & 0x0f;
@@ -289,6 +292,9 @@ function CharDetail({
           {entry.char && !entry.isControl && <CopyButton value={entry.char} label={t('common.copy')} />}
         </div>
       </div>
+
+      {/* Che cos'è, prima di che codice ha: è la domanda che ci si fa cliccando. */}
+      <p className="char-note">{charNote(entry, lang)}</p>
 
       <table className="data-table compact">
         <tbody>

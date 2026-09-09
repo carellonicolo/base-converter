@@ -22,7 +22,7 @@ condivide grafica, header unificato e login SSO.
 | **Aritmetica in base** | Addizione, sottrazione e moltiplicazione in colonna in base 2/8/10/16, con riporti, prestiti e prodotti parziali espliciti, più controprova in base 10. |
 | **Numeri con segno** | Complemento a due e a uno, modulo e segno, eccesso-K su 4/8/16/32 bit. Bit cliccabili, intervallo rappresentabile, overflow, e i passaggi «inverti + aggiungi 1». |
 | **IEEE 754** | Half/single/double: campi segno, esponente e mantissa colorati e modificabili bit a bit, casi speciali (zero, denormali, ±∞, NaN) ed errore di rappresentazione reale. |
-| **Testo e codifiche** | Tabella dei caratteri come **griglia 16×16** (riga = 4 bit alti, colonna = 4 bit bassi) su quattro code page — ASCII a 7 bit, CP437, ISO 8859-1, Windows-1252 — con il confronto dello stesso byte tra le code page e l'**export del poster A4 in PDF vettoriale e PNG**. Poi esploratore Unicode per blocchi, codifica UTF-8/16/32 byte per byte, Base64 con la scomposizione 3 byte → 24 bit → 4 sestetti, URL-encoding. |
+| **Testo e codifiche** | Tabella dei caratteri come **griglia 16×16** (riga = 4 bit alti, colonna = 4 bit bassi) su quattro code page — ASCII a 7 bit, CP437, ISO 8859-1, Windows-1252 — con il confronto dello stesso byte tra le code page, **due righe di spiegazione per ogni carattere** e l'**export del poster A4 in PDF vettoriale e PNG**. Modali con i cenni storici su ASCII e su Unicode, linea del tempo inclusa. Poi esploratore Unicode per blocchi, codifica UTF-8/16/32 byte per byte, Base64 con la scomposizione 3 byte → 24 bit → 4 sestetti, URL-encoding. |
 | **Palestra** | Esercizi generati automaticamente su tutti i moduli, tre livelli, XP e livelli, serie (streak), statistiche per argomento, 16 traguardi da sbloccare e **modalità tutor** che corregge un passaggio alla volta. |
 | **Verifiche** | Prova ufficiale con timer, correzione automatica lato server, voto in decimi e revisione domanda per domanda. |
 | **Console docente** | Configurazione per classe (moduli, difficoltà, durata, numero domande, soglia di sufficienza), risultati con export CSV e vista «in diretta» delle prove in corso. |
@@ -63,7 +63,7 @@ src/
   components/      screens/ (pagine) e ui/ (guscio e componenti condivisi)
   hooks/           useAuth, useFocusMonitor, useCopy
   lib/             auth SSO, progressi e badge, sync, formattazioni, poster/pdf/download
-  i18n/            dizionari IT/EN
+  i18n/            dizionari IT/EN, note sui caratteri e cenni teorici (bilingui, appaiati)
 functions/         Pages Functions: /api/profile, /api/exam/*, /api/teacher/*
 migrations/        0001_bc_init.sql (tabelle bc_* nel D1 condiviso `ccna1`)
 ```

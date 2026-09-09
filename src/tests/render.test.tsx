@@ -6,7 +6,7 @@
  * perché ogni push su main va in produzione automaticamente.
  */
 import { describe, it, expect, beforeAll, afterEach, vi } from 'vitest';
-import { render, screen, cleanup, fireEvent } from '@testing-library/react';
+import { render, screen, cleanup, fireEvent, waitFor } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import type { ReactNode } from 'react';
 
@@ -222,5 +222,60 @@ describe('Tabella dei caratteri — comportamento', () => {
     expect(container.querySelector('.ascii-cell.sel')?.getAttribute('data-code')).toBe('81');
     fireEvent.keyDown(grid, { key: 'ArrowLeft' });
     expect(container.querySelector('.ascii-cell.sel')?.getAttribute('data-code')).toBe('80');
+  });
+});
+
+describe('Spiegazioni e teoria', () => {
+  function renderText() {
+    return render(
+      <Providers>
+        <TextPage />
+      </Providers>
+    );
+  }
+
+  it('il pannello di dettaglio spiega il carattere selezionato', () => {
+    const { container } = renderText();
+    fireEvent.click(container.querySelector('[data-code="7"]')!); // BEL
+    expect(screen.getByText(/campanello vero sulla telescrivente/i)).toBeTruthy();
+    fireEvent.click(container.querySelector('[data-code="127"]')!); // DEL
+    expect(screen.getByText(/nastro perforato/i)).toBeTruthy();
+  });
+
+  it('anche le lettere hanno una spiegazione, quella di categoria', () => {
+    const { container } = renderText();
+    fireEvent.click(container.querySelector('[data-code="66"]')!); // B
+    expect(screen.getByText(/un bit soltanto/i)).toBeTruthy();
+  });
+
+  it('il pulsante Teoria c’è su ASCII e Unicode, non sulle altre schede', () => {
+    renderText();
+    expect(screen.getByRole('button', { name: /Teoria/ })).toBeTruthy();
+    fireEvent.click(screen.getByRole('button', { name: 'Unicode' }));
+    expect(screen.getByRole('button', { name: /Teoria/ })).toBeTruthy();
+    fireEvent.click(screen.getByRole('button', { name: /Base64/ }));
+    expect(screen.queryByRole('button', { name: /Teoria/ })).toBeNull();
+  });
+
+  it('apre la modale teorica e la chiude con Esc', async () => {
+    renderText();
+    fireEvent.click(screen.getByRole('button', { name: /Teoria/ }));
+    // Il contenuto arriva da un chunk caricato al primo clic.
+    await waitFor(() => expect(screen.getByRole('dialog')).toBeTruthy());
+    expect(screen.getByText(/ASCII: come e perché/)).toBeTruthy();
+    expect(screen.getByText(/Come ci siamo arrivati/)).toBeTruthy();
+    expect(screen.getByText(/nasce ASCII/)).toBeTruthy(); // linea del tempo
+
+    fireEvent.keyDown(document, { key: 'Escape' });
+    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
+  });
+
+  it('la modale di Unicode racconta un’altra storia', async () => {
+    renderText();
+    fireEvent.click(screen.getByRole('button', { name: 'Unicode' }));
+    fireEvent.click(screen.getByRole('button', { name: /Teoria/ }));
+    await waitFor(() => expect(screen.getByRole('dialog')).toBeTruthy());
+    expect(screen.getByText(/Unicode: come e perché/)).toBeTruthy();
+    expect(screen.getByText(/UTF-8, e perché ha vinto/)).toBeTruthy();
   });
 });

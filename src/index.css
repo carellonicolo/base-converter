@@ -984,6 +984,81 @@ button.chip:hover { border-color: var(--primary); }
   .ascii-detail-glyph { width: 64px; height: 64px; font-size: 2rem; }
 }
 
+/* ============================================================
+   TEORIA — pulsante, modale, linea del tempo
+   ============================================================ */
+
+/* Il pulsante vive accanto alle schede, non dentro: stessa posizione per
+   ASCII e per Unicode, e non ruba spazio alla barra degli strumenti. */
+.text-tabs { display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap; margin-bottom: 1.25rem; }
+.theory-btn { margin-left: auto; }
+
+.theory-head { display: inline-flex; align-items: center; gap: 0.5rem; }
+.theory-head svg { color: var(--primary); flex-shrink: 0; }
+
+/* Il pannello largo 900px è giusto per una tabella, non per un testo da
+   leggere: qui la riga va tenuta sotto le ~70 battute, altrimenti l'occhio
+   perde il capo riga. */
+.theory-modal { max-width: 700px; }
+.theory-lead {
+  margin: 0 0 1.4rem;
+  padding-bottom: 1.1rem;
+  border-bottom: 1px solid var(--border);
+  font-size: 1rem;
+  line-height: 1.65;
+}
+.theory-section { margin-bottom: 1.5rem; }
+.theory-section h3 { margin: 0 0 0.5rem; font-size: 1rem; color: var(--primary); }
+.theory-section p { margin: 0 0 0.7rem; line-height: 1.7; }
+.theory-section p:last-child { margin-bottom: 0; }
+.theory-section code, .char-note code {
+  font-family: var(--font-mono);
+  font-size: 0.88em;
+  background: var(--readonly-bg);
+  border: 1px solid var(--border);
+  padding: 0.05em 0.35em;
+  border-radius: 4px;
+}
+
+/* Linea del tempo: griglia a due colonne invece di posizionamenti assoluti,
+   così l'anno resta allineato al suo evento anche quando il testo va a capo. */
+.theory-timeline { margin-top: 1.75rem; padding-top: 1.25rem; border-top: 1px solid var(--border); }
+.theory-timeline h3 { margin: 0 0 0.9rem; font-size: 1rem; color: var(--primary); }
+.theory-events { display: grid; grid-template-columns: 3.1rem minmax(0, 1fr); column-gap: 0.9rem; }
+.theory-year {
+  font-family: var(--font-mono); font-weight: 700; font-size: 0.8rem;
+  color: var(--primary); text-align: right; line-height: 1.5;
+}
+.theory-event {
+  position: relative; padding: 0 0 0.9rem 1.05rem;
+  border-left: 2px solid var(--border-strong);
+  font-size: 0.88rem; line-height: 1.5;
+}
+.theory-event::before {
+  content: ''; position: absolute; left: -5px; top: 0.42rem;
+  width: 8px; height: 8px; border-radius: 50%;
+  background: var(--primary); border: 2px solid var(--card);
+}
+/* L'ultimo evento non deve trascinarsi dietro un pezzo di linea a vuoto. */
+.theory-events > .theory-event:last-child { padding-bottom: 0; border-left-color: transparent; }
+.theory-events > .theory-event:last-child::before { left: -4px; }
+
+@media (max-width: 560px) {
+  .theory-events { grid-template-columns: 2.6rem minmax(0, 1fr); column-gap: 0.7rem; }
+  .theory-btn { margin-left: 0; }
+}
+
+/* ---- le due righe di spiegazione nel pannello di dettaglio ---- */
+.char-note {
+  margin: 0 0 1rem;
+  padding: 0.7rem 0.85rem;
+  background: var(--readonly-bg);
+  border-left: 3px solid var(--primary);
+  border-radius: 0 8px 8px 0;
+  font-size: 0.85rem;
+  line-height: 1.55;
+}
+
 /* ---------------- Responsive ---------------- */
 @media (max-width: 640px) {
   .field-row { grid-template-columns: 1fr; }
