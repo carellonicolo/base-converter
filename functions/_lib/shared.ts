@@ -6,12 +6,12 @@
  *
  * Regole di accesso di QUESTA app (decise col docente):
  *  - Strumenti, teoria e palestra sono LIBERI: non passano da qui.
- *  - Il salvataggio dei progressi richiede solo un account valido.
+ *  - Il salvataggio dei progressi richiede un account ABILITATO sull'IdP.
  *  - Le VERIFICHE richiedono account attivo E classe approvata.
  *  - La console richiede `isTeacher || isSuperAdmin`.
  */
 
-import { verifySession, fetchUserInfo, type Identity } from './sso';
+import { verifySession, fetchUserInfo, requireAppAccess, type Identity } from './sso';
 
 export interface Env {
   DB: D1Database;
@@ -41,20 +41,28 @@ export interface Access {
 }
 
 /**
- * Sessione valida (qualsiasi utente autenticato). Usato per il salvataggio dei
- * progressi: anche uno studente ancora in attesa di approvazione può tenere i
- * suoi progressi della palestra.
+ * Account abilitato sull'IdP (qualsiasi ruolo). Usato per il salvataggio dei
+ * progressi.
+ *
+ * Fino a settembre 2026 bastava una sessione valida, anche in attesa di
+ * approvazione. Ora chi non è abilitato, per l'app, non è loggato — come in
+ * tutta la piattaforma (vedi _lib/sso.ts): la palestra la usa in modalità
+ * libera, senza salvataggi, finché un docente non conferma la sua classe.
  */
 export async function requireUser(request: Request): Promise<Access | Response> {
+  const gate = await requireAppAccess(request);
+  if (!gate.ok && gate.reason !== 'idp_unreachable') {
+    return jsonError(401, 'Accesso richiesto. Effettua il login.', 'unauthenticated');
+  }
   const identity = await verifySession(request);
   if (!identity) return jsonError(401, 'Accesso richiesto. Effettua il login.', 'unauthenticated');
 
-  const info = await fetchUserInfo(request);
-  if (!info) {
+  if (!gate.ok) {
     // L'IdP non risponde: ci fidiamo della firma del cookie (già verificata)
     // ma senza classi approvate. Sufficiente per i progressi personali.
     return { identity, isTeacher: false, classes: [], status: identity.status };
   }
+  const info = gate.info;
   const isTeacher = !!(info.user.isTeacher || info.user.isSuperAdmin);
   const classes = (info.approvedClasses ?? []).map((c) => c.classe).filter(Boolean);
   return { identity, isTeacher, classes, status: info.user.status };
@@ -71,6 +79,11 @@ export async function requireExamAccess(request: Request): Promise<Access | Resp
 
   const info = await fetchUserInfo(request);
   if (!info) return jsonError(401, 'Sessione non valida. Effettua di nuovo il login.', 'unauthenticated');
+  // Non abilitato sull'IdP (sospeso, password da sostituire…), docente compreso:
+  // per l'app non è loggato.
+  if (!info.access?.allowed) {
+    return jsonError(401, 'Accesso non ancora abilitato. Effettua di nuovo il login.', 'unauthenticated');
+  }
 
   const isTeacher = !!(info.user.isTeacher || info.user.isSuperAdmin);
   if (isTeacher) return { identity, isTeacher: true, classes: [], status: info.user.status };
@@ -95,6 +108,9 @@ export async function requireTeacher(request: Request): Promise<Access | Respons
   if (!identity) return jsonError(401, 'Accesso docente richiesto.', 'unauthenticated');
   const info = await fetchUserInfo(request);
   if (!info) return jsonError(401, 'Sessione non valida. Effettua di nuovo il login.', 'unauthenticated');
+  if (!info.access?.allowed) {
+    return jsonError(401, 'Accesso non ancora abilitato. Effettua di nuovo il login.', 'unauthenticated');
+  }
   if (!(info.user.isTeacher || info.user.isSuperAdmin)) {
     return jsonError(403, 'Sezione riservata al docente.', 'forbidden');
   }
