@@ -6,11 +6,13 @@
  * mancava) e l'analisi per tipo di esercizio, calcolata qui perché solo il
  * server ha semi e risposte.
  *
- * Solo docente.
+ * Solo docente, e solo per le assegnazioni del suo perimetro: una sessione
+ * sua si vede intera, anche la prova di chi nel frattempo ha cambiato classe.
  */
 import { jsonOk, jsonError, requireTeacher, type Env } from '../../_lib/shared';
 import { finalizeAbandoned, getAssignment, listAssignments, listAttempts, listSubmittedGrades, outcomeOf } from '../../_lib/examdb';
-import { fetchRoster, knownNames, rosterStudents } from '../../_lib/roster';
+import { knownNames, rosterStudents } from '../../_lib/roster';
+import { loadPerimeter, outsidePerimeter, ownsAssignment } from '../../_lib/perimeter';
 import { assignmentView, attemptView } from '../../_lib/views';
 import { analyzeByCategory } from '../../../shared/exam/analysis';
 import type { QuestionOutcome } from '../../../shared/exam/config';
@@ -23,15 +25,19 @@ export const onRequestGet: PagesFunction<Env> = async ({ request, env }) => {
   if (!id) return jsonError(400, 'id mancante.');
 
   try {
-    if (!(await getAssignment(env, id))) return jsonError(404, 'Sessione non trovata.', 'not_found');
+    const asg = await getAssignment(env, id);
+    if (!asg) return jsonError(404, 'Sessione non trovata.', 'not_found');
+    const p = await loadPerimeter(request, access);
+    if (p instanceof Response) return p;
+    if (!ownsAssignment(p, asg)) return outsidePerimeter('Questa verifica');
     await finalizeAbandoned(env);
 
-    const [all, grades, attempts, roster] = await Promise.all([
+    const [all, grades, attempts] = await Promise.all([
       listAssignments(env),
       listSubmittedGrades(env),
       listAttempts(env, { assignmentId: id, states: ['consegnata', 'in_corso', 'annullata'] }),
-      fetchRoster(request),
     ]);
+    const roster = p.roster;
     const a = all.find((x) => x.id === id)!;
 
     // Gli iscritti: la classe, o lo studente dell'assegnazione personale.

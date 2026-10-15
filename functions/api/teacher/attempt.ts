@@ -8,11 +8,12 @@
  * Una prova in corso o interrotta si corregge con le risposte salvate
  * durante la prova: è una correzione PROVVISORIA, e la console lo dice.
  *
- * Solo docente.
+ * Solo docente, e solo sulle prove del suo perimetro (_lib/perimeter.ts).
  */
 import { jsonOk, jsonError, requireTeacher, type Env } from '../../_lib/shared';
 import { deleteAttempt, getAttempt, listEvents, outcomeOf } from '../../_lib/examdb';
 import { attemptView } from '../../_lib/views';
+import { attemptInPerimeter, loadPerimeter, outsidePerimeter } from '../../_lib/perimeter';
 import { parseFocusEvents } from '../../../shared/exam/assignments';
 
 export const onRequestGet: PagesFunction<Env> = async ({ request, env }) => {
@@ -25,6 +26,9 @@ export const onRequestGet: PagesFunction<Env> = async ({ request, env }) => {
   try {
     const row = await getAttempt(env, id);
     if (!row) return jsonError(404, 'Prova non trovata.', 'not_found');
+    const p = await loadPerimeter(request, access);
+    if (p instanceof Response) return p;
+    if (!(await attemptInPerimeter(env, p, row))) return outsidePerimeter('Questa prova');
     const { outcome, config } = outcomeOf(row);
     const events = await listEvents(env, id);
     return jsonOk({
@@ -55,7 +59,11 @@ export const onRequestDelete: PagesFunction<Env> = async ({ request, env }) => {
   if (!id) return jsonError(400, 'id mancante.');
 
   try {
-    if (!(await getAttempt(env, id))) return jsonError(404, 'Prova non trovata.', 'not_found');
+    const row = await getAttempt(env, id);
+    if (!row) return jsonError(404, 'Prova non trovata.', 'not_found');
+    const p = await loadPerimeter(request, access);
+    if (p instanceof Response) return p;
+    if (!(await attemptInPerimeter(env, p, row))) return outsidePerimeter('Questa prova');
     await deleteAttempt(env, id);
     return jsonOk({ ok: true });
   } catch (e) {

@@ -8,28 +8,39 @@
  *
  * Se AUTH non risponde si ripiega sulle classi già viste nei tentativi e nelle
  * assegnazioni, per non lasciare la console senza scelte.
+ *
+ * Un docente vede solo le sue classi, `teacherClasses` dell'IdP (vedi
+ * _lib/perimeter.ts), anche quelle che non hanno ancora studenti; il
+ * super-admin le vede tutte.
  */
 import { jsonOk, jsonError, requireTeacher, type Env } from '../../_lib/shared';
 import { listKnownClasses } from '../../_lib/examdb';
-import { fetchRoster, rosterClasses } from '../../_lib/roster';
+import { rosterClasses } from '../../_lib/roster';
+import { loadPerimeter, visibleClasses } from '../../_lib/perimeter';
 
 export const onRequestGet: PagesFunction<Env> = async ({ request, env }) => {
   const access = await requireTeacher(request);
   if (access instanceof Response) return access;
 
-  const roster = await fetchRoster(request);
-  let classes: string[] = roster ? rosterClasses(roster) : [];
+  // Le classi di un docente le dice `teacherClasses`, non il registro: qui
+  // il registro serve solo a scriverle come le scrive lui.
+  const p = await loadPerimeter(request, access, { rosterOptional: true });
+  if (p instanceof Response) return p;
+  const roster = p.roster;
+  let known: string[] = roster ? rosterClasses(roster) : [];
   let source = roster ? 'auth' : 'fallback';
 
   // AUTH muto o senza classi: usa quelle note dal DB così la console resta usabile.
-  if (classes.length === 0) {
+  if (known.length === 0) {
     try {
-      classes = await listKnownClasses(env);
+      known = await listKnownClasses(env);
       if (source === 'auth') source = 'db';
     } catch (e) {
       return jsonError(500, `Errore DB: ${e instanceof Error ? e.message : String(e)}`);
     }
   }
 
-  return jsonOk({ classes, source });
+  // `scope`: 'own' = solo le classi del docente; la console allora non
+  // propone di scrivere a mano il nome di un'altra classe.
+  return jsonOk({ classes: visibleClasses(p, known), source, scope: p.superAdmin ? 'all' : 'own' });
 };

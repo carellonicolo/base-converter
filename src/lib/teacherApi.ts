@@ -162,7 +162,7 @@ const json = (body: unknown, method: string): RequestInit => ({ method, body: JS
 
 export const teacherApi = {
   catalog: () => authFetch<{ exams: CatalogExam[] }>('/api/teacher/exams'),
-  classes: () => authFetch<{ classes: string[]; source: string }>('/api/teacher/classes'),
+  classes: () => authFetch<{ classes: string[]; source: string; scope?: 'all' | 'own' }>('/api/teacher/classes'),
   sessions: () => authFetch<{ assignments: SessionSummary[]; now: string }>('/api/teacher/assignments'),
   session: async (id: string) => withNames(await authFetch<SessionDetail>(`/api/teacher/session?id=${encodeURIComponent(id)}`)),
   assign: (body: {

@@ -73,6 +73,8 @@ const STUDENTS = [
 ];
 
 const calls: { url: string; method: string; body: unknown }[] = [];
+/** La risposta di /api/teacher/classes: un test la cambia per il docente senza classi. */
+let classesResponse: { classes: string[]; source: string; scope?: 'all' | 'own' } = { classes: ['3A', '3B'], source: 'auth' };
 
 function stubFetch() {
   calls.length = 0;
@@ -92,7 +94,7 @@ function stubFetch() {
         return json({ exam: spec, seed: 7, questions });
       }
       if (url.includes('/api/teacher/exams')) return json({ exams: EXAMS });
-      if (url.includes('/api/teacher/classes')) return json({ classes: ['3A', '3B'], source: 'auth' });
+      if (url.includes('/api/teacher/classes')) return json(classesResponse);
       if (url.includes('/api/teacher/assignments')) {
         if (method === 'GET') return json({ assignments: SESSIONS, now: new Date().toISOString() });
         return json({ ok: true, id: 'nuova', closedPrevious: 0 });
@@ -150,6 +152,7 @@ beforeAll(() => {
 afterEach(() => {
   cleanup();
   localStorage.clear();
+  classesResponse = { classes: ['3A', '3B'], source: 'auth' };
 });
 
 function renderConsole(path = '/admin') {
@@ -203,6 +206,13 @@ describe('console docente — Assegna', () => {
     fireEvent.click(within(document.querySelector('.assign-form') as HTMLElement).getByRole('button', { name: /^Assegna$/ }));
     await waitFor(() => expect(lastCall('/api/teacher/assignments', 'POST')).toBeTruthy());
     expect(lastCall('/api/teacher/assignments', 'POST')!.body).toMatchObject({ targetType: 'class', class: '3B', openForMin: 30 });
+  });
+
+  it('un docente senza classi sull’IdP non può scriverne una a mano', async () => {
+    classesResponse = { classes: [], source: 'auth', scope: 'own' };
+    renderConsole();
+    await waitFor(() => expect(screen.getByText(/Non hai classi assegnate/)).toBeTruthy());
+    expect(screen.queryByPlaceholderText('es. 3A')).toBeNull();
   });
 
   it('assegna a un singolo studente', async () => {

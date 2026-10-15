@@ -10,10 +10,11 @@
  * VLSM e CCNA1; lo studente lo riceve al primo giro del canale
  * /api/exam/events, entro pochi secondi.
  *
- * Solo docente.
+ * Solo docente, e solo sulle prove del suo perimetro (_lib/perimeter.ts).
  */
 import { clientIp, jsonOk, jsonError, requireTeacher, type Env } from '../../_lib/shared';
 import { addEvent, annulAttempt, getAttempt, type EventType } from '../../_lib/examdb';
+import { attemptInPerimeter, loadPerimeter, outsidePerimeter } from '../../_lib/perimeter';
 
 interface Body {
   attemptId?: string;
@@ -43,6 +44,9 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
   try {
     const row = await getAttempt(env, id);
     if (!row) return jsonError(404, 'Prova non trovata.', 'not_found');
+    const p = await loadPerimeter(request, access);
+    if (p instanceof Response) return p;
+    if (!(await attemptInPerimeter(env, p, row))) return outsidePerimeter('Questa prova');
     if (row.state !== 'in_corso') return jsonError(409, 'La prova non è più in corso.', 'not_open');
 
     await addEvent(env, id, row.user_id, type, message, clientIp(request));

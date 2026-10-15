@@ -41,6 +41,8 @@ condivide grafica, header unificato e login SSO.
 
 Da ogni elenco si apre la **revisione della prova**: risposta data e attesa, uscite dalla pagina con ora e durata, interventi del docente, ed **elimina prova** per lasciarla rifare. Studenti come «Cognome Nome» e ordinati per cognome, come in VLSM. La scheda aperta sta nell'indirizzo (`/admin?tab=history&session=…`).
 
+**Perimetro del docente** (come in VLSM, `functions/_lib/perimeter.ts`): ogni docente vede e gestisce solo le **sue classi** — quelle che il super-admin gli assegna su AUTH (`teacherClasses`) — e gli **studenti** che il registro di AUTH gli restituisce. Una prova è sua se è di un suo studente o di una sua assegnazione, così una sessione resta intera anche se uno studente cambia classe. Il filtro sta sul server, nelle query; senza registro un docente riceve 502 invece di una lista sbagliata. Il **super-admin** non ha perimetro.
+
 ## Accesso
 
 L'app è a **uso libero**: strumenti, teoria e palestra funzionano senza login e

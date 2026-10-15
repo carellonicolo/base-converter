@@ -8,11 +8,15 @@
  * studente compare anche se non ha mai aperto l'app. Se AUTH non risponde
  * si ripiega su chi è noto dal DB (prove e progressi), con `source: 'db'`.
  *
- * Solo docente.
+ * Solo docente, nel suo perimetro (_lib/perimeter.ts): gli studenti sono
+ * quelli che AUTH gli restituisce per le sue classi. Il ripiego sul DB vale
+ * solo per il super-admin: per un docente, senza registro non si sa chi sia
+ * suo.
  */
 import { jsonOk, jsonError, requireTeacher, type Env } from '../../_lib/shared';
 import { getProgress, listAllProgress, listAttempts, listStudentAttemptStats } from '../../_lib/examdb';
-import { fetchRoster, knownNames, rosterStudents, sortClasses, type RosterStudent } from '../../_lib/roster';
+import { knownNames, rosterStudents, sortClasses, type RosterStudent } from '../../_lib/roster';
+import { classesInView, loadPerimeter, outsidePerimeter, seesStudent } from '../../_lib/perimeter';
 import { attemptView } from '../../_lib/views';
 
 function xpOf(data: string | null | undefined): number | null {
@@ -39,11 +43,17 @@ export const onRequestGet: PagesFunction<Env> = async ({ request, env }) => {
 
   const id = new URL(request.url).searchParams.get('id');
 
+  const p = await loadPerimeter(request, access);
+  if (p instanceof Response) return p;
+
   try {
-    const roster = await fetchRoster(request);
-    const fromRoster: RosterStudent[] = roster ? rosterStudents(roster) : [];
+    const roster = p.roster;
+    const fromRoster: RosterStudent[] = roster
+      ? rosterStudents(roster).map((s) => ({ ...s, classes: classesInView(p, s.classes) }))
+      : [];
 
     if (id) {
+      if (!seesStudent(p, id)) return outsidePerimeter('Lo studente');
       const [attempts, progress] = await Promise.all([
         listAttempts(env, { studentId: id, states: ['consegnata', 'in_corso', 'annullata'] }),
         getProgress(env, id),

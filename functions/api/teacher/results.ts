@@ -3,11 +3,13 @@
  * Query opzionali: ?class=3A  ?student=<id>  ?state=all|consegnata|annullata  ?format=csv
  *
  * Di norma le consegnate; `state=all` aggiunge le interrotte, che hanno un
- * motivo e nessun voto.
+ * motivo e nessun voto. Solo le prove del perimetro del docente
+ * (_lib/perimeter.ts), filtrate nella query.
  */
 import { jsonOk, jsonError, requireTeacher, type Env } from '../../_lib/shared';
 import { listAttempts, type AttemptState } from '../../_lib/examdb';
 import { attemptView } from '../../_lib/views';
+import { attemptScope, loadPerimeter, ownedAssignmentIds } from '../../_lib/perimeter';
 
 export const onRequestGet: PagesFunction<Env> = async ({ request, env }) => {
   const access = await requireTeacher(request);
@@ -21,8 +23,11 @@ export const onRequestGet: PagesFunction<Env> = async ({ request, env }) => {
   const states: AttemptState[] =
     stateParam === 'all' ? ['consegnata', 'annullata'] : stateParam === 'annullata' ? ['annullata'] : ['consegnata'];
 
+  const p = await loadPerimeter(request, access);
+  if (p instanceof Response) return p;
   try {
-    const rows = await listAttempts(env, { cls: cls && cls !== '*' ? cls : null, studentId: student, states });
+    const scope = attemptScope(p, await ownedAssignmentIds(env, p));
+    const rows = await listAttempts(env, { cls: cls && cls !== '*' ? cls : null, studentId: student, states, scope });
 
     if (format === 'csv') {
       const header = ['Studente', 'Email', 'Classe', 'Verifica', 'Stato', 'Voto', 'Corrette', 'Totale', 'Uscite pagina', 'Secondi fuori', 'Uscite schermo intero', 'Ammonizioni', 'Iniziata', 'Consegnata'];

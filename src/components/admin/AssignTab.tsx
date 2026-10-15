@@ -61,6 +61,8 @@ export function AssignTab({ preselect, preselectStudent, onOpenSession }: Props)
   const [sessions, setSessions] = useState<SessionSummary[] | null>(null);
   const [serverNow, setServerNow] = useState<string | null>(null);
   const [classes, setClasses] = useState<string[] | null>(null);
+  // 'own': il docente vede solo le sue classi (perimetro dell'IdP).
+  const [classScope, setClassScope] = useState<'all' | 'own'>('all');
   const [students, setStudents] = useState<StudentRow[] | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState<string | null>(null);
@@ -93,6 +95,7 @@ export function AssignTab({ preselect, preselectStudent, onOpenSession }: Props)
       if (c.ok && c.data) setExams(c.data.exams);
       else setError(c.error ?? `HTTP ${c.status}`);
       setClasses(cl.ok && cl.data ? cl.data.classes : []);
+      if (cl.ok && cl.data?.scope) setClassScope(cl.data.scope);
       setStudents(st.ok && st.data ? st.data.students : []);
     })();
     void loadSessions();
@@ -309,6 +312,8 @@ export function AssignTab({ preselect, preselectStudent, onOpenSession }: Props)
                       </button>
                     ))}
                   </div>
+                ) : classScope === 'own' ? (
+                  <p className="warn-text" style={{ marginTop: 0 }}>⚠ {t('admin.noOwnClasses')}</p>
                 ) : (
                   <>
                     <p className="hint" style={{ marginTop: 0 }}>{t('admin.noClasses')}</p>
