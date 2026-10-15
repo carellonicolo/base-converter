@@ -11,38 +11,15 @@
  */
 import { jsonOk, jsonError, requireTeacher, type Env } from '../../_lib/shared';
 import { listKnownClasses } from '../../_lib/examdb';
-
-const AUTH_ORIGIN = 'https://auth.nicolocarello.it';
-
-interface AuthUsers {
-  users?: { enrollments?: { classe?: string; approved?: boolean }[] }[];
-}
+import { fetchRoster, rosterClasses } from '../../_lib/roster';
 
 export const onRequestGet: PagesFunction<Env> = async ({ request, env }) => {
   const access = await requireTeacher(request);
   if (access instanceof Response) return access;
 
-  const cookie = request.headers.get('cookie') ?? '';
-  let classes: string[] = [];
-  let source = 'auth';
-
-  try {
-    const res = await fetch(`${AUTH_ORIGIN}/api/admin/users`, { headers: { cookie } });
-    if (res.ok) {
-      const data = (await res.json()) as AuthUsers;
-      const set = new Set<string>();
-      for (const u of data.users ?? []) {
-        for (const e of u.enrollments ?? []) {
-          if (e.approved && e.classe) set.add(e.classe);
-        }
-      }
-      classes = [...set].sort();
-    } else {
-      source = 'fallback';
-    }
-  } catch {
-    source = 'fallback';
-  }
+  const roster = await fetchRoster(request);
+  let classes: string[] = roster ? rosterClasses(roster) : [];
+  let source = roster ? 'auth' : 'fallback';
 
   // AUTH muto o senza classi: usa quelle note dal DB così la console resta usabile.
   if (classes.length === 0) {

@@ -13,7 +13,7 @@ type Tfn = (key: string, vars?: Record<string, string | number>) => string;
 
 const OP_SYMBOL: Record<string, string> = { add: '+', sub: '−', mul: '×' };
 
-function reprName(repr: string, t: Tfn): string {
+export function reprName(repr: string, t: Tfn): string {
   switch (repr) {
     case 'twos':
       return t('ex.reprTwos');
@@ -107,5 +107,46 @@ export function moduleLabel(module: string, t: Tfn): string {
       return t('home.textTitle');
     default:
       return module;
+  }
+}
+
+/**
+ * Una domanda come arriva dal server (consegna senza o con soluzione) nella
+ * forma di `Exercise`, per riusare `exercisePrompt` ed `expectedHint`.
+ */
+export function asExercise(q: { index: number; module: string; kind: string; params: Record<string, string | number>; points: number; answer?: string }): Exercise {
+  return {
+    id: `q${q.index}`,
+    module: q.module as Exercise['module'],
+    kind: q.kind as Exercise['kind'],
+    difficulty: 'medium',
+    params: q.params,
+    answer: q.answer ?? '',
+    points: q.points,
+  };
+}
+
+/** Il nome di un tipo di esercizio dell'analisi di sessione (shared/exam/analysis.ts). */
+export function categoryLabel(c: { kind: string; params: Record<string, string | number> }, t: Tfn): string {
+  const p = c.params;
+  switch (c.kind) {
+    case 'conv':
+      return t('admin.cat.conv', { from: Number(p.from), to: Number(p.to) });
+    case 'arith':
+      return t('admin.cat.arith', { op: t(`admin.cat.op_${p.op}`), base: Number(p.base) });
+    case 'signedEncode':
+      return t('admin.cat.signedEncode', { repr: reprName(String(p.repr), t) });
+    case 'signedDecode':
+      return t('admin.cat.signedDecode', { repr: reprName(String(p.repr), t) });
+    case 'ieeeValue':
+      return t('admin.cat.ieeeValue', { format: String(p.format) });
+    case 'ieeeExponent':
+    case 'asciiCode':
+    case 'asciiChar':
+    case 'utf8len':
+    case 'base64':
+      return t(`admin.cat.${c.kind}`);
+    default:
+      return c.kind;
   }
 }

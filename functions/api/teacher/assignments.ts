@@ -1,42 +1,57 @@
 /**
- * GET   /api/teacher/assignments — elenco delle assegnazioni con contatori.
- * POST  /api/teacher/assignments — assegna una verifica a UNA classe.
- * PATCH /api/teacher/assignments — apri/chiudi un'assegnazione.
+ * GET   /api/teacher/assignments — le assegnazioni, con contatori e voti:
+ *                                  è l'elenco delle sessioni dello Storico.
+ * POST  /api/teacher/assignments — assegna una verifica a una classe o a un
+ *                                  singolo studente, con la finestra per
+ *                                  iniziarla.
+ * PATCH /api/teacher/assignments — chiudi, riapri (recupero per gli assenti),
+ *                                  prolunga la finestra.
  *
- * Solo docente. Non esiste un modo per assegnare a "tutte le classi": il campo
- * classe è un nome singolo e obbligatorio.
+ * Solo docente. Non esiste un modo per assegnare a "tutte le classi": il
+ * destinatario è una classe per nome, o uno studente per id.
  */
 import { jsonOk, jsonError, requireTeacher, type Env } from '../../_lib/shared';
-import { listAssignments, createAssignment, setAssignmentStatus, getAssignment } from '../../_lib/examdb';
+import {
+  closeAssignment,
+  createAssignment,
+  getAssignment,
+  listAssignments,
+  listSubmittedGrades,
+  reopenAssignment,
+  setAssignmentWindow,
+} from '../../_lib/examdb';
+import { fetchRoster, rosterStudents } from '../../_lib/roster';
+import { assignmentView } from '../../_lib/views';
 import { findExam } from '../../../shared/exam/catalog';
+import { assignmentState, extendUntil, windowUntil } from '../../../shared/exam/assignments';
 
 export const onRequestGet: PagesFunction<Env> = async ({ request, env }) => {
   const access = await requireTeacher(request);
   if (access instanceof Response) return access;
   try {
-    const rows = await listAssignments(env);
-    // Arricchisco con i dati del catalogo. Un exam_id orfano (voce rimossa dal
-    // catalogo) NON rompe l'elenco: lo segnalo con missing:true.
-    const assignments = rows.map((a) => {
-      const spec = findExam(a.exam_id);
-      return {
-        id: a.id,
-        examId: a.exam_id,
-        class: a.class,
-        status: a.status,
-        durationMin: a.duration_min,
-        createdBy: a.created_by,
-        createdAt: a.created_at,
-        attempts: a.attempts,
-        submitted: a.submitted,
-        live: a.live,
-        exam: spec
-          ? { topic: spec.topic, level: spec.level, questionCount: spec.questionCount, durationMin: spec.durationMin }
-          : null,
-        missing: !spec,
-      };
-    });
-    return jsonOk({ assignments });
+    const [rows, grades, roster] = await Promise.all([listAssignments(env), listSubmittedGrades(env), fetchRoster(request)]);
+    const gradesBy = new Map<string, (number | null)[]>();
+    for (const g of grades) gradesBy.set(g.assignment_id, [...(gradesBy.get(g.assignment_id) ?? []), g.grade]);
+
+    // Iscritti per classe, dal registro: «12 consegne su 24».
+    let perClass: Map<string, number> | null = null;
+    if (roster) {
+      perClass = new Map();
+      for (const s of rosterStudents(roster)) for (const c of s.classes) perClass.set(c, (perClass.get(c) ?? 0) + 1);
+    }
+
+    const now = Date.now();
+    // Un exam_id orfano (voce rimossa dal catalogo) NON rompe l'elenco:
+    // lo segnala `missing: true`.
+    const assignments = rows.map((a) =>
+      assignmentView(
+        a,
+        now,
+        gradesBy.get(a.id) ?? [],
+        a.target_type === 'student' ? 1 : perClass ? perClass.get(a.class) ?? 0 : null
+      )
+    );
+    return jsonOk({ assignments, now: new Date(now).toISOString() });
   } catch (e) {
     return jsonError(500, `Errore DB: ${e instanceof Error ? e.message : String(e)}`);
   }
@@ -44,8 +59,15 @@ export const onRequestGet: PagesFunction<Env> = async ({ request, env }) => {
 
 interface PostBody {
   examId?: string;
+  targetType?: 'class' | 'student';
   class?: string;
+  studentId?: string;
+  /** Usati solo se il registro non risponde. */
+  studentName?: string;
+  studentClass?: string;
   durationMin?: number | null;
+  /** Minuti per iniziarla; null = finché il docente non la chiude. */
+  openForMin?: number | null;
 }
 
 export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
@@ -60,21 +82,46 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
   }
 
   const examId = String(body.examId ?? '').trim();
-  const cls = String(body.class ?? '').trim();
   if (!examId) return jsonError(400, 'Verifica mancante.', 'no_exam');
-  if (!cls) return jsonError(400, 'Classe mancante.', 'no_class');
-  if (cls === '*') return jsonError(400, 'Una verifica va assegnata a una classe specifica.', 'no_wildcard');
-  if (cls.length > 40) return jsonError(400, 'Nome classe troppo lungo.');
   if (!findExam(examId)) return jsonError(404, 'Verifica non trovata nel catalogo.', 'not_found');
+  const targetType = body.targetType === 'student' ? 'student' : 'class';
+
+  let cls = '';
+  let studentId: string | null = null;
+  let studentName: string | null = null;
+  if (targetType === 'class') {
+    cls = String(body.class ?? '').trim();
+    if (!cls) return jsonError(400, 'Classe mancante.', 'no_class');
+    if (cls === '*') return jsonError(400, 'Una verifica va assegnata a una classe specifica.', 'no_wildcard');
+    if (cls.length > 40) return jsonError(400, 'Nome classe troppo lungo.');
+  } else {
+    studentId = String(body.studentId ?? '').trim();
+    if (!studentId) return jsonError(400, 'Studente mancante.', 'no_student');
+    // Nome e classe dal registro, che è la fonte di verità; quelli del
+    // browser solo se il registro non risponde.
+    const roster = await fetchRoster(request);
+    const found = roster ? rosterStudents(roster).find((s) => s.id === studentId) : null;
+    if (roster && !found) return jsonError(404, 'Studente non trovato nel registro.', 'no_student');
+    studentName = (found?.name ?? String(body.studentName ?? '').trim()).slice(0, 120) || studentId;
+    cls = (found?.classes[0] ?? String(body.studentClass ?? '').trim()).slice(0, 40);
+  }
 
   const duration =
-    body.durationMin == null || body.durationMin === undefined
-      ? null
-      : Math.max(1, Math.min(240, Math.floor(Number(body.durationMin) || 0))) || null;
+    body.durationMin == null ? null : Math.max(1, Math.min(240, Math.floor(Number(body.durationMin) || 0))) || null;
 
   try {
     const id = crypto.randomUUID();
-    const { closed } = await createAssignment(env, id, examId, cls, duration, access.identity.email);
+    const { closed } = await createAssignment(env, {
+      id,
+      examId,
+      targetType,
+      cls,
+      studentId,
+      studentName,
+      durationMin: duration,
+      openUntil: windowUntil(body.openForMin, Date.now()),
+      byEmail: access.identity.email,
+    });
     return jsonOk({ ok: true, id, closedPrevious: closed });
   } catch (e) {
     return jsonError(500, `Errore DB: ${e instanceof Error ? e.message : String(e)}`);
@@ -83,7 +130,10 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
 
 interface PatchBody {
   id?: string;
-  status?: 'open' | 'closed';
+  action?: 'close' | 'reopen' | 'extend';
+  /** reopen: nuova finestra (null = senza termine). extend: minuti in più. */
+  openForMin?: number | null;
+  minutes?: number;
 }
 
 export const onRequestPatch: PagesFunction<Env> = async ({ request, env }) => {
@@ -99,12 +149,31 @@ export const onRequestPatch: PagesFunction<Env> = async ({ request, env }) => {
 
   const id = String(body.id ?? '').trim();
   if (!id) return jsonError(400, 'id mancante.');
-  if (body.status !== 'open' && body.status !== 'closed') return jsonError(400, 'status non valido.');
 
   try {
-    if (!(await getAssignment(env, id))) return jsonError(404, 'Assegnazione non trovata.', 'not_found');
-    await setAssignmentStatus(env, id, body.status);
-    return jsonOk({ ok: true });
+    const a = await getAssignment(env, id);
+    if (!a) return jsonError(404, 'Assegnazione non trovata.', 'not_found');
+    const now = Date.now();
+
+    switch (body.action) {
+      case 'close':
+        await closeAssignment(env, id);
+        return jsonOk({ ok: true });
+      case 'reopen': {
+        const { closed } = await reopenAssignment(env, a, windowUntil(body.openForMin, now));
+        return jsonOk({ ok: true, closedPrevious: closed });
+      }
+      case 'extend': {
+        if (assignmentState(a, now) === 'closed') return jsonError(409, 'La verifica è chiusa: riaprila.', 'closed');
+        const minutes = Math.round(Number(body.minutes ?? 15));
+        if (!Number.isFinite(minutes) || minutes <= 0) return jsonError(400, 'Minuti non validi.');
+        // Una finestra scaduta riparte da adesso; una senza termine resta tale.
+        await setAssignmentWindow(env, id, extendUntil(a.open_until, minutes, now));
+        return jsonOk({ ok: true });
+      }
+      default:
+        return jsonError(400, 'Azione non valida.');
+    }
   } catch (e) {
     return jsonError(500, `Errore DB: ${e instanceof Error ? e.message : String(e)}`);
   }

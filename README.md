@@ -24,8 +24,22 @@ condivide grafica, header unificato e login SSO.
 | **IEEE 754** | Half/single/double: campi segno, esponente e mantissa colorati e modificabili bit a bit, casi speciali (zero, denormali, ±∞, NaN) ed errore di rappresentazione reale. |
 | **Testo e codifiche** | Tabella dei caratteri come **griglia 16×16** (riga = 4 bit alti, colonna = 4 bit bassi) su quattro code page — ASCII a 7 bit, CP437, ISO 8859-1, Windows-1252 — con il confronto dello stesso byte tra le code page, **due righe di spiegazione per ogni carattere** e l'**export del poster A4 in PDF vettoriale e PNG**. Modali con i cenni storici su ASCII e su Unicode, linea del tempo inclusa. Poi esploratore Unicode per blocchi, codifica UTF-8/16/32 byte per byte, Base64 con la scomposizione 3 byte → 24 bit → 4 sestetti, URL-encoding. |
 | **Palestra** | Esercizi generati automaticamente su tutti i moduli, tre livelli, XP e livelli, serie (streak), statistiche per argomento, 16 traguardi da sbloccare e **modalità tutor** che corregge un passaggio alla volta. |
-| **Verifiche** | Prova ufficiale con timer, correzione automatica lato server, voto in decimi e revisione domanda per domanda. |
-| **Console docente** | Configurazione per classe (moduli, difficoltà, durata, numero domande, soglia di sufficienza), risultati con export CSV e vista «in diretta» delle prove in corso. |
+| **Verifiche** | Prova ufficiale a schermo intero con timer, correzione automatica lato server, voto in decimi e revisione domanda per domanda. Le risposte si salvano durante la prova: se il computer si spegne, la consegna la fa il server. Uscite dalla pagina e dallo schermo intero registrate una per una. |
+| **Console docente** | Barra laterale come VLSM e CCNA1 — vedi sotto. |
+
+### Console docente (`/admin`)
+
+| Scheda | Cosa fa |
+|:--|:--|
+| **Assegna** | Una verifica del catalogo a una **classe** o a un **singolo studente** (recuperi, assenze lunghe), con la durata e la **finestra** per iniziarla: passata, si chiude da sola e chi l'ha iniziata la porta a termine. In cima, le verifiche aperte adesso (+15 min, chiudi). |
+| **Sessioni live** | Le prove in corso ogni 5 s: avanzamento, tempo, ultimo segnale, distrazioni. **Avviso**, **ammonizione** e **interruzione** arrivano allo studente in pochi secondi. |
+| **Storico verifiche** | Ogni assegnazione è una sessione da riaprire in seguito: statistiche, istogramma dei voti, studenti ordinabili, *dove sbaglia la classe* per tipo di esercizio, assenti, prove da guardare, CSV. **Riapri per gli assenti**: la stessa sessione, ma la può iniziare solo chi non l'ha svolta. |
+| **Risultati** | Tutte le prove, filtrabili per classe, verifica, esito e studente; CSV. |
+| **Classifica** | La palestra per classe: podio, classifica per XP ordinabile per colonna, dove sbaglia la classe, dettaglio dello studente. |
+| **Studenti** | Il registro dell'IdP per classe; la cartella di ogni studente (verifiche, palestra) e l'assegnazione personale. |
+| **Catalogo** | Sette argomenti × tre livelli, con anteprima e soluzioni. |
+
+Da ogni elenco si apre la **revisione della prova**: risposta data e attesa, uscite dalla pagina con ora e durata, interventi del docente, ed **elimina prova** per lasciarla rifare. Studenti come «Cognome Nome» e ordinati per cognome, come in VLSM. La scheda aperta sta nell'indirizzo (`/admin?tab=history&session=…`).
 
 ## Accesso
 
@@ -64,8 +78,8 @@ src/
   hooks/           useAuth, useFocusMonitor, useCopy
   lib/             auth SSO, progressi e badge, sync, formattazioni, poster/pdf/download
   i18n/            dizionari IT/EN, note sui caratteri e cenni teorici (bilingui, appaiati)
-functions/         Pages Functions: /api/profile, /api/exam/*, /api/teacher/*
-migrations/        0001_bc_init.sql (tabelle bc_* nel D1 condiviso `ccna1`)
+functions/         Pages Functions: /api/profile, /api/exam/*, /api/teacher/*  (+ test su SQLite)
+migrations/        0001–0004 (tabelle bc_* nel D1 condiviso `piattaforma`), SCHEMA.sql
 ```
 
 Il codice in `shared/` è il **cuore didattico**: la stessa identica logica che
@@ -95,18 +109,26 @@ npm run build && npm test && npm run typecheck:functions
 
 `npm test` copre il motore di conversione, l'aritmetica, le rappresentazioni con
 segno, IEEE 754, le codifiche di testo, il generatore di esercizi, la correzione
-delle verifiche e il rendering di tutte le schermate pubbliche.
+delle verifiche e il rendering di tutte le schermate pubbliche. Le regole della
+console (finestre, recupero per gli assenti, assegnazione personale, consegna
+del server, interventi) girano sulle Functions vere contro un SQLite con lo
+schema di produzione (`functions/_lib/testing/database.ts`, richiede Node ≥ 22.13);
+la console stessa si prova scheda per scheda in `src/tests/console.test.tsx`.
 
 ## Deploy
 
 Il push su `main` avvia la build su Cloudflare Pages (`dist/`). I binding sono
 dichiarati in `wrangler.toml` (D1 `ccna1`, tabelle prefissate `bc_`).
 
-Alla **prima messa in produzione** va applicata una volta la migrazione:
+**Prima del deploy della console nuova** va applicata la migrazione 0004
+(sole aggiunte di colonne, compatibile col codice in produzione):
 
 ```bash
-npx wrangler d1 execute ccna1 --remote --file=migrations/0001_bc_init.sql
+npx wrangler d1 execute piattaforma --remote --file=migrations/0004_bc_console.sql
 ```
+
+Interventi del docente e prove usano anche le tabelle condivise `verifiche` e
+`attempt_events` (app = 'bc'), già presenti nel database della piattaforma.
 
 ## Licenza
 

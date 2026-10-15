@@ -1,44 +1,26 @@
 /**
- * GET /api/teacher/live — verifiche attualmente in corso (heartbeat recenti).
+ * GET /api/teacher/live — le prove in corso, per «Sessioni live».
+ *
+ * Prima consegna le prove abbandonate oltre la scadenza (lo farebbe comunque
+ * la prossima lettura dello studente): così l'elenco non tiene per sempre
+ * una prova di un computer spento. Per ogni prova: avanzamento, tempo
+ * residuo, ultimo segnale, distrazioni, uscite dallo schermo intero,
+ * ammonizioni.
  */
 import { jsonOk, jsonError, requireTeacher, type Env } from '../../_lib/shared';
-import { listLiveAttempts } from '../../_lib/examdb';
-import { parseConfig } from '../../../shared/exam/config';
-import { findExam } from '../../../shared/exam/catalog';
+import { finalizeAbandoned, listInProgress } from '../../_lib/examdb';
+import { answeredCount, attemptView } from '../../_lib/views';
 
 export const onRequestGet: PagesFunction<Env> = async ({ request, env }) => {
   const access = await requireTeacher(request);
   if (access instanceof Response) return access;
 
   try {
-    const rows = await listLiveAttempts(env);
-    const now = Date.now();
+    await finalizeAbandoned(env);
+    const rows = await listInProgress(env);
     return jsonOk({
-      live: rows.map((r) => {
-        // La durata effettiva è quella salvata nel tentativo (con l'eventuale
-        // override della durata già applicato all'avvio).
-        let durationMin = 30;
-        try {
-          durationMin = parseConfig(JSON.parse(r.config)).durationMin;
-        } catch {
-          /* default */
-        }
-        const spec = r.exam_id ? findExam(r.exam_id) : null;
-        const deadline = new Date(r.started_at).getTime() + durationMin * 60_000;
-        return {
-          id: r.id,
-          name: r.full_name,
-          email: r.email,
-          class: r.class,
-          examId: r.exam_id,
-          examTopic: spec?.topic ?? null,
-          examLevel: spec?.level ?? null,
-          started_at: r.started_at,
-          last_seen_at: r.last_seen_at,
-          away_events: r.away_events,
-          remainingMs: Math.max(0, deadline - now),
-        };
-      }),
+      live: rows.map((r) => ({ ...attemptView(r), ...answeredCount(r) })),
+      now: new Date().toISOString(),
     });
   } catch (e) {
     return jsonError(500, `Errore DB: ${e instanceof Error ? e.message : String(e)}`);

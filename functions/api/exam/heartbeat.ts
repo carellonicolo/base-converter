@@ -1,20 +1,30 @@
 /**
  * POST /api/exam/heartbeat — segnale periodico durante la verifica.
  *
- * Alimenta la vista "in diretta" della console docente e registra il conteggio
- * delle uscite dalla pagina (focus monitor) anche se lo studente non consegna.
+ * Salva le risposte date finora (se il computer si spegne, la consegna la fa
+ * il server con queste: vedi finalizeAbandoned), le uscite dalla pagina una
+ * per una e le uscite dallo schermo intero. Alimenta la vista «Sessioni
+ * live» della console.
+ *
+ * Solo la firma del cookie: il gate completo l'ha superato l'avvio.
  */
-import { jsonOk, jsonError, requireExamAccess, type Env } from '../../_lib/shared';
-import { findOpenAttempt, touchAttempt } from '../../_lib/examdb';
+import { jsonOk, jsonError, requireSession, type Env } from '../../_lib/shared';
+import { findOpenAttempt, saveAttemptProgress, savedAnswers } from '../../_lib/examdb';
+import { parseConfig } from '../../../shared/exam/config';
+import { parseFocusEvents } from '../../../shared/exam/assignments';
 
 interface Body {
+  id?: string;
+  answers?: unknown;
+  focusEvents?: unknown;
   awayEvents?: number;
   awayMs?: number;
+  fullscreenExits?: number;
 }
 
 export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
-  const access = await requireExamAccess(request);
-  if (access instanceof Response) return access;
+  const identity = await requireSession(request);
+  if (identity instanceof Response) return identity;
 
   let body: Body = {};
   try {
@@ -24,10 +34,19 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
   }
 
   try {
-    const open = await findOpenAttempt(env, access.identity.userId);
-    if (!open) return jsonOk({ open: false });
-    await touchAttempt(env, open.id, clampInt(body.awayEvents, 0, 100000, open.away_events), clampInt(body.awayMs, 0, 24 * 3600 * 1000, open.away_ms));
-    return jsonOk({ open: true });
+    const open = await findOpenAttempt(env, identity.userId);
+    if (!open || (body.id && body.id !== open.id)) return jsonOk({ open: false });
+    const count = parseConfig(JSON.parse(open.config)).questionCount;
+    const saved = await saveAttemptProgress(env, open.id, {
+      answers: Array.isArray(body.answers) ? savedAnswers(JSON.stringify(body.answers), count) : undefined,
+      focusEvents: body.focusEvents === undefined ? undefined : parseFocusEvents(body.focusEvents),
+      // I contatori non scendono: un client che riparte da zero non cancella
+      // le distrazioni già registrate.
+      awayEvents: Math.max(open.away_events, clampInt(body.awayEvents, 0, 100000, 0)),
+      awayMs: Math.max(open.away_ms, clampInt(body.awayMs, 0, 24 * 3600 * 1000, 0)),
+      fullscreenExits: Math.max(open.fullscreen_exits ?? 0, clampInt(body.fullscreenExits, 0, 100000, 0)),
+    });
+    return jsonOk({ open: saved, savedAt: new Date().toISOString() });
   } catch (e) {
     return jsonError(500, `Errore DB: ${e instanceof Error ? e.message : String(e)}`);
   }

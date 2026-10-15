@@ -1,15 +1,17 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { ClipboardCheck, LogIn, Timer, Eye, TriangleAlert } from 'lucide-react';
+import { ClipboardCheck, LogIn, Timer, Eye, TriangleAlert, Maximize, OctagonX, MessageSquare, Hand } from 'lucide-react';
 import { AppShell } from '../ui/AppShell';
 import { useI18n } from '../../i18n';
 import { useAuth } from '../../hooks/useAuth';
 import { useConfirm } from '../ui/Confirm';
 import { useToast } from '../ui/Toast';
 import { useFocusMonitor } from '../../hooks/useFocusMonitor';
+import { useFullscreen } from '../../hooks/useFullscreen';
+import { useTeacherEvents } from '../../hooks/useTeacherEvents';
 import { authFetch } from '../../lib/auth';
-import { fmtClock, fmtGrade } from '../../lib/format';
-import { exercisePrompt, expectedHint, moduleLabel, examTitle } from '../../lib/exerciseText';
-import type { Exercise } from '../../../shared/exercises/generator';
+import { fmtClock, fmtGrade, fmtTime, fmtTimeSec } from '../../lib/format';
+import { asExercise, exercisePrompt, expectedHint, moduleLabel, examTitle } from '../../lib/exerciseText';
+import { MAX_FOCUS_EVENTS, type FocusEvent } from '../../../shared/exam/assignments';
 
 /** Domanda inviata dal server: SENZA la risposta attesa. */
 interface Question {
@@ -35,15 +37,27 @@ interface ExamState {
   staleExam?: boolean;
   exam?: ExamMeta;
   config?: { durationMin: number; questionCount: number; modules: string[]; difficulty: string; passGrade: number };
+  /** Fino a quando la si può iniziare (null = finché il docente non la chiude). */
+  openUntil?: string | null;
   current: null | {
     id: string;
     startedAt: string;
     deadline: string;
     questions: Question[];
     answers: string[];
+    focusEvents?: FocusEvent[];
+    awayEvents?: number;
+    awayMs?: number;
+    fullscreenExits?: number;
   };
-  /** Verifica già consegnata: si mostra l'esito, non si ripete. */
-  submitted: null | { grade: number | null; correctCount: number; totalCount: number };
+  /** Verifica già svolta (consegnata o interrotta): si mostra l'esito, non si ripete. */
+  submitted: null | {
+    state?: 'consegnata' | 'annullata' | 'in_corso';
+    grade: number | null;
+    correctCount: number;
+    totalCount: number;
+    annulledReason?: string | null;
+  };
 }
 
 interface Outcome {
@@ -63,18 +77,10 @@ interface Outcome {
   }[];
 }
 
-/** Adatta una Question del server al tipo Exercise per riusare il renderer. */
-function asExercise(q: Question): Exercise {
-  return {
-    id: `q${q.index}`,
-    module: q.module as Exercise['module'],
-    kind: q.kind as Exercise['kind'],
-    difficulty: 'medium',
-    params: q.params,
-    answer: '',
-    points: q.points,
-  };
-}
+/** Ogni quanto si salva comunque, anche senza risposte nuove. */
+const HEARTBEAT_MS = 20_000;
+/** Dopo una risposta, il salvataggio parte appena lo studente si ferma. */
+const SAVE_DEBOUNCE_MS = 2500;
 
 export function ExamPage() {
   const { t } = useI18n();
@@ -91,16 +97,29 @@ export function ExamPage() {
   const [now, setNow] = useState(Date.now());
   const [submitting, setSubmitting] = useState(false);
   const [outcome, setOutcome] = useState<Outcome | null>(null);
+  const [savedAt, setSavedAt] = useState<string | null>(null);
+  const [saveFailed, setSaveFailed] = useState(false);
+  const [reload, setReload] = useState(0);
 
-  // Focus monitor: conteggio uscite dalla pagina durante la prova.
+  // Controllo delle distrazioni: le uscite dalla pagina una per una (quando,
+  // per quanto) e le uscite dallo schermo intero. Il docente le vede in
+  // diretta e sulla prova.
+  const [focusEvents, setFocusEvents] = useState<FocusEvent[]>([]);
   const [awayEvents, setAwayEvents] = useState(0);
   const awayMsRef = useRef(0);
+  const [fullscreenExits, setFullscreenExits] = useState(0);
   const running = !!attemptId && !outcome;
 
-  useFocusMonitor(running, (e) => {
+  const teacher = useTeacherEvents(running ? attemptId : null);
+  const annulled = teacher.annulled;
+  const active = running && !annulled;
+
+  useFocusMonitor(active, (e) => {
     awayMsRef.current += e.durataMs;
     setAwayEvents((n) => n + 1);
+    setFocusEvents((list) => (list.length >= MAX_FOCUS_EVENTS ? list : [...list, { at: e.startedAt, ms: e.durataMs }]));
   });
+  const fullscreen = useFullscreen(active, () => setFullscreenExits((n) => n + 1));
 
   /* ---- caricamento stato ---- */
   useEffect(() => {
@@ -112,11 +131,17 @@ export function ExamPage() {
       if (res.ok && res.data) {
         setState(res.data);
         setError(null);
-        if (res.data.current) {
-          setAttemptId(res.data.current.id);
-          setQuestions(res.data.current.questions);
-          setDeadline(new Date(res.data.current.deadline).getTime());
-          setAnswers(padAnswers(res.data.current.answers, res.data.current.questions.length));
+        const cur = res.data.current;
+        if (cur) {
+          setAttemptId(cur.id);
+          setQuestions(cur.questions);
+          setDeadline(new Date(cur.deadline).getTime());
+          setAnswers(padAnswers(cur.answers, cur.questions.length));
+          // Dopo un ricaricamento il conteggio riparte da quello registrato.
+          setFocusEvents(cur.focusEvents ?? []);
+          setAwayEvents(cur.awayEvents ?? 0);
+          awayMsRef.current = cur.awayMs ?? 0;
+          setFullscreenExits(cur.fullscreenExits ?? 0);
         }
       } else {
         setError({ message: res.error ?? 'Errore', code: res.code });
@@ -125,34 +150,53 @@ export function ExamPage() {
     return () => {
       alive = false;
     };
-  }, [user]);
+  }, [user, reload]);
 
   /* ---- timer ---- */
   useEffect(() => {
-    if (!running) return;
+    if (!active) return;
     const id = setInterval(() => setNow(Date.now()), 1000);
     return () => clearInterval(id);
-  }, [running]);
+  }, [active]);
 
-  /* ---- heartbeat per la vista "in diretta" del docente ---- */
+  /* ---- salvataggio: risposte e distrazioni, per la vista live e per un computer che si spegne ---- */
+  const payloadRef = useRef({ answers, focusEvents, awayEvents, fullscreenExits });
+  payloadRef.current = { answers, focusEvents, awayEvents, fullscreenExits };
+
+  const save = useCallback(async () => {
+    if (!attemptId) return;
+    const p = payloadRef.current;
+    const res = await authFetch<{ open: boolean; savedAt?: string }>('/api/exam/heartbeat', {
+      method: 'POST',
+      body: JSON.stringify({ id: attemptId, ...p, awayMs: Math.round(awayMsRef.current) }),
+    });
+    if (res.ok && res.data?.open) {
+      setSavedAt(res.data.savedAt ?? new Date().toISOString());
+      setSaveFailed(false);
+    } else if (!res.ok) {
+      setSaveFailed(true);
+    }
+  }, [attemptId]);
+
   useEffect(() => {
-    if (!running) return;
-    const send = () => {
-      void authFetch('/api/exam/heartbeat', {
-        method: 'POST',
-        body: JSON.stringify({ awayEvents, awayMs: Math.round(awayMsRef.current) }),
-      });
-    };
-    send();
-    const id = setInterval(send, 30_000);
+    if (!active) return;
+    void save();
+    const id = setInterval(() => void save(), HEARTBEAT_MS);
     return () => clearInterval(id);
-  }, [running, awayEvents]);
+  }, [active, save]);
+
+  // Una risposta nuova, un'uscita nuova: si salva appena lo studente si ferma.
+  useEffect(() => {
+    if (!active) return;
+    const id = setTimeout(() => void save(), SAVE_DEBOUNCE_MS);
+    return () => clearTimeout(id);
+  }, [active, save, answers, awayEvents, fullscreenExits]);
 
   const remaining = deadline ? deadline - now : 0;
 
   const doSubmit = useCallback(
     async (auto = false) => {
-      if (!attemptId || submitting) return;
+      if (!attemptId || submitting || annulled) return;
       setSubmitting(true);
       const res = await authFetch<Outcome>('/api/exam/submit', {
         method: 'POST',
@@ -161,53 +205,59 @@ export function ExamPage() {
           answers,
           awayEvents,
           awayMs: Math.round(awayMsRef.current),
+          focusEvents,
+          fullscreenExits,
+          auto,
         }),
       });
       setSubmitting(false);
       if (res.ok && res.data) {
         setOutcome(res.data);
         setAttemptId(null);
-        if (auto) toast(t('exam.timeLeft') + ' 00:00', 'info');
+        if (auto) toast(t('exam.timeUp'), 'info');
+      } else if (res.code === 'annulled' || res.code === 'already_submitted' || res.code === 'not_open' || res.code === 'no_attempt') {
+        // La prova non è più in corso (interrotta, o consegnata dal server):
+        // si ricarica lo stato, che dice com'è finita.
+        setAttemptId(null);
+        setQuestions(null);
+        setReload((n) => n + 1);
       } else {
         toast(res.error ?? t('errors.network'), 'error');
       }
     },
-    [attemptId, answers, awayEvents, submitting, t, toast]
+    [attemptId, answers, awayEvents, focusEvents, fullscreenExits, submitting, annulled, t, toast]
   );
 
   /* ---- consegna automatica allo scadere ---- */
   useEffect(() => {
-    if (running && deadline && now >= deadline) void doSubmit(true);
-  }, [running, deadline, now, doSubmit]);
+    if (active && deadline && now >= deadline) void doSubmit(true);
+  }, [active, deadline, now, doSubmit]);
 
   const start = async () => {
-    const res = await authFetch<{ id: string; questions: Question[]; config: { durationMin: number } }>('/api/exam/start', {
+    const res = await authFetch<{ id: string; questions?: Question[]; deadline?: string; config?: { durationMin: number } }>('/api/exam/start', {
       method: 'POST',
     });
     if (res.ok && res.data) {
-      setAttemptId(res.data.id);
       if (res.data.questions) {
+        setAttemptId(res.data.id);
         setQuestions(res.data.questions);
         setAnswers(new Array(res.data.questions.length).fill(''));
-        setDeadline(Date.now() + (res.data.config?.durationMin ?? 30) * 60_000);
+        setDeadline(res.data.deadline ? Date.parse(res.data.deadline) : Date.now() + (res.data.config?.durationMin ?? 30) * 60_000);
+        setFocusEvents([]);
+        setAwayEvents(0);
+        awayMsRef.current = 0;
+        setFullscreenExits(0);
       } else {
         // Tentativo ripreso: ricarica lo stato completo.
-        const st = await authFetch<ExamState>('/api/exam/state');
-        if (st.ok && st.data?.current) {
-          setQuestions(st.data.current.questions);
-          setDeadline(new Date(st.data.current.deadline).getTime());
-          setAnswers(padAnswers(st.data.current.answers, st.data.current.questions.length));
-        }
+        setReload((n) => n + 1);
       }
-      setAwayEvents(0);
-      awayMsRef.current = 0;
     } else {
       toast(res.error ?? t('errors.network'), 'error');
     }
   };
 
   const askSubmit = async () => {
-    const ok = await confirm({ title: t('exam.submit'), message: t('exam.submitConfirm'), confirmLabel: t('exam.submit') });
+    const ok = await confirm({ title: t('exam.submit'), message: t('exam.submitConfirm'), confirmLabel: t('exam.submit'), cancelLabel: t('common.cancel') });
     if (ok) void doSubmit(false);
   };
 
@@ -281,12 +331,60 @@ export function ExamPage() {
     );
   }
 
+  /* ---------- prova interrotta dal docente ---------- */
+  if (annulled && attemptId) {
+    return (
+      <AppShell nav={false}>
+        <div className="exam-overlay" role="alertdialog" aria-modal="true" aria-labelledby="annulled-title">
+          <div className="exam-overlay-card">
+            <OctagonX size={44} color="var(--error)" aria-hidden />
+            <h2 id="annulled-title" style={{ margin: '0.5rem 0' }}>{t('exam.annulledTitle')}</h2>
+            <p style={{ margin: '0 0 0.5rem' }}>{t('exam.annulledBody')}</p>
+            {annulled.reason && (
+              <div className="exam-overlay-reason">
+                <strong>{t('exam.reason')}:</strong> {annulled.reason}
+              </div>
+            )}
+            <button
+              className="btn"
+              type="button"
+              onClick={() => {
+                setAttemptId(null);
+                setQuestions(null);
+                setReload((n) => n + 1);
+              }}
+              style={{ marginTop: '0.75rem' }}
+            >
+              {t('common.close')}
+            </button>
+          </div>
+        </div>
+      </AppShell>
+    );
+  }
+
   /* ---------- prova in corso ---------- */
   if (attemptId && questions) {
     const danger = remaining < 60_000;
     const warning = remaining < 5 * 60_000;
+    const msg = teacher.current;
     return (
       <AppShell nav={false}>
+        {msg && (
+          <div className="exam-overlay" role="alertdialog" aria-modal="true" aria-labelledby="teacher-msg-title">
+            <div className={`exam-msg-card ${msg.type === 'ammonizione' ? 'exam-msg-warning' : 'exam-msg-alert'}`}>
+              {msg.type === 'ammonizione' ? <Hand size={38} color="var(--error)" aria-hidden /> : <MessageSquare size={38} color="var(--warn-text)" aria-hidden />}
+              <h2 id="teacher-msg-title" style={{ margin: '0.4rem 0' }}>
+                {msg.type === 'ammonizione' ? t('exam.warningTitle') : t('exam.alertTitle')}
+              </h2>
+              {msg.message && <p style={{ fontSize: '1.05rem', margin: '0 0 0.4rem' }}>{msg.message}</p>}
+              {msg.type === 'ammonizione' && <p className="hint">{t('exam.warningNote')}</p>}
+              <button className="btn" type="button" onClick={teacher.dismiss} autoFocus style={{ marginTop: '0.6rem' }}>
+                {msg.type === 'ammonizione' ? t('exam.understood') : t('common.close')}
+              </button>
+            </div>
+          </div>
+        )}
         <div className="module">
           <div className="test-header-bar">
             <span className={`timer-badge${danger ? ' danger' : warning ? ' warning' : ''}`}>
@@ -300,13 +398,34 @@ export function ExamPage() {
                 {answeredCount}/{questions.length}
               </span>
             </div>
-            <span className={`monitor-chip ${awayEvents === 0 ? 'zero' : 'warn'}`}>
-              <Eye size={14} /> {awayEvents === 0 ? t('exam.monitorOk') : t('exam.monitorAway', { n: awayEvents })}
+            <span className={`monitor-chip ${awayEvents + fullscreenExits === 0 ? 'zero' : 'warn'}`}>
+              <Eye size={14} />{' '}
+              {awayEvents + fullscreenExits === 0
+                ? t('exam.monitorOk')
+                : t('exam.monitorAway', { n: awayEvents }) + (fullscreenExits ? ` · ${t('exam.monitorFullscreen', { n: fullscreenExits })}` : '')}
+            </span>
+            {teacher.warnings > 0 && (
+              <span className="monitor-chip warn">
+                <Hand size={14} /> {t('exam.warningsCount', { n: teacher.warnings })}
+              </span>
+            )}
+            <span className="save-state" aria-live="polite">
+              {saveFailed ? t('exam.saveFailed') : savedAt ? t('exam.savedAt', { time: fmtTimeSec(savedAt) }) : ''}
             </span>
             <button className="btn btn-sm" type="button" onClick={askSubmit} disabled={submitting}>
               {submitting ? t('exam.submitting') : t('exam.submit')}
             </button>
           </div>
+
+          {fullscreen.supported && !fullscreen.isFullscreen && (
+            <div className="fullscreen-banner">
+              <Maximize size={18} aria-hidden />
+              <span>{fullscreenExits > 0 ? t('exam.fullscreenLeft') : t('exam.fullscreenAsk')}</span>
+              <button className="btn btn-sm" type="button" onClick={fullscreen.enter}>
+                {t('exam.fullscreenBack')}
+              </button>
+            </div>
+          )}
 
           {awayEvents > 0 && (
             <div className="feedback ko" style={{ marginBottom: '1rem' }}>
@@ -321,7 +440,7 @@ export function ExamPage() {
                   {i + 1}. {moduleLabel(q.module, t)}
                 </span>
                 <span className="chip">
-                  {q.points} {q.points === 1 ? 'punto' : 'punti'}
+                  {t(q.points === 1 ? 'exam.point' : 'exam.points', { n: q.points })}
                 </span>
               </div>
               <p className="exercise-prompt">{exercisePrompt(asExercise(q), t)}</p>
@@ -377,6 +496,17 @@ export function ExamPage() {
           </div>
         ) : !state ? (
           <div className="card">{t('common.loading')}</div>
+        ) : state.submitted?.state === 'annullata' ? (
+          <div className="card">
+            <h2 style={{ marginTop: 0, fontSize: '1.05rem' }}>{t('exam.annulledTitle')}</h2>
+            {examName && <span className="chip primary" style={{ marginBottom: '0.75rem' }}>{examName}</span>}
+            <p className="hint">{t('exam.annulledDone')}</p>
+            {state.submitted.annulledReason && (
+              <p className="hint">
+                <strong>{t('exam.reason')}:</strong> {state.submitted.annulledReason}
+              </p>
+            )}
+          </div>
         ) : state.submitted ? (
           <div className="card">
             <h2 style={{ marginTop: 0, fontSize: '1.05rem' }}>{t('exam.alreadyDoneTitle')}</h2>
@@ -420,15 +550,13 @@ export function ExamPage() {
                 <div className="stat-label">{t('admin.passThreshold')}</div>
               </div>
             </div>
+            {state.openUntil && <p className="hint" style={{ marginTop: 0 }}>{t('exam.openUntil', { time: fmtTime(state.openUntil) })}</p>}
             <div className="infobox warn">
               <div className="infobox-head" style={{ cursor: 'default' }}>
                 <TriangleAlert size={18} aria-hidden />
-                <span>{t('exam.away')}</span>
+                <span>{t('exam.rulesTitle')}</span>
               </div>
-              <p style={{ margin: 0 }}>
-                Durante la prova le uscite dalla pagina vengono registrate e mostrate al docente. Il tempo scorre anche se chiudi la
-                pagina: alla scadenza la verifica viene consegnata automaticamente.
-              </p>
+              <p style={{ margin: 0 }}>{t('exam.rulesBody')}</p>
             </div>
             <button className="btn" type="button" onClick={start}>
               {t('exam.start')}

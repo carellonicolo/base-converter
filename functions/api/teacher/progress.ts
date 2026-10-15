@@ -14,12 +14,7 @@
  */
 import { jsonOk, jsonError, requireTeacher, type Env } from '../../_lib/shared';
 import { listAllProgress } from '../../_lib/examdb';
-
-const AUTH_ORIGIN = 'https://auth.nicolocarello.it';
-
-interface AuthUsers {
-  users?: { id?: string; enrollments?: { classe?: string; approved?: boolean }[] }[];
-}
+import { fetchRoster, knownNames, rosterStudents, sortClasses } from '../../_lib/roster';
 
 export const onRequestGet: PagesFunction<Env> = async ({ request, env }) => {
   const access = await requireTeacher(request);
@@ -28,21 +23,11 @@ export const onRequestGet: PagesFunction<Env> = async ({ request, env }) => {
   try {
     const rows = await listAllProgress(env);
 
-    // Mappa userId → classi approvate, da AUTH. Degrada a vuoto se muto.
-    const classesByUser = new Map<string, string[]>();
-    try {
-      const res = await fetch(`${AUTH_ORIGIN}/api/admin/users`, { headers: { cookie: request.headers.get('cookie') ?? '' } });
-      if (res.ok) {
-        const data = (await res.json()) as AuthUsers;
-        for (const u of data.users ?? []) {
-          if (!u.id) continue;
-          const cls = (u.enrollments ?? []).filter((e) => e.approved && e.classe).map((e) => e.classe as string);
-          if (cls.length) classesByUser.set(u.id, cls);
-        }
-      }
-    } catch {
-      /* AUTH non raggiungibile: nessuna classe, ma i progressi si vedono lo stesso. */
-    }
+    // Mappa userId → classi approvate, da AUTH. Degrada a vuoto se muto:
+    // nessuna classe, ma i progressi si vedono lo stesso.
+    const roster = await fetchRoster(request);
+    const registry = roster ? rosterStudents(roster) : [];
+    const classesByUser = new Map(registry.filter((u) => u.classes.length).map((u) => [u.id, u.classes]));
 
     const students = rows.map((r) => {
       let progress: unknown = null;
@@ -57,15 +42,23 @@ export const onRequestGet: PagesFunction<Env> = async ({ request, env }) => {
         email: r.email,
         classes: classesByUser.get(r.user_id) ?? [],
         progress,
-        updatedAt: r.updated_at,
+        updatedAt: r.updated_at as string | null,
       };
     });
+
+    // Anche chi non si è mai allenato: in classifica c'è, a zero XP, così
+    // il docente vede chi manca all'appello invece di una classe più corta.
+    const withProgress = new Set(rows.map((r) => r.user_id));
+    for (const u of registry) {
+      if (withProgress.has(u.id) || u.classes.length === 0) continue;
+      students.push({ userId: u.id, name: u.name, email: u.email, classes: u.classes, progress: null, updatedAt: null });
+    }
 
     // Elenco classi presenti, per popolare il selettore senza una seconda chiamata.
     const classSet = new Set<string>();
     for (const s of students) for (const c of s.classes) classSet.add(c);
 
-    return jsonOk({ students, classes: [...classSet].sort() });
+    return jsonOk({ students, classes: sortClasses(classSet), nomi: knownNames(registry) });
   } catch (e) {
     return jsonError(500, `Errore DB: ${e instanceof Error ? e.message : String(e)}`);
   }
