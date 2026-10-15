@@ -119,8 +119,18 @@ export function clientIp(request: Request): string {
   return request.headers.get('cf-connecting-ip') ?? '';
 }
 
+/**
+ * Il docente, con ciò che serve a tracciarne il perimetro (vedi
+ * _lib/perimeter.ts): se è super-admin, e le classi che l'IdP gli assegna
+ * per l'anno in corso.
+ */
+export interface TeacherAccess extends Access {
+  superAdmin: boolean;
+  teacherClasses: string[];
+}
+
 /** Solo docente (console e API di configurazione). */
-export async function requireTeacher(request: Request): Promise<Access | Response> {
+export async function requireTeacher(request: Request): Promise<TeacherAccess | Response> {
   const identity = await verifySession(request);
   if (!identity) return jsonError(401, 'Accesso docente richiesto.', 'unauthenticated');
   const info = await fetchUserInfo(request);
@@ -131,5 +141,12 @@ export async function requireTeacher(request: Request): Promise<Access | Respons
   if (!(info.user.isTeacher || info.user.isSuperAdmin)) {
     return jsonError(403, 'Sezione riservata al docente.', 'forbidden');
   }
-  return { identity, isTeacher: true, classes: [], status: info.user.status };
+  return {
+    identity,
+    isTeacher: true,
+    classes: [],
+    status: info.user.status,
+    superAdmin: !!info.user.isSuperAdmin,
+    teacherClasses: info.teacherClasses ?? [],
+  };
 }

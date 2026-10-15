@@ -3,30 +3,37 @@
  *
  * Il dato grezzo è già in bc_progress (una riga per studente che ha salvato).
  * Qui si incrocia con le classi da AUTH — bc_progress non le memorizza — così
- * il docente può filtrare per classe. Se AUTH non risponde gli studenti
- * restano senza classe (finiscono nella vista "Tutte").
+ * il docente può filtrare per classe. Se AUTH non risponde, il super-admin
+ * vede gli studenti senza classe; un docente riceve 502, perché senza
+ * registro non si sa quali studenti siano suoi.
  *
  * La MATEMATICA (livello, precisione, badge) NON viene fatta qui: si mandano i
  * progressi grezzi e li elabora il client, che possiede già quelle funzioni
  * (src/lib/progress.ts) usate anche dallo studente. Un'unica fonte di verità.
  *
- * Solo docente.
+ * Solo docente, nel suo perimetro (_lib/perimeter.ts).
  */
 import { jsonOk, jsonError, requireTeacher, type Env } from '../../_lib/shared';
 import { listAllProgress } from '../../_lib/examdb';
-import { fetchRoster, knownNames, rosterStudents, sortClasses } from '../../_lib/roster';
+import { knownNames, rosterStudents, sortClasses } from '../../_lib/roster';
+import { classesInView, loadPerimeter, seesStudent } from '../../_lib/perimeter';
 
 export const onRequestGet: PagesFunction<Env> = async ({ request, env }) => {
   const access = await requireTeacher(request);
   if (access instanceof Response) return access;
 
-  try {
-    const rows = await listAllProgress(env);
+  // Il perimetro (_lib/perimeter.ts): un docente vede la palestra dei suoi
+  // studenti, il super-admin di tutti.
+  const p = await loadPerimeter(request, access);
+  if (p instanceof Response) return p;
 
-    // Mappa userId → classi approvate, da AUTH. Degrada a vuoto se muto:
-    // nessuna classe, ma i progressi si vedono lo stesso.
-    const roster = await fetchRoster(request);
-    const registry = roster ? rosterStudents(roster) : [];
+  try {
+    const rows = (await listAllProgress(env)).filter((r) => seesStudent(p, r.user_id));
+
+    // Mappa userId → classi approvate, da AUTH. Per il super-admin degrada a
+    // vuoto se muto: nessuna classe, ma i progressi si vedono lo stesso.
+    const roster = p.roster;
+    const registry = roster ? rosterStudents(roster).map((s) => ({ ...s, classes: classesInView(p, s.classes) })) : [];
     const classesByUser = new Map(registry.filter((u) => u.classes.length).map((u) => [u.id, u.classes]));
 
     const students = rows.map((r) => {

@@ -157,6 +157,14 @@ export async function setAssignmentWindow(env: Env, id: string, openUntil: strin
     .run();
 }
 
+/** I soli destinatari di tutte le assegnazioni: bastano a decidere quali sono di un docente. */
+export async function listAssignmentTargets(env: Env): Promise<Pick<AssignmentRow, 'id' | 'target_type' | 'class' | 'target_student'>[]> {
+  const { results } = await env.DB.prepare(`SELECT id, target_type, class, target_student FROM bc_assignments`).all<
+    Pick<AssignmentRow, 'id' | 'target_type' | 'class' | 'target_student'>
+  >();
+  return results ?? [];
+}
+
 export async function getAssignment(env: Env, id: string): Promise<AssignmentRow | null> {
   const row = await env.DB.prepare(`SELECT * FROM bc_assignments WHERE id = ?`).bind(id).first<AssignmentRow>();
   return row ?? null;
@@ -484,7 +492,21 @@ export interface AttemptFilter {
   assignmentId?: string | null;
   /** Stati da includere; di norma solo le consegnate. */
   states?: AttemptState[];
+  /**
+   * Il perimetro del docente (_lib/perimeter.ts): solo le prove di questi
+   * studenti o di queste assegnazioni. Assente = nessun limite.
+   */
+  scope?: { studentIds: string[]; assignmentIds: string[] } | null;
   limit?: number;
+}
+
+/** La condizione SQL del perimetro, con i suoi parametri. */
+function scopeSql(scope: AttemptFilter['scope']): { sql: string; bind: string[] } | null {
+  if (!scope) return null;
+  return {
+    sql: `(v.student_id IN (SELECT value FROM json_each(?)) OR v.assegnazione_id IN (SELECT value FROM json_each(?)))`,
+    bind: [JSON.stringify(scope.studentIds), JSON.stringify(scope.assignmentIds)],
+  };
 }
 
 export async function listAttempts(env: Env, f: AttemptFilter = {}): Promise<AttemptRow[]> {
@@ -505,6 +527,11 @@ export async function listAttempts(env: Env, f: AttemptFilter = {}): Promise<Att
     where.push('v.assegnazione_id = ?');
     bind.push(f.assignmentId);
   }
+  const scope = scopeSql(f.scope);
+  if (scope) {
+    where.push(scope.sql);
+    bind.push(...scope.bind);
+  }
   bind.push(f.limit ?? 500);
   const { results } = await env.DB.prepare(
     `${SELECT_TENTATIVO} WHERE ${where.join(' AND ')} ORDER BY COALESCE(v.consegnata_il, v.iniziata_il) DESC LIMIT ?`
@@ -519,11 +546,14 @@ export async function listAllAttempts(env: Env, cls: string | null, limit = 500)
   return listAttempts(env, { cls, limit });
 }
 
-/** Le prove in corso: la vista «Sessioni live». */
-export async function listInProgress(env: Env): Promise<AttemptRow[]> {
+/** Le prove in corso: la vista «Sessioni live». `scope` = il perimetro del docente. */
+export async function listInProgress(env: Env, scope?: AttemptFilter['scope']): Promise<AttemptRow[]> {
+  const sc = scopeSql(scope);
   const { results } = await env.DB.prepare(
-    `${SELECT_TENTATIVO} WHERE v.stato = 'in_corso' ORDER BY v.iniziata_il DESC LIMIT 300`
-  ).all<AttemptRow>();
+    `${SELECT_TENTATIVO} WHERE v.stato = 'in_corso'${sc ? ` AND ${sc.sql}` : ''} ORDER BY v.iniziata_il DESC LIMIT 300`
+  )
+    .bind(...(sc?.bind ?? []))
+    .all<AttemptRow>();
   return results ?? [];
 }
 
