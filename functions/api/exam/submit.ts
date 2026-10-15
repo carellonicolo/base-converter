@@ -7,14 +7,19 @@
  * rete) la prova viene comunque corretta ma marcata come fuori tempo.
  */
 import { jsonOk, jsonError, requireExamAccess, type Env } from '../../_lib/shared';
-import { findOpenAttempt, finalizeAttempt } from '../../_lib/examdb';
+import { deadlineOf, findLatestAttempt, findOpenAttempt, finalizeAttempt } from '../../_lib/examdb';
 import { gradeExam, parseConfig } from '../../../shared/exam/config';
+import { parseFocusEvents } from '../../../shared/exam/assignments';
 
 interface Body {
   id?: string;
   answers?: unknown;
   awayEvents?: number;
   awayMs?: number;
+  fullscreenExits?: number;
+  focusEvents?: unknown;
+  /** true se la consegna l'ha fatta il timer del browser. */
+  auto?: boolean;
 }
 
 /** Tolleranza sulla scadenza (latenza di rete / salvataggio). */
@@ -33,31 +38,36 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
 
   try {
     const open = await findOpenAttempt(env, access.identity.userId);
-    if (!open) return jsonError(404, 'Nessuna verifica in corso.', 'no_attempt');
+    if (!open) {
+      // Interrotta dal docente o già consegnata dal server: lo si dice, con
+      // un codice che il browser sa leggere.
+      const latest = await findLatestAttempt(env, access.identity.userId, new Date(Date.now() - 6 * 3600_000).toISOString());
+      if (latest && latest.id === body.id && latest.state === 'annullata') {
+        return jsonError(409, latest.annulled_reason || 'Prova interrotta dal docente.', 'annulled');
+      }
+      if (latest && latest.id === body.id && latest.state === 'consegnata') {
+        return jsonError(409, 'La verifica è già stata consegnata.', 'already_submitted');
+      }
+      return jsonError(404, 'Nessuna verifica in corso.', 'no_attempt');
+    }
     if (body.id && body.id !== open.id) return jsonError(409, 'Verifica non corrispondente.', 'mismatch');
 
     const config = parseConfig(JSON.parse(open.config));
     const answers = normalizeAnswers(body.answers, config.questionCount);
-
-    const deadline = new Date(open.started_at).getTime() + config.durationMin * 60_000;
-    const lateBy = Date.now() - (deadline + GRACE_MS);
-
+    const lateBy = Date.now() - (deadlineOf(open) + GRACE_MS);
     const outcome = gradeExam(config, open.seed, answers);
-    const awayEvents = clampInt(body.awayEvents, 0, 100000, 0);
-    const awayMs = clampInt(body.awayMs, 0, 24 * 3600 * 1000, 0);
 
-    await finalizeAttempt(
-      env,
-      open.id,
+    const focusEvents = parseFocusEvents(body.focusEvents);
+    const applied = await finalizeAttempt(env, open.id, {
       answers,
-      outcome.score,
-      outcome.maxScore,
-      outcome.grade,
-      outcome.correctCount,
-      outcome.totalCount,
-      awayEvents,
-      awayMs
-    );
+      outcome,
+      awayEvents: Math.max(open.away_events, clampInt(body.awayEvents, 0, 100000, 0)),
+      awayMs: Math.max(open.away_ms, clampInt(body.awayMs, 0, 24 * 3600 * 1000, 0)),
+      fullscreenExits: Math.max(open.fullscreen_exits ?? 0, clampInt(body.fullscreenExits, 0, 100000, 0)),
+      focusEvents: focusEvents.length ? focusEvents : parseFocusEvents(open.focus_events),
+      reason: body.auto ? 'tempo' : 'volontaria',
+    });
+    if (!applied) return jsonError(409, 'La prova non è più in corso.', 'not_open');
 
     return jsonOk({
       id: open.id,

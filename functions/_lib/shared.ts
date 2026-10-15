@@ -102,6 +102,23 @@ export async function requireExamAccess(request: Request): Promise<Access | Resp
   return { identity, isTeacher: false, classes, status: info.user.status };
 }
 
+/**
+ * Solo la firma del cookie, senza chiamare l'IdP. Per i segnali che la
+ * prova manda ogni pochi secondi (salvataggio, canale degli interventi):
+ * il gate pieno l'ha già superato all'avvio, e chiamare l'IdP a ogni
+ * battito, per trenta studenti, sarebbe solo traffico.
+ */
+export async function requireSession(request: Request): Promise<Identity | Response> {
+  const identity = await verifySession(request);
+  if (!identity) return jsonError(401, 'Accesso richiesto. Effettua il login.', 'unauthenticated');
+  return identity;
+}
+
+/** L'IP di chi chiama, per la traccia degli interventi. */
+export function clientIp(request: Request): string {
+  return request.headers.get('cf-connecting-ip') ?? '';
+}
+
 /** Solo docente (console e API di configurazione). */
 export async function requireTeacher(request: Request): Promise<Access | Response> {
   const identity = await verifySession(request);

@@ -12,6 +12,9 @@ interface Props {
   className?: string;
 }
 
+/** Le modali aperte, dalla più vecchia alla più recente: Esc chiude solo l'ultima. */
+const openStack: object[] = [];
+
 /**
  * Guscio delle finestre di dialogo con intestazione.
  *
@@ -32,13 +35,16 @@ export function Modal({ title, onClose, children, size = 'md', className }: Prop
 
   useEffect(() => {
     const previous = document.activeElement as HTMLElement | null;
+    const me = {};
+    openStack.push(me);
     panelRef.current?.focus();
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') closeRef.current();
+      if (e.key === 'Escape' && openStack[openStack.length - 1] === me) closeRef.current();
     };
     document.addEventListener('keydown', onKey);
     return () => {
       document.removeEventListener('keydown', onKey);
+      openStack.splice(openStack.indexOf(me), 1);
       previous?.focus?.();
     };
   }, []);
